@@ -1,0 +1,122 @@
+# Series registry: every data series the hub keeps.
+#
+# To add a series: add one entry under "series". If its source is already
+# listed under "sources", nothing else is needed. A new source needs one small
+# adapter file in hub/sources/ (see README, "How to add a dial").
+#
+# Fields
+#   id         name used everywhere in the hub (history folder, feed, signals)
+#   source     which adapter fetches it
+#   code       the id at the source
+#   units      what one unit of the value is
+#   freq       D daily, W weekly, M monthly, E on event days only
+#   lag_days   usual days between the date a value is for and its publication
+#              (used only to date back-filled history; see hub/store.py)
+#   start      first date to keep when back-filling
+#   meaning    one plain sentence
+
+sources:
+  # every: minimum minutes between fetches. credit: shown in the dashboard footer.
+  coinbase:    {every: 15,   credit: "Coinbase Exchange"}
+  bitview:     {every: 60,   credit: "Bitview (bitview.space), CC BY 4.0"}
+  coinmetrics: {every: 360,  credit: "Coin Metrics community data"}
+  defillama:   {every: 60,   credit: "DefiLlama"}
+  ecb:         {every: 30,   credit: "European Central Bank reference rates"}
+  fred:        {every: 60,   credit: "FRED, Federal Reserve Bank of St. Louis"}
+  finra:       {every: 720,  credit: "FINRA margin statistics"}
+  treasury:    {every: 180,  credit: "US Treasury Fiscal Data"}
+  nasdaq:      {every: 60,   credit: "Nasdaq quote service (unofficial)"}
+  coingecko:   {every: 60,   credit: "CoinGecko"}
+  coinalyze:   {every: 60,   credit: "Coinalyze"}
+  dxycheck:    {every: 180,  credit: "Published dollar index close (check only)", check_only: true}
+
+series:
+  # ---- Bitcoin and watchlist prices (Coinbase). Daily candle closing 24:00 UTC.
+  - {id: BTCUSD,  source: coinbase, code: BTC-USD,  units: USD, freq: D, lag_days: 1, start: "2015-07-20", meaning: "Bitcoin price, daily close"}
+  - {id: SOLUSD,  source: coinbase, code: SOL-USD,  units: USD, freq: D, lag_days: 1, start: "2021-06-01", meaning: "Solana price, daily close"}
+  - {id: SUIUSD,  source: coinbase, code: SUI-USD,  units: USD, freq: D, lag_days: 1, start: "2023-05-01", meaning: "Sui price, daily close"}
+  - {id: NEARUSD, source: coinbase, code: NEAR-USD, units: USD, freq: D, lag_days: 1, start: "2021-09-01", meaning: "NEAR price, daily close"}
+  - {id: LINKUSD, source: coinbase, code: LINK-USD, units: USD, freq: D, lag_days: 1, start: "2019-06-01", meaning: "Chainlink price, daily close"}
+  - {id: TAOUSD,  source: coinbase, code: TAO-USD,  units: USD, freq: D, lag_days: 1, start: "2024-01-01", meaning: "Bittensor price, daily close"}
+
+  # ---- On-chain (Bitview; long-term holder = coins unmoved 150 days or more)
+  - {id: BV_REALIZED_PRICE,     source: bitview, code: realized_price,          units: USD,   freq: D, lag_days: 1, start: "2011-01-01", meaning: "Average price at which every bitcoin last moved (realised price)"}
+  - {id: BV_LTH_REALIZED_PRICE, source: bitview, code: lth_realized_price,      units: USD,   freq: D, lag_days: 1, start: "2011-01-01", meaning: "Long-term holders' average cost"}
+  - {id: BV_STH_REALIZED_PRICE, source: bitview, code: sth_realized_price,      units: USD,   freq: D, lag_days: 1, start: "2011-01-01", meaning: "Short-term holders' average cost"}
+  - {id: BV_LTH_SOPR_1M,        source: bitview, code: lth_sopr_1m,             units: ratio, freq: D, lag_days: 1, start: "2011-01-01", meaning: "Long-term holders' selling price over cost, 30 days (below 1 = selling at a loss)"}
+  - {id: BV_LTH_SOPR_1W,        source: bitview, code: lth_sopr_1w,             units: ratio, freq: D, lag_days: 1, start: "2011-01-01", meaning: "Same, 7 days (early warning)"}
+  - {id: BV_NET_PNL_1M,         source: bitview, code: net_realized_pnl_sum_1m, units: USD,   freq: D, lag_days: 1, start: "2011-01-01", meaning: "Profits minus losses realised on-chain over 30 days (negative = net losses)"}
+  - {id: BV_REALIZED_CAP,       source: bitview, code: realized_cap,            units: USD,   freq: D, lag_days: 1, start: "2011-01-01", meaning: "Value of all bitcoin at the price each last moved (realised cap)"}
+  - {id: CM_REALIZED_PRICE,     source: coinmetrics, code: "PriceUSD/CapMVRVCur", units: USD, freq: D, lag_days: 1, start: "2011-01-01", meaning: "Realised price from Coin Metrics, used as a cross-check"}
+
+  # ---- Stablecoins (DefiLlama)
+  - {id: STABLE_USD, source: defillama, code: peggedUSD, units: USD, freq: D, lag_days: 1, start: "2018-01-01", meaning: "Total supply of dollar-pegged stablecoins"}
+  - {id: STABLE_ALL, source: defillama, code: all,       units: USD, freq: D, lag_days: 1, start: "2018-01-01", meaning: "Total supply of all stablecoins, in dollars"}
+
+  # ---- Whole-market snapshot (CoinGecko; no free history, so recorded once a day)
+  - {id: CG_TOTAL_MCAP, source: coingecko, code: total_market_cap.usd,      units: USD,     freq: D, lag_days: 0, start: "2026-11-25", meaning: "Value of all crypto"}
+  - {id: CG_BTC_DOM,    source: coingecko, code: market_cap_percentage.btc, units: percent, freq: D, lag_days: 0, start: "2026-11-25", meaning: "Bitcoin's share of all crypto value"}
+
+  # ---- Exchange rates per 1 euro (ECB daily fixing), for the dollar index
+  - {id: ECB_USD, source: ecb, code: USD, units: "USD per EUR", freq: D, lag_days: 0, start: "1999-01-04", meaning: "ECB reference rate"}
+  - {id: ECB_JPY, source: ecb, code: JPY, units: "JPY per EUR", freq: D, lag_days: 0, start: "1999-01-04", meaning: "ECB reference rate"}
+  - {id: ECB_GBP, source: ecb, code: GBP, units: "GBP per EUR", freq: D, lag_days: 0, start: "1999-01-04", meaning: "ECB reference rate"}
+  - {id: ECB_CAD, source: ecb, code: CAD, units: "CAD per EUR", freq: D, lag_days: 0, start: "1999-01-04", meaning: "ECB reference rate"}
+  - {id: ECB_SEK, source: ecb, code: SEK, units: "SEK per EUR", freq: D, lag_days: 0, start: "1999-01-04", meaning: "ECB reference rate"}
+  - {id: ECB_CHF, source: ecb, code: CHF, units: "CHF per EUR", freq: D, lag_days: 0, start: "1999-01-04", meaning: "ECB reference rate"}
+  - {id: DXY_PUB, source: dxycheck, code: DX-Y.NYB, units: index, freq: D, lag_days: 1, start: "2015-01-01", meaning: "Published dollar index close. A check only: never drives a dial"}
+
+  # ---- FRED
+  - {id: SP500,        source: fred, code: SP500,        units: index,       freq: D, lag_days: 1,  start: "2014-01-01", meaning: "S&P 500 close"}
+  - {id: NASDAQ100,    source: fred, code: NASDAQ100,    units: index,       freq: D, lag_days: 1,  start: "2014-01-01", meaning: "Nasdaq-100 close"}
+  - {id: SOFR,         source: fred, code: SOFR,         units: percent,     freq: D, lag_days: 1,  start: "2018-04-03", meaning: "Overnight secured funding rate"}
+  - {id: IORB,         source: fred, code: IORB,         units: percent,     freq: D, lag_days: 0,  start: "2021-07-29", meaning: "Rate the Fed pays banks on reserves"}
+  - {id: IOER,         source: fred, code: IOER,         units: percent,     freq: D, lag_days: 0,  start: "2014-01-01", meaning: "Older name for the reserves rate (before July 2021); history only"}
+  - {id: DGS2,         source: fred, code: DGS2,         units: percent,     freq: D, lag_days: 1,  start: "2014-01-01", meaning: "2-year Treasury yield"}
+  - {id: DGS10,        source: fred, code: DGS10,        units: percent,     freq: D, lag_days: 1,  start: "2014-01-01", meaning: "10-year Treasury yield"}
+  - {id: T10Y2Y,       source: fred, code: T10Y2Y,       units: percent,     freq: D, lag_days: 1,  start: "2014-01-01", meaning: "10-year minus 2-year yield (the curve)"}
+  - {id: DFF,          source: fred, code: DFF,          units: percent,     freq: D, lag_days: 1,  start: "2014-01-01", meaning: "Effective Fed funds rate"}
+  - {id: DFEDTARU,     source: fred, code: DFEDTARU,     units: percent,     freq: D, lag_days: 0,  start: "2014-01-01", meaning: "Fed target range, upper limit"}
+  - {id: DFEDTARL,     source: fred, code: DFEDTARL,     units: percent,     freq: D, lag_days: 0,  start: "2014-01-01", meaning: "Fed target range, lower limit"}
+  - {id: CPIAUCSL,     source: fred, code: CPIAUCSL,     units: index,       freq: M, lag_days: 45, start: "2014-01-01", meaning: "Consumer price index (dated the 1st of its month)"}
+  - {id: T5YIE,        source: fred, code: T5YIE,        units: percent,     freq: D, lag_days: 1,  start: "2014-01-01", meaning: "5-year breakeven inflation"}
+  - {id: WALCL,        source: fred, code: WALCL,        units: "USD millions", freq: W, lag_days: 1, start: "2014-01-01", meaning: "Federal Reserve total assets"}
+  - {id: ECBASSETSW,   source: fred, code: ECBASSETSW,   units: "EUR millions", freq: W, lag_days: 5, start: "2014-01-01", meaning: "ECB total assets"}
+  - {id: JPNASSETS,    source: fred, code: JPNASSETS,    units: "JPY 100 millions", freq: M, lag_days: 35, start: "2014-01-01", meaning: "Bank of Japan total assets (dated the 1st of its month)"}
+  - {id: M2SL,         source: fred, code: M2SL,         units: "USD billions", freq: M, lag_days: 55, start: "2014-01-01", meaning: "US M2 money supply (dated the 1st of its month)"}
+  - {id: BAMLH0A0HYM2, source: fred, code: BAMLH0A0HYM2, units: percent,     freq: D, lag_days: 1,  start: "2014-01-01", meaning: "High-yield bond spread (FRED keeps only 3 years)"}
+  - {id: BAMLH0A3HYC,  source: fred, code: BAMLH0A3HYC,  units: percent,     freq: D, lag_days: 1,  start: "2014-01-01", meaning: "CCC and lower bond spread"}
+  - {id: BAMLH0A1HYBB, source: fred, code: BAMLH0A1HYBB, units: percent,     freq: D, lag_days: 1,  start: "2014-01-01", meaning: "BB bond spread"}
+  - {id: BAMLC0A4CBBB, source: fred, code: BAMLC0A4CBBB, units: percent,     freq: D, lag_days: 1,  start: "2014-01-01", meaning: "BBB investment-grade bond spread"}
+  - {id: NFCI,         source: fred, code: NFCI,         units: index,       freq: W, lag_days: 5,  start: "2014-01-01", meaning: "Chicago Fed financial conditions (above 0 = tighter than average)"}
+  - {id: STLFSI4,      source: fred, code: STLFSI4,      units: index,       freq: W, lag_days: 6,  start: "2014-01-01", meaning: "St. Louis Fed financial stress (0 = normal)"}
+  - {id: WLCFLPCL,     source: fred, code: WLCFLPCL,     units: "USD millions", freq: W, lag_days: 1, start: "2014-01-01", meaning: "Fed discount window lending (primary credit)"}
+  - {id: RPONTSYD,     source: fred, code: RPONTSYD,     units: "USD billions", freq: D, lag_days: 0, start: "2014-01-01", meaning: "Fed overnight repo lending (standing repo facility)"}
+  - {id: WSHOBL,       source: fred, code: WSHOBL,       units: "USD millions", freq: W, lag_days: 1, start: "2014-01-01", meaning: "Treasury bills held by the Fed"}
+  - {id: WRESBAL,      source: fred, code: WRESBAL,      units: "USD millions", freq: W, lag_days: 1, start: "2014-01-01", meaning: "Bank reserves at the Fed"}
+
+  # ---- FINRA margin debt (falls back to manual/margin_debt.csv)
+  - {id: MARGIN_DEBT, source: finra, code: debit_balances, units: "USD millions", freq: M, lag_days: 25, start: "2010-02-01", meaning: "Money borrowed against shares (dated the last day of its month)"}
+
+  # ---- Treasury buybacks, summed per operation day
+  - {id: BUYBACK_LS, source: treasury, code: "Liquidity Support", units: USD, freq: E, lag_days: 1, start: "2024-01-01", meaning: "Treasury buybacks to support market liquidity, par accepted"}
+  - {id: BUYBACK_CM, source: treasury, code: "Cash Management",   units: USD, freq: E, lag_days: 1, start: "2024-01-01", meaning: "Treasury buybacks for cash management, par accepted"}
+
+  # ---- Share prices (Nasdaq quote service; not adjusted for dividends)
+  - {id: CRWV, source: nasdaq, code: "CRWV:stocks", units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "CoreWeave share price"}
+  - {id: ORCL, source: nasdaq, code: "ORCL:stocks", units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "Oracle share price"}
+  - {id: NBIS, source: nasdaq, code: "NBIS:stocks", units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "Nebius share price"}
+  - {id: APLD, source: nasdaq, code: "APLD:stocks", units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "Applied Digital share price"}
+  - {id: IREN, source: nasdaq, code: "IREN:stocks", units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "IREN share price"}
+  - {id: BIZD, source: nasdaq, code: "BIZD:etf",    units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "Business-development-company fund (private credit proxy)"}
+  - {id: KRE,  source: nasdaq, code: "KRE:etf",     units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "Regional bank fund"}
+
+  # ---- Derivatives (Coinalyze)
+  - {id: FUND_BINANCE, source: coinalyze, code: "funding:BTCUSDT_PERP.A", units: "percent per 8h", freq: D, lag_days: 1, start: "2020-01-21", meaning: "Bitcoin funding rate on Binance, last of the day"}
+  - {id: FUND_BYBIT,   source: coinalyze, code: "funding:BTCUSDT.6",      units: "percent per 8h", freq: D, lag_days: 1, start: "2020-04-04", meaning: "Bitcoin funding rate on Bybit, last of the day"}
+  - {id: FUND_OKX,     source: coinalyze, code: "funding:BTCUSDT_PERP.3", units: "percent per 8h", freq: D, lag_days: 1, start: "2020-03-28", meaning: "Bitcoin funding rate on OKX, last of the day"}
+  - {id: OI_BTC, source: coinalyze, code: "oi:btc", units: USD, freq: D, lag_days: 1, start: "2022-10-16", meaning: "Open interest in Bitcoin perpetual futures (markets listed in registry/oi_universe.yaml)"}
+  - {id: OI_ALT, source: coinalyze, code: "oi:alt", units: USD, freq: D, lag_days: 1, start: "2022-10-16", meaning: "Open interest in altcoin perpetual futures (same list)"}
+
+# Room for later additions (not built): company financials from SEC EDGAR would be
+# a new source "edgar" with one adapter file; equity data is another "nasdaq" entry.

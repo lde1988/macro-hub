@@ -1,0 +1,204 @@
+"""Turns dial calculations into the published picture: colours with the
+no-flapping rule, families, the regime, and the buy / hold / sell reading.
+
+Fixed, written rules only. No machine learning and no hidden weights.
+"""
+import numpy as np
+import pandas as pd
+
+from hub.signals.core import A, G, R, WORD, Raw
+from hub.signals.dials import DIALS
+
+GROUP_NAMES = {"A": "Is it cheap?", "B": "Is stress still building?", "C": "Credit-event risk", "D": "Has the turn started?"}
+FAMILY_NAMES = {"rates_dollar": "rates and dollar", "money_market": "money-market funding", "credit": "credit spreads",
+                "ai_private": "AI and private credit", "banks": "banks", "crypto_leverage": "crypto leverage",
+                "equities": "equities"}
+
+
+def step(prev, raw_colour, now, confirm_runs, mode="run"):
+    """No-flapping rule for one dial. Returns (new state, colour it changed from or None).
+
+    A dial changes colour only after `confirm_runs` runs in a row showing the new
+    colour. mode "none" is for dials whose own calculation already confirms
+    (weekly closes; the dollar's two-fixing rule). With no data the dial keeps
+    its last colour. The very first colour is a silent baseline.
+    """
+    st = {"colour": prev.get("colour"), "pending": prev.get("pending"), "count": prev.get("count", 0),
+          "since": prev.get("since"), "baseline": prev.get("baseline", False)}
+    cur = st["colour"]
+    if raw_colour is None:
+        return st, None
+    if cur is None:
+        st.update(colour=raw_colour, pending=None, count=0, since=str(now), baseline=True)
+        return st, None
+    if raw_colour == cur:
+        st.update(pending=None, count=0)
+        return st, None
+    if mode != "none":
+        st["count"] = st["count"] + 1 if st["pending"] == raw_colour else 1
+        st["pending"] = raw_colour
+        if st["count"] < confirm_runs:
+            return st, None
+    st.update(colour=raw_colour, pending=None, count=0, since=str(now), baseline=False)
+    return st, cur
+
+
+def trading_days_between(a, b):
+    return int(np.busday_count(pd.Timestamp(a).date(), pd.Timestamp(b).date()))
+
+
+def evaluate_dials(view, cfg, state):
+    """Run every dial. Returns (readings, new dial state)."""
+    readings, new_state = {}, {}
+    runs = cfg["general"]["confirm_runs"]
+    for d in DIALS:
+        prev = (state or {}).get(d["id"], {})
+        try:
+            raw = d["fn"](view, cfg, prev.get("colour"))
+        except Exception as ex:  # one broken dial must never stop the others
+            raw = Raw(text=f"calculation error ({type(ex).__name__})")
+        st, changed_from = step(prev, raw.colour, view.now, runs, d["confirm"])
+        new_state[d["id"]] = st
+        fresh_red = (st["colour"] == R and not st["baseline"] and st["since"] is not None
+                     and trading_days_between(st["since"], view.now) < cfg["general"]["fresh_red_trading_days"])
+        readings[d["id"]] = {
+            "id": d["id"], "group": d["group"], "title": d["title"], "value": raw.value, "text": raw.text,
+            "colour": st["colour"], "word": WORD[st["colour"]], "raw_colour": raw.colour, "moves": raw.moves,
+            "obs_date": str(raw.obs)[:10] if raw.obs is not None else None, "since": st["since"],
+            "changed_from": changed_from, "fresh_red": fresh_red, "no_data": raw.colour is None,
+            "gauge": raw.gauge, "extra": raw.extra,
+        }
+    return readings, new_state
+
+
+def families(readings, cfg):
+    out = {}
+    for fam, ids in cfg["families"].items():
+        got = [readings[i] for i in ids if i in readings]
+        out[fam] = {"name": FAMILY_NAMES.get(fam, fam), "red": any(r["colour"] == R for r in got),
+                    "fresh_red": [r["title"] for r in got if r["fresh_red"]],
+                    "red_dials": [r["title"] for r in got if r["colour"] == R]}
+    return out
+
+
+def turn_status(readings, cfg):
+    """The turn is confirmed when the dollar reversal dial is green, or when two of the
+    three turn families (rates; Fed and Treasury; crypto liquidity) are green together.
+    Bank reserves are not in any family, so on their own they never confirm a turn."""
+    fams = {f: any(readings.get(i, {}).get("colour") == G for i in ids) for f, ids in cfg["turn_families"].items()}
+    dollar = readings.get("dollar_reversal", {}).get("colour") == G
+    return {"confirmed": dollar or sum(fams.values()) >= 2, "dollar_reversal": dollar, "families": fams,
+            "any_signal": any(r["colour"] == G for r in readings.values() if r["group"] == "D")}
+
+
+def regime(readings, cfg):
+    """First match wins: TURN > BREAK > STRESS BUILDING > FRAGILE > CALM."""
+    turn = turn_status(readings, cfg)
+    x = lambda i, k: bool(readings.get(i, {}).get("extra", {}).get(k))
+    red_bc = [r["title"] for r in readings.values() if r["group"] in "BC" and r["colour"] == R]
+    if turn["any_signal"]:
+        fired = [r["title"] for r in readings.values() if r["group"] == "D" and r["colour"] == G]
+        return {"name": "TURN", "detail": ("confirmed" if turn["confirmed"] else "early, not confirmed") + ": " + ", ".join(fired)}
+    if x("sp500", "month_end_break") or x("btc_weekly", "break_in_force"):
+        why = [n for n, f in (("S&P 500 month-end close below its 10-month average", x("sp500", "month_end_break")),
+                              ("Bitcoin weekly close below the break level", x("btc_weekly", "break_in_force"))) if f]
+        return {"name": "BREAK", "detail": "; ".join(why)}
+    if red_bc:
+        return {"name": "STRESS BUILDING", "detail": "red: " + ", ".join(red_bc)}
+    if x("margin_debt", "fired_latched"):
+        return {"name": "FRAGILE", "detail": "the margin-debt signal fired within the past 12 months"}
+    return {"name": "CALM", "detail": "no stress, break or turn signal"}
+
+
+def reading(readings, cfg, rule="new"):
+    """The buy / hold / sell reading. rule="new" is the two-level buy approved on
+    25 Nov 2026; rule="old" is the original single buy rule, kept for comparison."""
+    col = lambda i: readings.get(i, {}).get("colour")
+    ex = lambda i, k, d=None: readings.get(i, {}).get("extra", {}).get(k, d)
+    fam, turn = families(readings, cfg), turn_status(readings, cfg)
+
+    froth = [n for n, f in (("funding at 30% a year or more", col("funding") == R),
+                            ("altcoin open interest at or above its 90th percentile", col("alt_oi") == R),
+                            ("price above 2.4x realised price", col("btc_price") == R)) if f]
+    red_fams = [f["name"] for f in fam.values() if f["red"]]
+    liq = [n for n, f in (("the margin-debt signal has fired", bool(ex("margin_debt", "fired_latched"))),
+                          ("the dollar is above 102.5 and rising", col("dollar") == R),
+                          (f"{len(red_fams)} families red ({', '.join(red_fams)})", len(red_fams) >= 2)) if f]
+    cheap = col("btc_price") == G
+    ratio = ex("btc_price", "ratio_to_realised")
+    capit = [n for n, f in (("long-term holders are selling at a loss (LTH-SOPR green)", col("lth_sopr") == G),
+                            ("net realised losses are spiking", col("net_loss") == G)) if f]
+    block = [f"{fam[f]['name']} ({', '.join(fam[f]['fresh_red'])})" for f in cfg["buy_blocking_families"] if fam[f]["fresh_red"]]
+    any_fresh = [r["title"] for r in readings.values() if r["group"] in "BC" and r["fresh_red"]]
+    turned = [r["title"] for r in readings.values() if r["group"] == "D" and r["colour"] == G]
+    out = {"rule": rule, "caution": bool(ex("btc_weekly", "break_in_force")) and not cheap, "turn": turn}
+
+    if froth and liq:
+        out.update(label="SELL", headline="Sell (reduce risk)", reasons=["Froth: " + "; ".join(froth), "Liquidity deteriorating: " + "; ".join(liq)],
+                   change="Back to hold when the froth clears or liquidity stops deteriorating.")
+    elif rule == "old" and cheap and turned and not any_fresh:
+        out.update(label="BUY", headline="Buy (in stages)",
+                   reasons=["Price is in the value zone", "Turn signal: " + ", ".join(turned), "No group B or C dial newly red in 5 trading days"],
+                   change="Back to hold if price leaves the value zone, the turn signals fade, or a stress dial turns red.")
+    elif rule == "new" and ratio is not None and ratio <= cfg["btc_price"]["confirmed_buy_multiple"] and turn["confirmed"] and not block:
+        how = "the dollar has reversed" if turn["dollar_reversal"] else "two turn families are green (" + ", ".join(f for f, g in turn["families"].items() if g) + ")"
+        out.update(label="BUY", level="CONFIRMED", headline="Buy (confirmed)",
+                   reasons=[f"Price is {ratio:.2f}x realised price (at or below 1.3x)", f"Turn confirmed: {how}",
+                            "No fresh red in money-market funding, credit spreads or banks"],
+                   change="Back to hold if the turn is no longer confirmed, price rises above 1.3x realised price, or fresh stress appears in funding, credit or banks.")
+    elif rule == "new" and cheap and capit and not block:
+        out.update(label="BUY", level="STAGED", headline="Buy (staged)",
+                   reasons=["Price is in the value zone", "Capitulation sign: " + "; ".join(capit),
+                            "No fresh red in money-market funding, credit spreads or banks",
+                            "The turn is not confirmed yet, so buy in stages" if not turn["confirmed"] else "Turn confirmed"],
+                   change="Becomes Buy (confirmed) when the dollar reverses or two turn families go green; back to hold if price leaves the value zone or fresh stress appears.")
+    else:
+        if froth:
+            kind, reasons = "frothy, but liquidity is not deteriorating", ["Froth: " + "; ".join(froth)]
+            change = "Sell if the margin-debt signal fires, the dollar rises through 102.5, or two families turn red."
+        elif cheap:
+            if rule == "old":
+                why = "no turn signal has fired" if not turned else "a stress dial turned red in the past 5 trading days (" + ", ".join(any_fresh) + ")"
+                change = "Buy when a group D turn signal goes green with no newly red stress dial."
+            elif not capit:
+                why = "no capitulation sign and the turn is not confirmed"
+                change = "Buy (staged) when LTH-SOPR or net realised losses turn green; Buy (confirmed) when the turn is confirmed."
+            else:
+                why = "fresh stress in " + "; ".join(block)
+                change = "Buy once that dial has been red for more than 5 trading days without a new one joining it, or it clears."
+            kind, reasons = f"cheap, but {why}", ["Price is in the value zone"]
+        elif rule == "new" and ratio is not None and ratio <= cfg["btc_price"]["confirmed_buy_multiple"]:
+            why = "the turn is not confirmed" if not turn["confirmed"] else "fresh stress in " + "; ".join(block)
+            kind, reasons = f"fairly cheap, but {why}", [f"Price is {ratio:.2f}x realised price, not yet in the value zone"]
+            change = "Buy (confirmed) when the dollar reverses or two turn families go green; Buy (staged) if price falls into the value zone with a capitulation sign."
+        else:
+            kind, reasons = "neither cheap nor frothy", ["Price is outside the value zone and below the froth level"]
+            change = "Buy needs a cheaper price or a confirmed turn; sell needs froth with deteriorating liquidity."
+        if not turn["confirmed"]:
+            reasons.append("Turn not confirmed" + (": " + ", ".join(turned) + " only" if turned else ": no turn signal is green"))
+        if liq:
+            reasons.append("Liquidity deteriorating: " + "; ".join(liq))
+        elif red_fams:
+            reasons.append("Red family: " + ", ".join(red_fams))
+        out.update(label="HOLD", headline="Hold: " + kind, reasons=reasons[:4], change=change)
+    if out["caution"] and out["label"] == "HOLD":
+        out["headline"] += " (CAUTION: weekly close below the break level)"
+
+    alt_green = col("alt_oi") == G
+    if out["label"] == "BUY" and alt_green:
+        out["alts"] = {"label": "BUY", "headline": out["headline"], "why": "Bitcoin reading is Buy and altcoin open interest is below its 50th percentile"}
+    elif out["label"] == "SELL":
+        out["alts"] = {"label": "SELL", "headline": "Sell (reduce risk)", "why": "altcoins take the brunt of a deleveraging"}
+    else:
+        why = ("the Bitcoin reading is not Buy" if out["label"] != "BUY"
+               else "altcoin open interest is not below its 50th percentile" if col("alt_oi") else "altcoin open interest has no reading yet")
+        out["alts"] = {"label": "HOLD", "headline": "Hold", "why": why}
+    return out
+
+
+def evaluate(view, cfg, state=None):
+    """Everything for one run. state: {"dials": {...}} from the previous run."""
+    readings, dial_state = evaluate_dials(view, cfg, (state or {}).get("dials"))
+    return {"readings": readings, "families": families(readings, cfg), "regime": regime(readings, cfg),
+            "reading": reading(readings, cfg, "new"), "reading_old_rule": reading(readings, cfg, "old"),
+            "state": {"dials": dial_state}}

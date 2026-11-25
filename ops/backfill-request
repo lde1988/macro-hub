@@ -1,0 +1,3 @@
+# Changing this file starts a back-fill. The first line that is not a comment lists the
+# sources to load, comma separated. Leave that line empty to load every source.
+coinbase,bitview,coinmetrics,defillama,ecb,fred,finra,treasury,nasdaq,coingecko,dxycheck

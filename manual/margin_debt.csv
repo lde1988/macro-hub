@@ -1,0 +1,4 @@
+# Hand-filled fallback for FINRA margin debt, used only if FINRA's file cannot be read.
+# One line per month: month as YYYY-MM, debit balances in millions of dollars.
+# Source: https://www.finra.org/rules-guidance/key-topics/margin-accounts/margin-statistics
+month,debit_usd_millions

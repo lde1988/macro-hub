@@ -1,0 +1,38 @@
+# Loads past history for every series into the "data" branch. Run by hand
+# (Actions tab -> Backfill -> Run workflow) or by changing ops/backfill-request.
+name: Backfill
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Sources to load, comma separated (empty = all)"
+        default: ""
+  push:
+    branches: [claude/build, main]
+    paths: [ops/backfill-request]
+permissions:
+  contents: write
+concurrency:
+  group: data-branch
+  cancel-in-progress: false
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install --quiet -r requirements.txt
+      - run: tools/data_branch.sh open
+      - name: Fetch history
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          COINALYZE_API_KEY: ${{ secrets.COINALYZE_API_KEY }}
+          ONLY: ${{ github.event.inputs.only }}
+        run: |
+          REQ="$(grep -v '^#' ops/backfill-request | head -1 | tr -d ' \n')"
+          python -m hub.fetch --data data --backfill --only "${ONLY:-$REQ}"
+      - run: tools/data_branch.sh save "Backfill history"
