@@ -1,0 +1,56 @@
+# Altcoin and Bitcoin open interest, once a day. It has its own job because it reads about a
+# thousand markets at Coinalyze's limit of 40 a minute (roughly 27 minutes).
+# Run by hand: Actions tab -> Open interest (daily) -> Run workflow.
+name: Open interest (daily)
+on:
+  schedule:
+    - cron: "40 0 * * *"     # 00:40 UTC, after the day's figures are final
+  workflow_dispatch:
+    inputs:
+      backfill:
+        description: "Type yes to reload the full history (about 30 minutes)"
+        default: "no"
+  push:
+    branches: [main]
+    paths: [ops/oi-request]
+permissions:
+  contents: write
+  actions: write     # to keep the scheduled workflows switched on
+concurrency:
+  group: oi-daily
+  cancel-in-progress: false
+jobs:
+  open-interest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install --quiet -r requirements.txt
+      - run: tools/data_branch.sh open
+      - name: Fetch open interest
+        env:
+          COINALYZE_API_KEY: ${{ secrets.COINALYZE_API_KEY }}
+          BACKFILL: ${{ github.event.inputs.backfill }}
+        run: |
+          MODE=""
+          if [ "$BACKFILL" = "yes" ] || { [ "${{ github.event_name }}" = "push" ] && grep -q '^backfill' ops/oi-request; }; then MODE="--backfill"; fi
+          python -m hub.fetch --data data --only coinalyze_oi --state-dir oi-runtime $MODE | tee oi.log
+          grep -q "coinalyze_oi: FAILED" oi.log && exit 1 || true
+      - run: tools/data_branch.sh save "Open interest"
+      - name: Keep the schedules alive
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for w in hub.yml watchdog.yml oi-daily.yml; do
+            gh workflow enable "$w" --repo "${{ github.repository }}" >/dev/null 2>&1 || echo "could not enable $w"
+          done
+      - name: Tell the phone if this failed
+        if: failure() || cancelled()
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python -m hub.notify --failed "the daily open-interest update" --runtime oi-runtime

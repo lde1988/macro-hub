@@ -28,6 +28,8 @@ sources:
   nasdaq:      {every: 60,   credit: "Nasdaq quote service (unofficial)"}
   coingecko:   {every: 60,   credit: "CoinGecko"}
   coinalyze:   {every: 60,   credit: "Coinalyze"}
+  # open interest needs about 1,060 markets at 40 a minute (27 minutes), so it has its own daily job
+  coinalyze_oi: {every: 1440, credit: "Coinalyze (open interest, daily job)", scheduled: false}
   dxycheck:    {every: 180,  credit: "Published dollar index close (check only)", check_only: true}
 
 series:
@@ -116,8 +118,8 @@ series:
   - {id: FUND_BINANCE, source: coinalyze, code: "funding:BTCUSDT_PERP.A", units: "percent per 8h", freq: D, lag_days: 1, start: "2020-01-21", meaning: "Bitcoin funding rate on Binance, last of the day"}
   - {id: FUND_BYBIT,   source: coinalyze, code: "funding:BTCUSDT.6",      units: "percent per 8h", freq: D, lag_days: 1, start: "2020-04-04", meaning: "Bitcoin funding rate on Bybit, last of the day"}
   - {id: FUND_OKX,     source: coinalyze, code: "funding:BTCUSDT_PERP.3", units: "percent per 8h", freq: D, lag_days: 1, start: "2020-03-28", meaning: "Bitcoin funding rate on OKX, last of the day"}
-  - {id: OI_BTC, source: coinalyze, code: "oi:btc", units: USD, freq: D, lag_days: 1, start: "2022-10-16", meaning: "Open interest in Bitcoin perpetual futures (markets listed in registry/oi_universe.yaml)"}
-  - {id: OI_ALT, source: coinalyze, code: "oi:alt", units: USD, freq: D, lag_days: 1, start: "2022-10-16", meaning: "Open interest in altcoin perpetual futures (same list)"}
+  - {id: OI_BTC, source: coinalyze_oi, code: "oi:btc", units: USD, freq: D, lag_days: 1, start: "2022-10-16", meaning: "Open interest in Bitcoin perpetual futures (markets listed in registry/oi_universe.yaml)"}
+  - {id: OI_ALT, source: coinalyze_oi, code: "oi:alt", units: USD, freq: D, lag_days: 1, start: "2022-10-16", meaning: "Open interest in crypto altcoin perpetual futures, ETH included (same list; shares, metals and tokenised gold left out)"}
 
 # Room for later additions (not built): company financials from SEC EDGAR would be
 # a new source "edgar" with one adapter file; equity data is another "nasdaq" entry.

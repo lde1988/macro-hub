@@ -119,6 +119,37 @@ def test_dxycheck_parse():
     assert list(dxycheck.parse(j)) == [104.32]
 
 
+def test_open_interest_job_sums_the_market_list_and_drops_days_without_bitcoin(tmp_path):
+    from hub.sources import coinalyze_oi
+    (tmp_path / "registry").mkdir()
+    (tmp_path / "registry" / "oi_universe.yaml").write_text("btc: [BTCUSDT_PERP.A]\nalt: [ETHUSDT_PERP.A, SOLUSDT_PERP.A]\n")
+
+    class W:
+        def get(self, url, **k):
+            class R:
+                status_code = 200
+                headers = {}
+
+                def json(self):
+                    return [{"symbol": "BTCUSDT_PERP.A", "history": [{"t": ts("2026-11-22"), "c": 0.0}, {"t": ts("2026-11-23"), "c": 5.0}, {"t": ts("2026-11-24"), "c": 6.0}]},
+                            {"symbol": "ETHUSDT_PERP.A", "history": [{"t": ts("2026-11-22"), "c": 9.0}, {"t": ts("2026-11-23"), "c": 3.0}, {"t": ts("2026-11-24"), "c": 4.0}]},
+                            {"symbol": "SOLUSDT_PERP.A", "history": [{"t": ts("2026-11-23"), "c": 1.0}, {"t": ts("2026-11-24"), "c": 2.0}, {"t": ts("2026-11-25"), "c": 99.0}]}]
+            return R()
+    entries = [{"id": "OI_BTC", "code": "oi:btc", "start": "2022-10-16"}, {"id": "OI_ALT", "code": "oi:alt", "start": "2022-10-16"}]
+    res = coinalyze_oi.fetch(entries, Ctx(now=NOW, backfill=True, web=W(), env={"COINALYZE_API_KEY": "k"}, root=str(tmp_path)))
+    assert list(res.history["OI_BTC"]) == [5.0, 6.0] and list(res.history["OI_ALT"]) == [4.0, 6.0]   # zero-Bitcoin day and today's unfinished day dropped
+
+
+def test_open_interest_is_not_part_of_the_15_minute_run(tmp_path):
+    called = []
+    reg = {"sources": {"coinalyze_oi": {"every": 1440, "scheduled": False}}, "series": [{"id": "OI_ALT", "source": "coinalyze_oi", "start": "2022-10-16"}]}
+    f = {"coinalyze_oi": lambda e, c: called.append(1) or Result()}
+    F.run_fetch(tmp_path, now=NOW, registry=reg, fetchers=f)
+    assert called == []
+    F.run_fetch(tmp_path, now=NOW, registry=reg, fetchers=f, only=["coinalyze_oi"])
+    assert called == [1]
+
+
 def test_coinalyze_history_and_universe_sum():
     items = [{"symbol": "BTCUSDT_PERP.A", "history": [{"t": ts("2026-11-23"), "c": 5.0}, {"t": ts("2026-11-24"), "c": 6.0}, {"t": ts("2026-11-25"), "c": 9.0}]},
              {"symbol": "ETHUSDT_PERP.A", "history": [{"t": ts("2026-11-23"), "c": 3.0}, {"t": ts("2026-11-24"), "c": 4.0}]},

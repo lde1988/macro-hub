@@ -54,6 +54,8 @@ def run_fetch(data_dir, backfill=False, only=None, now=None, registry=None, root
         entries = [e for e in reg["series"] if e["source"] == name]
         if not entries:
             continue
+        if reg["sources"].get(name, {}).get("scheduled") is False and not (only and name in only):
+            continue                                    # runs only in its own workflow (asked for by name)
         st = status.setdefault(name, {"fails": 0})
         if not backfill and not is_due(st, reg["sources"][name].get("every", 60), now_ts):
             continue
@@ -102,5 +104,6 @@ if __name__ == "__main__":
     ap.add_argument("--data", required=True)
     ap.add_argument("--backfill", action="store_true")
     ap.add_argument("--only", default="")
+    ap.add_argument("--state-dir", default=None)
     a = ap.parse_args()
-    run_fetch(a.data, backfill=a.backfill, only=[x for x in a.only.split(",") if x] or None)
+    run_fetch(a.data, backfill=a.backfill, only=[x for x in a.only.split(",") if x] or None, state_dir=a.state_dir)

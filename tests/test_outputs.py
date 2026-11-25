@@ -322,3 +322,17 @@ def test_with_pushes_switched_off_waiting_pushes_are_kept_not_discarded(tmp_path
     hub.write_text(json.dumps(st))
     main(data, site, rt, now=t0 + dt.timedelta(minutes=15), fetchers=src, push=False)
     assert [p["title"] for p in json.loads(hub.read_text())["outbox"]] == ["waiting"]
+
+
+def test_a_long_silence_is_announced_when_the_hub_comes_back(tmp_path):
+    data, site, rt = tmp_path / "data", tmp_path / "site", tmp_path / "rt"
+    sent = []
+    sender = lambda title, message, priority, tags=None: (sent.append((title, priority, message)), (True, "sent"))[1]
+    src = fake_sources([80000] * 30, 2.1)
+    t0 = dt.datetime(2026, 11, 25, 9, 0, tzinfo=dt.timezone.utc)
+    main(data, site, rt, now=t0, fetchers=src, sender=sender)
+    main(data, site, rt, now=t0 + dt.timedelta(minutes=15), fetchers=src, sender=sender)
+    assert not [t for t, _, _ in sent if "running again" in t]              # a normal 15-minute gap says nothing
+    main(data, site, rt, now=t0 + dt.timedelta(hours=7), fetchers=src, sender=sender)
+    back = [x for x in sent if x[0] == "macro-hub is running again"]
+    assert len(back) == 1 and back[0][1] == 4 and "7 hours" in back[0][2]

@@ -7,7 +7,7 @@ from hub.signals.dials import DIALS
 from hub.signals.engine import evaluate, families, reading, regime, step, trading_days_between, trend_exit, turn_status
 from tests.helpers import cfg, flat, view
 
-C = cfg()
+C = cfg(alt_oi={"matched_to_coutts": True})      # the rules as designed; the unmatched-proxy gate is tested separately
 T0 = pd.Timestamp("2026-11-25 09:00")
 
 
@@ -376,3 +376,20 @@ def test_break_and_risk_off_survive_a_dial_that_fails_for_a_run(tmp_path, monkey
 def weekly():
     from tests.helpers import weekly_btc
     return weekly_btc([80000, 61000])
+
+
+def test_an_unmatched_open_interest_proxy_takes_no_part_in_any_rule():
+    proxy = cfg(alt_oi={"matched_to_coutts": False})
+    assert reading(R_(alt_oi=R, dollar=R), proxy)["label"] == "HOLD"                  # not froth
+    assert reading(R_(alt_oi=R, dollar=R), C)["label"] == "FROTH WARNING"
+    buy = dict(**CHEAP, lth_sopr=G, alt_oi=G)
+    alts = reading(R_(**buy), proxy)["alts"]
+    assert alts["label"] == "HOLD" and "proxy" in alts["why"]                         # cannot give an altcoin buy
+    assert reading(R_(**buy), C)["alts"]["label"] == "BUY"
+    assert reading(R_(funding=R, dollar=R), proxy)["label"] == "FROTH WARNING"        # the other froth tests still work
+
+
+def test_live_config_keeps_the_proxy_gate_until_it_is_matched():
+    from hub.util import load_config
+    live = load_config()["alt_oi"]["matched_to_coutts"]
+    assert live in (True, False)

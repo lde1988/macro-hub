@@ -41,6 +41,8 @@ alerts:
   source_down_priority: 3    # a source failing 4 runs in a row
   stale_priority: 3          # a dial's data becoming too old to trust
   max_outbox: 20             # unsent pushes kept for retry
+  silence_hours: 3           # after this many hours without a run, the next run pushes "running again"
+  silence_priority: 4        # priority of that push
 
 levels:                      # fixed levels; Coutts' posts may update these automatically (Phase 2), within 15%
   btc_value_zone: 58600      # first-half 2026 low: at or below this the price dial is green
@@ -143,6 +145,9 @@ funding:
   red_at_or_above: 30.0      # percent a year; green when negative
 
 alt_oi:
+  matched_to_coutts: false   # false = dial is labelled "proxy, not matched to Coutts" and is kept out of the froth warning
+                             # and the altcoin buy line. Set true only once the stored series reproduces his 27 Sep 2026
+                             # figure (about 1.66x at about the 98th percentile). See reports/09.
   green_below: 50            # percentile
   red_at_or_above: 90  # percentile; red at or above
   min_history_days: 365  # days of history needed before a percentile means anything

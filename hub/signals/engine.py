@@ -162,8 +162,9 @@ def reading(readings, cfg, rule="new"):
     ex = lambda i, k, d=None: readings.get(i, {}).get("extra", {}).get(k, d)
     fam, turn = families(readings, cfg), turn_status(readings, cfg)
 
+    oi_ok = bool(cfg["alt_oi"].get("matched_to_coutts"))    # an unmatched proxy takes no part in any rule
     froth = [n for n, f in (("funding at 30% a year or more", col("funding") == R),
-                            ("altcoin open interest at or above its 90th percentile", col("alt_oi") == R),
+                            ("altcoin open interest at or above its 90th percentile", oi_ok and col("alt_oi") == R),
                             ("price above 2.4x realised price", col("btc_price") == R)) if f]
     red_fams = [f["name"] for f in fam.values() if f["red"]]
     liq = [n for n, f in (("the margin-debt signal has fired", bool(ex("margin_debt", "fired_latched"))),
@@ -236,13 +237,14 @@ def reading(readings, cfg, rule="new"):
     if out["caution"] and out["label"] == "HOLD":
         out["headline"] += " (CAUTION: weekly close below the break level)"
 
-    alt_green = col("alt_oi") == G
+    alt_green = oi_ok and col("alt_oi") == G
     if out["label"] == "BUY" and alt_green:
         out["alts"] = {"label": "BUY", "headline": out["headline"], "why": "Bitcoin reading is Buy and altcoin open interest is below its 50th percentile"}
     elif out["label"] == "FROTH WARNING":
         out["alts"] = {"label": "FROTH WARNING", "headline": "Froth warning (reduce-risk watch)", "why": "altcoins take the brunt of a deleveraging"}
     else:
         why = ("the Bitcoin reading is not Buy" if out["label"] != "BUY"
+               else "the altcoin open-interest test is still a proxy, not matched to Coutts' figures, so it cannot give a buy" if not oi_ok
                else "altcoin open interest is not below its 50th percentile" if col("alt_oi") else "altcoin open interest has no reading yet")
         out["alts"] = {"label": "HOLD", "headline": "Hold", "why": why}
     return out

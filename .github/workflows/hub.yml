@@ -1,8 +1,11 @@
 # The hub: fetch data, work out the dials and the reading, publish the dashboard and
 # feed to GitHub Pages, log, and send pushes. One run does all of it.
-# Run by hand: Actions tab -> Hub run -> Run workflow. (The 15-minute schedule is added at go-live.)
+# Runs every 15 minutes. To run it by hand: Actions tab -> Hub run -> Run workflow.
+# To pause it: Actions tab -> Hub run -> "..." menu -> Disable workflow. (See README.)
 name: Hub run
 on:
+  schedule:
+    - cron: "3,18,33,48 * * * *"   # every 15 minutes, off the hour (GitHub's busiest minute)
   workflow_dispatch:
   push:
     branches: [main]
@@ -10,6 +13,7 @@ on:
 permissions:
   contents: write    # to save history to the data branch
   pages: write       # to publish the dashboard
+  actions: write     # to keep the scheduled workflows switched on (see "Keep the schedules alive")
   id-token: write    # required by GitHub Pages
 concurrency:
   group: hub-run     # never two runs at once
@@ -39,6 +43,16 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python -m hub.run --data data --site site --runtime runtime
       - run: tools/data_branch.sh save "Hub run"
+      - name: Keep the schedules alive
+        # GitHub switches scheduled workflows off after 60 days without activity. Re-enabling them
+        # resets that clock, and brings back any of the three that was switched off by mistake.
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for w in hub.yml watchdog.yml oi-daily.yml; do
+            gh workflow enable "$w" --repo "${{ github.repository }}" >/dev/null 2>&1 || echo "could not enable $w"
+          done
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site

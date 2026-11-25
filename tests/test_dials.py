@@ -559,3 +559,9 @@ def test_buybacks_are_never_frozen_by_the_stale_rule(tmp_path):
         state = o["state"]
     b = o["readings"]["buybacks"]
     assert b["colour"] == R and b["too_old"] is False and b["fresh_green"] is False
+
+
+def test_alt_open_interest_is_labelled_a_proxy_until_matched(tmp_path):
+    data = {"OI_ALT": daily([1.0 + (i % 100) / 100 for i in range(400)]), "OI_BTC": flat(1.0, 400)}
+    assert "proxy, not matched to Coutts" in D.alt_oi(view(tmp_path, data), cfg(alt_oi={"matched_to_coutts": False})).text
+    assert "proxy" not in D.alt_oi(view(tmp_path / "b", data), cfg(alt_oi={"matched_to_coutts": True})).text

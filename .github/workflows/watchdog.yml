@@ -1,0 +1,34 @@
+# Backstop. Four times a day, on its own timer, this checks that the dashboard is being
+# refreshed. If it is more than 90 minutes old it switches the hub's schedule back on, starts
+# a run, and sends a push. It also keeps the other schedules from being switched off for inactivity.
+name: Watchdog
+on:
+  schedule:
+    - cron: "27 1,7,13,19 * * *"
+  workflow_dispatch:
+permissions:
+  actions: write
+  contents: read
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check the feed's age and restart the hub if it has gone quiet
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          FEED: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/feed/latest.json
+        run: |
+          for w in hub.yml oi-daily.yml watchdog.yml; do
+            gh workflow enable "$w" --repo "${{ github.repository }}" >/dev/null 2>&1 || echo "could not enable $w"
+          done
+          stamp=$(curl -fsS -m 30 "$FEED" | python3 -c "import json,sys; print(json.load(sys.stdin)['generated_at'])" 2>/dev/null || true)
+          if [ -n "$stamp" ]; then age=$(( ($(date -u +%s) - $(date -u -d "$stamp" +%s)) / 60 )); else age=99999; fi
+          echo "feed age: $age minutes"
+          if [ "$age" -gt 90 ]; then
+            gh workflow run hub.yml --repo "${{ github.repository }}" --ref main && started="A run has been started." || started="A run could NOT be started; see the README, 'If it stops'."
+            if [ "$age" -eq 99999 ]; then how="could not be read"; else how="was $((age / 60)) hours old"; fi
+            curl -sS -o /dev/null -H "Title: macro-hub: the hub had gone quiet" -H "Priority: 4" -H "Tags: rotating_light" \
+              -d "The watchdog found the dashboard $how. $started" "https://ntfy.sh/${NTFY_TOPIC}" || true
+          fi

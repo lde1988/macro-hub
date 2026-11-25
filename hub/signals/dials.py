@@ -455,9 +455,11 @@ def alt_oi(v, c, prev=None):
     r = df.iloc[:, 0] / df.iloc[:, 1]
     pct = percentile_of_last(r)
     col = band(pct, [k["green_below"], k["red_at_or_above"]], [G, A, R], right=False)
-    return Raw(pct, col, f"{r.iloc[-1]:.2f}x · {pct:.0f}th percentile since {r.index[0]:%b %Y}",
+    tag = "" if k.get("matched_to_coutts") else " · proxy, not matched to Coutts"
+    return Raw(pct, col, f"{r.iloc[-1]:.2f}x · {pct:.0f}th percentile since {r.index[0]:%b %Y}{tag}",
                "Green below its 50th percentile; red at or above the 90th (altcoin leverage is stretched).", df.index[-1],
-               gauge(0, 100, [k["green_below"], k["red_at_or_above"]], [G, A, R]), {"ratio": float(r.iloc[-1])})
+               gauge(0, 100, [k["green_below"], k["red_at_or_above"]], [G, A, R]),
+               {"ratio": float(r.iloc[-1]), "matched_to_coutts": bool(k.get("matched_to_coutts"))})
 
 
 @dial("stable_30d", "B", "Stablecoin supply")

@@ -106,6 +106,13 @@ def main(data, site, runtime, push=True, now=None, fetchers=None, sender=None):
     fd["stale_minutes"] = cfg["general"]["stale_minutes"]
 
     pushes = alerts.plan(st["summary"], fd, cfg)
+    # if the hub has been silent for hours (schedule switched off, GitHub outage), say so when it comes back
+    gap = (pd.Timestamp(now) - pd.Timestamp(st["last_run"])).total_seconds() / 3600 if st.get("last_run") else 0
+    if gap >= cfg["alerts"]["silence_hours"]:
+        pushes.append({"title": "macro-hub is running again", "priority": cfg["alerts"]["silence_priority"], "tags": ["arrows_counterclockwise"],
+                       "message": f"The hub had not run for {gap:.0f} hours (last run {feedmod.hkt(st['last_run']).strftime('%d %b %H:%M HKT')}). "
+                                  "Readings are current again. Any change during the gap is in the pushes that follow."})
+    st["last_run"] = pd.Timestamp(now).strftime("%Y-%m-%dT%H:%M:%SZ")
     more, st["down"] = alerts.source_pushes(status, registry, cfg, st["down"])
     pushes += more
     stamp = pd.Timestamp(now).strftime("%Y-%m-%dT%H:%M:%SZ")

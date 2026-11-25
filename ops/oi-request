@@ -1,0 +1,4 @@
+# Changing this file starts the open-interest job on the main branch.
+# First line that is not a comment: "backfill" reloads the full history, "update" fetches the latest days.
+backfill
+# request 1

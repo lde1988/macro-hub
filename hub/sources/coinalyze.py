@@ -1,8 +1,5 @@
-"""Coinalyze: funding rates and open interest. Needs the COINALYZE_API_KEY secret.
-
-Rate limit: 40 symbols a minute. Open interest is summed over the markets
-listed in registry/oi_universe.yaml and refreshed once a day.
-"""
+"""Coinalyze: funding rates. Needs the COINALYZE_API_KEY secret. Rate limit: 40 symbols a minute.
+Open interest is in coinalyze_oi.py (its own daily job, because it needs about a thousand markets)."""
 import time
 from pathlib import Path
 
@@ -56,26 +53,4 @@ def fetch(entries, ctx):
             res.history[e["id"]] = next(iter(parse_history(j, ctx.today).values()))
         except Exception as ex:
             res.errors[e["id"]] = str(ex)
-    oi = {e["code"]: e for e in entries if e["code"].startswith("oi:")}
-    uni_path = Path(ctx.root) / "registry" / "oi_universe.yaml"
-    have = ctx.last.get("OI_ALT")
-    due = have is None or pd.Timestamp(have) < ctx.today - pd.Timedelta(days=1)  # once a day is enough
-    if oi and uni_path.exists() and due:
-        uni = load_yaml(uni_path)
-        btc, alt = uni.get("btc", []), uni.get("alt", [])
-        syms, hist = btc + alt, {}
-        reach = min((ctx.today - pd.Timestamp(have)).days + 3, 400) if have is not None else 10
-        t0 = int((ctx.today - pd.Timedelta(days=max(reach, 10))).timestamp())
-        try:
-            for i in range(0, len(syms), 20):
-                j = call(ctx, "/open-interest-history", key, symbols=",".join(syms[i:i + 20]), interval="daily",
-                         convert_to_usd="true", **{"from": t0, "to": t1})
-                hist.update(parse_history(j, ctx.today))
-            b, a = sum_universe(hist, btc, alt)
-            # only days after the last stored one (plus a 2-day overlap) are written: older days came from the full back-fill
-            cut = pd.Timestamp(have) - pd.Timedelta(days=2) if have is not None else ctx.today - pd.Timedelta(days=3)
-            res.history[oi["oi:btc"]["id"]] = b[b.index >= cut]
-            res.history[oi["oi:alt"]["id"]] = a[a.index >= cut]
-        except Exception as ex:
-            res.errors["OI_BTC"] = res.errors["OI_ALT"] = str(ex)
     return res
