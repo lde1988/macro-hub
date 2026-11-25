@@ -133,9 +133,18 @@ def test_regime_order():
     assert regime(R_(margin_debt__fired_latched=True, hy_spread=R), C)["name"] == "STRESS BUILDING"
     assert regime(R_(hy_spread=R, btc_weekly__break_in_force=True), C)["name"] == "BREAK"
     assert regime(R_(sp500__month_end_break=True), C)["name"] == "BREAK"
-    t = regime(R_(hy_spread=R, btc_weekly__break_in_force=True, front_end=G), C)
-    assert t["name"] == "TURN" and "early" in t["detail"]
-    assert "confirmed" in regime(R_(dollar_reversal=G), C)["detail"]
+    t = regime(R_(hy_spread=R, btc_weekly__break_in_force=True, dollar_reversal=G), C)
+    assert t["name"] == "TURN" and "confirmed" in t["detail"] and t["early_line"] == ""
+    assert regime(R_(front_end=G, stable_turn=G), C)["name"] == "TURN"            # two families
+
+
+def test_unconfirmed_turn_signals_show_under_the_underlying_regime():
+    t = regime(R_(hy_spread=R, btc_weekly__break_in_force=True, front_end=G, hikes_out=G), C)
+    assert t["name"] == "BREAK"                                                    # one family only: not confirmed
+    assert t["early_line"] == "2 early turn signals: Front-end easing (2-year yield), Rate hikes being priced out"
+    one = regime(R_(fed_reserves=G), C)
+    assert one["name"] == "CALM" and one["early_line"].startswith("1 early turn signal: ")
+    assert regime(R_(), C)["early_line"] == ""
 
 
 def test_group_a_red_does_not_count_as_stress():
@@ -257,12 +266,12 @@ def test_green_is_fresh_for_13_weeks_after_switching_on(tmp_path):
     o = run(530000.0, "2026-06-04 09:15", o["state"])
     o = run(530000.0, "2026-06-04 09:30", o["state"])           # second run: turns green
     assert o["readings"]["fed_bills"]["colour"] == G and o["readings"]["fed_bills"]["fresh_green"] is True
-    assert o["regime"]["name"] == "TURN" and "early" in o["regime"]["detail"]
+    assert o["regime"]["name"] == "CALM" and o["regime"]["early_line"].startswith("1 early turn signal")
     later = run(530000.0, "2026-09-02 09:30", o["state"])       # 90 days on: still fresh
     assert later["readings"]["fed_bills"]["fresh_green"] is True
     stale = run(530000.0, "2026-09-04 09:30", o["state"])       # 92 days on: still green, no longer a turn
     assert stale["readings"]["fed_bills"]["colour"] == G and stale["readings"]["fed_bills"]["fresh_green"] is False
-    assert stale["regime"]["name"] == "CALM"
+    assert stale["regime"]["name"] == "CALM" and stale["regime"]["early_line"] == ""
 
 
 def test_a_baseline_green_is_not_treated_as_fresh(tmp_path):

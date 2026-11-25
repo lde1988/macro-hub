@@ -28,7 +28,8 @@ class View:
     live: {series id: {"value":, "time":}} values still moving today (never stored).
     """
 
-    def __init__(self, store, registry, now, live=None, asof=False, cache=None):
+    def __init__(self, store, registry, now, live=None, asof=False, cache=None, blackout=None):
+        self.blackout = blackout or {}   # {series id: date}; replays hide a series before that date
         self.store, self.now, self.asof = store, pd.Timestamp(now).tz_localize(None) if pd.Timestamp(now).tzinfo else pd.Timestamp(now), asof
         self.lag = {e["id"]: e.get("lag_days", 0) for e in registry["series"]}
         self.livevals = live or {}
@@ -38,6 +39,9 @@ class View:
     def s(self, sid):
         """History of one series (finished periods only)."""
         if sid in self._s:
+            return self._s[sid]
+        if sid in self.blackout and self.now < pd.Timestamp(self.blackout[sid]):
+            self._s[sid] = pd.Series(dtype=float, index=pd.DatetimeIndex([]))
             return self._s[sid]
         if not self.asof:
             out = self.store.series(sid)

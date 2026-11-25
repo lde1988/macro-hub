@@ -99,21 +99,30 @@ def turn_status(readings, cfg):
 
 
 def regime(readings, cfg):
-    """First match wins: TURN > BREAK > STRESS BUILDING > FRAGILE > CALM."""
+    """TURN is shown only when the turn is confirmed. Otherwise the underlying regime is
+    shown (first match wins: BREAK > STRESS BUILDING > FRAGILE > CALM) with a line
+    listing any early turn signals (freshly green group D dials)."""
     turn = turn_status(readings, cfg)
     x = lambda i, k: bool(readings.get(i, {}).get("extra", {}).get(k))
     red_bc = [r["title"] for r in readings.values() if r["group"] in "BC" and r["colour"] == R]
-    if turn["any_signal"]:
-        return {"name": "TURN", "detail": ("confirmed" if turn["confirmed"] else "early, not confirmed") + ": " + ", ".join(turn["fresh_signals"])}
-    if x("sp500", "month_end_break") or x("btc_weekly", "break_in_force"):
-        why = [n for n, f in (("S&P 500 month-end close below its 10-month average", x("sp500", "month_end_break")),
-                              ("Bitcoin weekly close below the break level", x("btc_weekly", "break_in_force"))) if f]
-        return {"name": "BREAK", "detail": "; ".join(why)}
-    if red_bc:
-        return {"name": "STRESS BUILDING", "detail": "red: " + ", ".join(red_bc)}
-    if x("margin_debt", "fired_latched"):
-        return {"name": "FRAGILE", "detail": "the margin-debt signal fired within the past 12 months"}
-    return {"name": "CALM", "detail": "no stress, break or turn signal"}
+    early = turn["fresh_signals"]
+    n = len(early)
+    early_line = "" if not n else f"{n} early turn signal{'s' if n > 1 else ''}: " + ", ".join(early)
+    if turn["confirmed"]:
+        how = "the dollar has reversed" if turn["dollar_reversal"] else "two turn families are green together"
+        out = {"name": "TURN", "detail": f"confirmed ({how}): " + ", ".join(early)}
+    elif x("sp500", "month_end_break") or x("btc_weekly", "break_in_force"):
+        why = [n_ for n_, f in (("S&P 500 month-end close below its 10-month average", x("sp500", "month_end_break")),
+                                ("Bitcoin weekly close below the break level", x("btc_weekly", "break_in_force"))) if f]
+        out = {"name": "BREAK", "detail": "; ".join(why)}
+    elif red_bc:
+        out = {"name": "STRESS BUILDING", "detail": "red: " + ", ".join(red_bc)}
+    elif x("margin_debt", "fired_latched"):
+        out = {"name": "FRAGILE", "detail": "the margin-debt signal fired within the past 12 months"}
+    else:
+        out = {"name": "CALM", "detail": "no stress, break or turn signal"}
+    out.update(early_signals=early, early_line="" if turn["confirmed"] else early_line)
+    return out
 
 
 def reading(readings, cfg, rule="new"):
