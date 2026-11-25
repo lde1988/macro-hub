@@ -5,7 +5,7 @@ import json
 import pandas as pd
 
 from hub import alerts
-from hub.outputs import dashboard, feed as feedmod, icons
+from hub.outputs import dashboard, feed as feedmod, icons, plain
 from hub.run import main, update_since
 from hub.signals.engine import evaluate
 from hub.sources import Result
@@ -73,9 +73,9 @@ def test_a_dial_going_stale_pushes_once(tmp_path):
     fd1, out1 = small_feed(tmp_path)
     fd2, _ = small_feed(tmp_path / "b", {"T5YIE": flat(2.1, 5, end="2026-11-10")}, state=out1["state"])
     p = alerts.plan(alerts.summary(fd1), fd2, C)
-    assert len(p) == 1 and p[0]["title"] == "Stale data: 5-year breakeven inflation" and p[0]["priority"] == 3
+    assert len(p) == 1 and p[0]["title"] == "Old data: 5-year breakeven inflation" and p[0]["priority"] == 3
     assert alerts.plan(alerts.summary(fd2), fd2, C) == []                    # not repeated
-    assert "Stale dials: 5-year breakeven inflation" in alerts.digest(fd2, C)["message"]
+    assert "Old data: 5-year breakeven inflation" in alerts.digest(fd2, C)["message"]
 
 
 def test_feed_keeps_last_colour_greyed_when_a_source_stops(tmp_path):
@@ -93,12 +93,12 @@ def test_dashboard_is_self_contained_and_in_the_agreed_order(tmp_path):
     page = dashboard.render(fd)
     assert "<script src" not in page and "http://" not in page and "@import" not in page and "fonts.googleapis" not in page
     assert page.count("https://") == 0                                   # no external resource at all
-    order = [page.index(x) for x in ("Regime</p>", "Bitcoin reading", "Is it cheap?", "Rates and dollar", "Has the turn started?",
-                                     "What they're watching", "Sources: last successful fetch")]
+    order = [page.index(x) for x in ('class="lamp"', "Of the ", ">Backdrop<", "weekly trend<", ">Altcoins<", "Is it cheap?", "Rates and dollar",
+                                     "Has the turn started?", "What they're watching", "Sources: last successful fetch")]
     assert order == sorted(order)
     assert "Framework reading, not financial advice" in page
     assert "Built to spot buy zones. Its exit signals have a weak record." in page
-    assert "Trend exit" in page and "RISK-OFF" in page and "Bitview (bitview.space), CC BY 4.0" in page
+    assert "Trend: down" in page and "Bitview (bitview.space), CC BY 4.0" in page
     assert 'rel="manifest"' in page and "apple-touch-icon" in page
 
 
@@ -111,11 +111,14 @@ def test_dashboard_never_relies_on_colour_alone(tmp_path):
     assert page.count('class="moves"') == 39                             # one sentence on what would move each dial
 
 
-def test_dashboard_shows_froth_record_only_with_a_froth_warning(tmp_path):
+def test_red_light_shows_the_weak_record_line(tmp_path):
     fd, _ = small_feed(tmp_path)
-    assert "Record of this warning" not in dashboard.render(fd)
-    fd["reading"].update(label="FROTH WARNING", headline="Froth warning (reduce-risk watch)", record="right on 3 of 8 past occasions")
-    assert "Record of this warning: right on 3 of 8 past occasions" in dashboard.render(fd)
+    assert "right on 3 of 8" not in dashboard.render(fd)
+    fd["reading"].update(label="FROTH WARNING", kind="froth", headline="Froth warning (reduce-risk watch)", record="right on 3 of 8 past occasions")
+    fd["plain"] = plain.build(fd)
+    page = dashboard.render(fd)
+    assert "Exit signals have a weak record: right on 3 of 8 past occasions." in page and ">SELL<" in page
+    assert "Framework reading, not financial advice" in page
 
 
 def test_dashboard_escapes_text(tmp_path):
@@ -145,12 +148,14 @@ def test_no_change_no_push(tmp_path):
 def test_reading_change_is_priority_5_and_froth_is_4(tmp_path):
     fd, _ = small_feed(tmp_path)
     prev = alerts.summary(fd)
-    prev.update(reading="Buy (staged)", label="BUY")
+    prev.update(reading="Buy (staged)", label="BUY", light="BUY")
     p = alerts.plan(prev, fd, C)
-    assert len(p) == 1 and p[0]["priority"] == 5 and "Buy (staged) →" in p[0]["message"] and "not financial advice" in p[0]["message"]
-    fd["reading"].update(label="FROTH WARNING", headline="Froth warning (reduce-risk watch)", record="right on 3 of 8 past occasions")
+    assert len(p) == 1 and p[0]["priority"] == 5 and p[0]["title"] == "HOLD (was BUY)"
+    assert p[0]["message"].startswith("Hold. ") and "What would change it:" in p[0]["message"] and "not financial advice" in p[0]["message"]
+    fd["reading"].update(label="FROTH WARNING", kind="froth", headline="Froth warning (reduce-risk watch)", record="right on 3 of 8 past occasions")
+    fd["plain"] = plain.build(fd)
     p = alerts.plan(alerts.summary(small_feed(tmp_path / "b")[0]), fd, C)
-    assert p[0]["priority"] == 4 and "3 of 8" in p[0]["message"]
+    assert p[0]["priority"] == 4 and p[0]["title"] == "SELL (was HOLD)" and "right on 3 of 8" in p[0]["message"]
 
 
 def test_caution_wording_alone_does_not_count_as_a_reading_change(tmp_path):
@@ -160,13 +165,17 @@ def test_caution_wording_alone_does_not_count_as_a_reading_change(tmp_path):
     assert [p for p in alerts.plan(prev, fd, C) if p["title"].startswith("Reading")] == []
 
 
-def test_regime_and_trend_exit_changes_are_priority_5(tmp_path):
+def test_backdrop_and_trend_changes_are_priority_5_and_in_plain_words(tmp_path):
     fd, _ = small_feed(tmp_path)
     prev = alerts.summary(fd)
-    prev.update(regime="CALM", trend_exit="RISK-ON")
+    prev.update(regime="CALM", trend_exit="RISK-ON", backdrop="Calm")
     p = {x["title"]: x for x in alerts.plan(prev, fd, C)}
-    assert p["Regime: CALM → BREAK"]["priority"] == 5 and p["Trend exit: RISK-OFF"]["priority"] == 5
-    assert "$61,000" in p["Trend exit: RISK-OFF"]["message"]
+    b = p["Backdrop: Downtrend: Bitcoin is below its weekly trend line"]
+    assert b["priority"] == 5 and "Before: Calm." in b["message"]
+    t = p["Bitcoin's weekly trend has turned down"]
+    assert t["priority"] == 5 and "$61,000" in t["message"] and "$73,000" in t["message"]
+    for x in p.values():
+        assert not any(w in x["title"] + x["message"] for w in ("BREAK", "RISK-OFF", "regime", "Regime"))
 
 
 def test_dial_change_priorities(tmp_path):
@@ -180,7 +189,8 @@ def test_dial_change_priorities(tmp_path):
     assert pr("breakeven", "amber")["priority"] == 2           # turned green: improvement
     assert pr("breakeven", "red")["priority"] == 2
     one = pr("btc_weekly", "green")
-    assert "Supports → Against" in one["message"] and "$61,000" in one["message"]
+    assert one["title"] == "Bitcoin weekly close: now against buying (was supports buying)"
+    assert "weekly trend is down" in one["message"] and "$61,000" in one["message"]
     fd["dials"][0]["colour"] = "amber"
     prev = alerts.summary(fd)
     prev["dials"][fd["dials"][0]["id"]] = "red"
@@ -194,7 +204,7 @@ def test_several_dial_changes_make_one_push_at_the_highest_priority(tmp_path):
     prev = alerts.summary(fd)
     prev["dials"].update(btc_weekly="amber", breakeven="amber", nfci="amber")
     p = alerts.plan(prev, fd, C)
-    assert len(p) == 1 and p[0]["title"] == "3 dials changed" and p[0]["priority"] == 4
+    assert len(p) == 1 and p[0]["title"] == "3 measures changed" and p[0]["priority"] == 4
 
 
 def test_a_dial_gaining_its_first_colour_does_not_push(tmp_path):
@@ -227,7 +237,9 @@ def test_digest_once_a_day_at_8am_hong_kong_time():
 def test_digest_text(tmp_path):
     fd, _ = small_feed(tmp_path)
     d = alerts.digest(fd, C)
-    assert d["priority"] == 2 and "Regime: BREAK" in d["message"] and "Trend exit: RISK-OFF" in d["message"] and "All sources answering" in d["message"]
+    m = d["message"]
+    assert d["priority"] == 2 and m.startswith("HOLD. ") and "Backdrop: Downtrend" in m and "Trend: down" in m
+    assert "Of the " in m and "All sources answering." in m and "BREAK" not in m and "RISK-OFF" not in m
 
 
 def test_since_dates_move_only_when_something_changes():
@@ -280,10 +292,10 @@ def test_full_run_baseline_then_change_then_failed_push_is_retried(tmp_path):
     fd = main(data, site, rt, now=t1, fetchers=src, sender=broken)
     st = json.loads((data / "state" / "hub.json").read_text())
     titles = [p["title"] for p in st["outbox"]]
-    assert "Trend exit: RISK-OFF" in titles and any(t.startswith("Regime: ") for t in titles) and "macro-hub daily digest" in titles
+    assert "Bitcoin's weekly trend has turned down" in titles and any(t.startswith("Backdrop: ") for t in titles) and "macro-hub daily digest" in titles
     assert fd["trend_exit"]["since"] == "2026-11-30T00:20Z"
     fd = main(data, site, rt, now=t1 + dt.timedelta(minutes=15), fetchers=src, sender=sender)
-    assert {"Trend exit: RISK-OFF", "macro-hub daily digest"} <= {t for t, _ in sent}
+    assert {"Bitcoin's weekly trend has turned down", "macro-hub daily digest"} <= {t for t, _ in sent}
     assert json.loads((data / "state" / "hub.json").read_text())["outbox"] == []
     log = (data / "log" / "verdicts.csv").read_text()
     # one row for the trend/regime change (the digest shared it), then one when the reading itself

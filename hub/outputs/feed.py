@@ -2,6 +2,7 @@
 fields are only ever added within a major version, never renamed or removed."""
 import pandas as pd
 
+from hub.outputs import plain
 from hub.signals.core import A, G, R, WORD
 from hub.signals.engine import FAMILY_NAMES
 
@@ -86,7 +87,7 @@ def build(out, cfg, registry, now, status, since, record=None):
     alts = rd.pop("alts")
     price = out["readings"].get("btc_price", {})
     credits = {k: v.get("credit", k) for k, v in registry["sources"].items()}
-    return {
+    fd = {
         "version": FEED_VERSION,
         "generated_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "generated_at_hkt": hkt(now).strftime("%Y-%m-%d %H:%M HKT"),
@@ -106,3 +107,5 @@ def build(out, cfg, registry, now, status, since, record=None):
                     for k, v in sorted(status.items())},
         "watching": {"enabled": False, "note": "Weekly sweep (Phase 2) is switched off."},
     }
+    fd["plain"] = plain.build(fd)      # plain-English wording for people; the fields above stay as they are for bots
+    return fd

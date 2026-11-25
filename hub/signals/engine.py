@@ -181,35 +181,39 @@ def reading(readings, cfg, rule="new"):
     any_fresh = [r["title"] for r in readings.values() if r["group"] in "BC" and r["fresh_red"]]
     old_turned = [r["title"] for r in readings.values() if r["group"] == "D" and r["colour"] == G]  # original rule: any green
     turned = old_turned if rule == "old" else turn["fresh_signals"]
-    out = {"rule": rule, "caution": bool(ex("btc_weekly", "break_in_force")) and not cheap, "turn": turn}
+    out = {"rule": rule, "caution": bool(ex("btc_weekly", "break_in_force")) and not cheap, "turn": turn,
+           "blocked_by": [fam[f]["name"] for f in cfg["buy_blocking_families"] if fam[f]["fresh_red"]],
+           "capitulation": bool(capit)}
 
     not_cheap = not near                                               # frothy and cheap cannot both be true
     if froth and liq and not_cheap:
-        out.update(label="FROTH WARNING", headline="Froth warning (reduce-risk watch)",
+        out.update(label="FROTH WARNING", kind="froth", headline="Froth warning (reduce-risk watch)",
                    reasons=["Froth: " + "; ".join(froth), "Liquidity deteriorating: " + "; ".join(liq)],
                    change="Back to hold when the froth clears, liquidity stops deteriorating, or price falls to 1.3x realised price or below.",
                    record=cfg["froth_warning"]["record"])
     elif rule == "old" and cheap and turned and not any_fresh:
-        out.update(label="BUY", headline="Buy (in stages)",
+        out.update(label="BUY", kind="buy_old", headline="Buy (in stages)",
                    reasons=["Price is in the value zone", "Turn signal: " + ", ".join(turned), "No group B or C dial newly red in 5 trading days"],
                    change="Back to hold if price leaves the value zone, the turn signals fade, or a stress dial turns red.")
     elif rule == "new" and near and turn["confirmed"] and not block:
         how = "the dollar has reversed" if turn["dollar_reversal"] else "two turn families are green (" + ", ".join(f for f, g in turn["families"].items() if g) + ")"
-        out.update(label="BUY", level="CONFIRMED", headline="Buy (confirmed)",
+        out.update(label="BUY", level="CONFIRMED", kind="buy_confirmed", headline="Buy (confirmed)",
                    reasons=[f"Price is {ratio:.2f}x realised price (at or below 1.3x)" if ratio is not None else "Price is at or below 1.3x realised price", f"Turn confirmed: {how}",
                             "No fresh red in money-market funding, credit spreads or banks"],
                    change="Back to hold if the turn is no longer confirmed, price rises above 1.3x realised price, or fresh stress appears in funding, credit or banks.")
     elif rule == "new" and cheap and capit and not block:
-        out.update(label="BUY", level="STAGED", headline="Buy (staged)",
+        out.update(label="BUY", level="STAGED", kind="buy_staged", headline="Buy (staged)",
                    reasons=["Price is in the value zone", "Capitulation sign: " + "; ".join(capit),
                             "No fresh red in money-market funding, credit spreads or banks",
                             "The turn is not confirmed yet, so buy in stages" if not turn["confirmed"] else "Turn confirmed"],
                    change="Becomes Buy (confirmed) when the dollar reverses or two turn families go green; back to hold if price leaves the value zone or fresh stress appears.")
     else:
         if froth:
+            code = "hold_froth"
             kind, reasons = "frothy, but liquidity is not deteriorating", ["Froth: " + "; ".join(froth)]
             change = "Froth warning if the margin-debt signal fires, the dollar rises through 102.5, or two families turn red (and price is above 1.3x realised price)."
         elif cheap:
+            code = "hold_cheap_waiting" if not capit else "hold_cheap_stress"
             if rule == "old":
                 why = "no turn signal has fired" if not turned else "a stress dial turned red in the past 5 trading days (" + ", ".join(any_fresh) + ")"
                 change = "Buy when a group D turn signal goes green with no newly red stress dial."
@@ -222,9 +226,11 @@ def reading(readings, cfg, rule="new"):
             kind, reasons = f"cheap, but {why}", ["Price is in the value zone"]
         elif rule == "new" and near:
             why = "the turn is not confirmed" if not turn["confirmed"] else "fresh stress in " + "; ".join(block)
+            code = "hold_near_no_turn" if not turn["confirmed"] else "hold_near_stress"
             kind, reasons = f"fairly cheap, but {why}", [f"Price is {ratio:.2f}x realised price, not yet in the value zone" if ratio is not None else "Price is at or below 1.3x realised price"]
             change = "Buy (confirmed) when the dollar reverses or two turn families go green; Buy (staged) if price falls into the value zone with a capitulation sign."
         else:
+            code = "hold_neutral"
             kind, reasons = "neither cheap nor frothy", ["Price is outside the value zone and below the froth level"]
             change = "Buy needs a cheaper price or a confirmed turn; a froth warning needs froth with deteriorating liquidity."
         if not turn["confirmed"]:
@@ -233,7 +239,7 @@ def reading(readings, cfg, rule="new"):
             reasons.append("Liquidity deteriorating: " + "; ".join(liq))
         elif red_fams:
             reasons.append("Red family: " + ", ".join(red_fams))
-        out.update(label="HOLD", headline="Hold: " + kind, reasons=reasons[:4], change=change)
+        out.update(label="HOLD", kind=code, headline="Hold: " + kind, reasons=reasons[:4], change=change)
     if out["caution"] and out["label"] == "HOLD":
         out["headline"] += " (CAUTION: weekly close below the break level)"
 

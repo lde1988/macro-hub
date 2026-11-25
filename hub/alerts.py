@@ -5,6 +5,7 @@ Push only on change. Plain English: what changed, the number, one line on what i
 """
 import pandas as pd
 
+from hub.outputs import plain
 from hub.outputs.feed import hkt
 
 WORD = {"green": "Supports", "amber": "Neutral", "red": "Against", None: "No data"}
@@ -12,35 +13,40 @@ WORD = {"green": "Supports", "amber": "Neutral", "red": "Against", None: "No dat
 
 def summary(feed):
     """The few facts alerts compare from run to run."""
+    pl = feed["plain"]
     return {"reading": feed["reading"]["headline"].split(" (CAUTION")[0], "label": feed["reading"]["label"],
             "regime": feed["regime"]["name"], "trend_exit": feed["trend_exit"]["state"],
+            "light": pl["headline"]["word"], "backdrop": pl["backdrop"]["text"],
             "dials": {d["id"]: d["colour"] for d in feed["dials"]},
             "stale": sorted(d["id"] for d in feed["dials"] if d["stale"])}
 
 
 def plan(prev, feed, cfg, down_before=None):
-    """Pushes for the changes between the previous summary and this feed.
+    """Pushes for the changes between the previous summary and this feed, in plain words.
     prev None = first run: record a silent baseline, push nothing."""
-    a, cur, out = cfg["alerts"], summary(feed), []
+    a, cur, out, pl = cfg["alerts"], summary(feed), [], feed["plain"]
     if not prev:
         return out
-    rd = feed["reading"]
     if cur["reading"] != prev.get("reading"):
         froth = "FROTH WARNING" in (cur["label"], prev.get("label"))
-        body = f'{prev.get("reading")} → {cur["reading"]}.\n' + "\n".join("• " + r for r in rd["reasons"][:3])
-        if rd.get("record"):
-            body += f'\nRecord of this warning: {rd["record"]}.'
-        body += f'\nWhat would change it: {rd["change"]}\n{feed["disclaimer"]}.'
-        out.append({"title": f'Reading: {cur["reading"]}', "message": body, "tags": ["chart_with_upwards_trend"],
+        was = prev.get("light")
+        title = pl["headline"]["word"] + (f" (was {was})" if was and was != pl["headline"]["word"] else " (reason changed)")
+        body = pl["headline"]["sentence"]
+        if pl["weak_record"]:
+            body += "\n" + pl["weak_record"]
+        body += f'\nWhat would change it: {pl["what_would_change"]}\n{feed["disclaimer"]}.'
+        out.append({"title": title, "message": body, "tags": ["vertical_traffic_light"],
                     "priority": cfg["froth_warning"]["push_priority"] if froth else a["reading_priority"]})
     if cur["regime"] != prev.get("regime"):
-        rg = feed["regime"]
-        out.append({"title": f'Regime: {prev.get("regime")} → {rg["name"]}', "priority": a["regime_priority"], "tags": ["compass"],
-                    "message": rg["detail"] + (f'\n{rg["early_line"]}' if rg.get("early_line") else "")})
+        bd = pl["backdrop"]
+        out.append({"title": "Backdrop: " + bd["text"], "priority": a["regime_priority"], "tags": ["compass"],
+                    "message": (f'Before: {prev["backdrop"]}.' if prev.get("backdrop") else "The backdrop has changed.")
+                    + (f'\n{bd["early"]}' if bd["early"] else "") + "\nThe backdrop is context; it does not set the buy / hold reading."})
     if cur["trend_exit"] != prev.get("trend_exit") and "NO DATA" not in (cur["trend_exit"], prev.get("trend_exit")):
-        tr = feed["trend_exit"]
-        out.append({"title": f'Trend exit: {tr["state"]}', "priority": a["trend_exit_priority"], "tags": ["triangular_flag_on_post"],
-                    "message": f'Bitcoin weekly close ${tr["weekly_close"]:,.0f}: {tr["text"]}. This line is separate from the buy / hold reading.'})
+        tr, raw = pl["trend"], feed["trend_exit"]
+        out.append({"title": "Bitcoin's weekly trend has turned " + ("down" if raw["state"] == "RISK-OFF" else "up"),
+                    "priority": a["trend_exit_priority"], "tags": ["triangular_flag_on_post"],
+                    "message": f'Bitcoin closed the week at ${raw["weekly_close"]:,.0f}. {tr["detail"]} This line is separate from the buy / hold reading.'})
     changes, top = [], 0
     for d in feed["dials"]:
         old, new = prev.get("dials", {}).get(d["id"]), d["colour"]
@@ -49,16 +55,17 @@ def plan(prev, feed, cfg, down_before=None):
         pr = (a["dial_red_priority"] if new == "red" else
               a["improvement_priority"] if (new == "green" or old == "red") else a["dial_change_priority"])
         top = max(top, pr)
-        changes.append(f'{d["title"]}: {WORD[old]} → {WORD[new]}. {d["text"]}. {d["moves"]}')
+        changes.append(plain.dial_change(d, old))
     if changes:
-        title = changes[0].split(". ")[0] if len(changes) == 1 else f"{len(changes)} dials changed"
-        out.append({"title": title, "message": "\n\n".join(changes)[:3000], "priority": top, "tags": ["control_knobs"]})
+        title = changes[0].split(". ")[0] if len(changes) == 1 else f"{len(changes)} measures changed"
+        body = changes[0].split(". ", 1)[1] if len(changes) == 1 else "\n\n".join(changes)
+        out.append({"title": title, "message": body[:3000], "priority": top, "tags": ["control_knobs"]})
     newly_stale = [d for d in feed["dials"] if d["stale"] and d["id"] not in prev.get("stale", [])]
     if newly_stale:
-        out.append({"title": f"Stale data: {newly_stale[0]['title']}" if len(newly_stale) == 1 else f"Stale data on {len(newly_stale)} dials",
+        out.append({"title": f"Old data: {newly_stale[0]['title']}" if len(newly_stale) == 1 else f"Old data on {len(newly_stale)} measures",
                     "priority": a["stale_priority"], "tags": ["hourglass"],
                     "message": "\n".join(f"{d['title']}: {d['stale_reason']}." for d in newly_stale)
-                    + "\nThese dials are greyed out and cannot change colour until fresh data arrives."})
+                    + "\nThese are greyed out and cannot change colour until fresh data arrives."})
     return out
 
 
@@ -97,17 +104,19 @@ def digest_due(now, last_digest_date, cfg):
 
 
 def digest(feed, cfg):
-    red = [s["name"] for s in feed["sections"] if s["colour"] == "red"]
+    pl = feed["plain"]
     bad = [v["credit"] for v in feed["sources"].values() if v["fails_in_a_row"] and not v["check_only"]]
     b = feed["bitcoin"]
-    lines = [feed["reading"]["headline"],
-             f'Regime: {feed["regime"]["name"]}' + (f' ({feed["regime"]["early_line"]})' if feed["regime"].get("early_line") else ""),
-             f'Trend exit: {feed["trend_exit"]["state"]}',
-             f'Bitcoin ${b["price"]:,.0f}, {b["ratio_to_realised"]:.2f}x realised price' if b.get("price") else "Bitcoin price unavailable",
-             "Against: " + (", ".join(red) if red else "no family"),
-             "Sources failing: " + ", ".join(bad) if bad else "All sources answering"]
+    lines = [pl["headline"]["word"] + ". " + pl["headline"]["sentence"].split(". ", 1)[-1],
+             "Backdrop: " + pl["backdrop"]["text"] + ".",
+             pl["trend"]["text"] + ".",
+             pl["tally"]["text"] + ".",
+             f'Bitcoin ${b["price"]:,.0f}.' if b.get("price") else "Bitcoin price unavailable.",
+             "Sources failing: " + ", ".join(bad) + "." if bad else "All sources answering."]
+    if pl["backdrop"]["early"]:
+        lines.insert(2, pl["backdrop"]["early"])
     stale = [d["title"] for d in feed["dials"] if d["stale"]]
     if stale:
-        lines.append("Stale dials: " + ", ".join(stale))
+        lines.append("Old data: " + ", ".join(stale) + ".")
     return {"title": "macro-hub daily digest", "message": "\n".join(lines) + f'\n{feed["disclaimer"]}.',
             "priority": cfg["alerts"]["digest_priority"], "tags": ["sunrise"]}

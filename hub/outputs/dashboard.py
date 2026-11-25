@@ -65,39 +65,40 @@ def dial_card(d):
             f'<p class="age">{age}</p></article>')
 
 
-def section_block(s, dials):
+def section_block(s, dials, sentence):
     c = s["colour"]
     cards = "".join(dial_card(dials[i]) for i in s["dials"])
     return (f'<details class="fam"><summary>'
             f'<span class="dot" style="background:{COL[c]}"></span>'
             f'<span class="famname">{esc(s["name"])}</span>'
             f'<span class="famword" style="color:{COL[c]}"><span aria-hidden="true">{SYM[c]}</span> {esc(s["word"])}</span>'
-            f'<span class="famline">{esc(s["sentence"])}</span></summary><div class="grid">{cards}</div></details>')
+            f'<span class="famline">{esc(sentence)}</span></summary>'
+            f'<p class="count">{esc(s["sentence"])}</p><div class="grid">{cards}</div></details>')
 
 
 def render(feed):
     dials = {d["id"]: d for d in feed["dials"]}
-    rd, rg, tr, alt = feed["reading"], feed["regime"], feed["trend_exit"], feed["altcoins"]
-    rcol = {"BUY": "green", "HOLD": "amber", "FROTH WARNING": "red"}.get(rd["label"])
-    tcol = {"RISK-ON": "green", "RISK-OFF": "red"}.get(tr["state"])
+    pl, rd, alt = feed["plain"], feed["reading"], feed["altcoins"]
+    hl, bd, tr, ty = pl["headline"], pl["backdrop"], pl["trend"], pl["tally"]
     acol = {"BUY": "green", "HOLD": "amber", "FROTH WARNING": "red"}.get(alt["label"])
-    regcol = {"TURN": "green", "CALM": "green", "FRAGILE": "amber", "STRESS BUILDING": "red", "BREAK": "red"}.get(rg["name"])
+    aword = {"BUY": "Buy", "HOLD": "Hold", "FROTH WARNING": "Sell signal"}.get(alt["label"], "Hold")
 
-    def inforce(x):
-        if not x.get("since"):
-            return ""
-        n = x.get("days_in_force")
-        return f'in force since {esc(str(x["since"])[:10])}' + (f' ({n} day{"s" if n != 1 else ""})' if n is not None else "")
-
+    since = ""
+    if rd.get("since"):
+        n = rd.get("days_in_force")
+        since = f' · in force since {esc(str(rd["since"])[:10])}' + (f' ({n} day{"s" if n != 1 else ""})' if n is not None else "")
+    small = pl["weak_record"] or feed["exit_note"]
+    total = max(ty["groups"], 1)
+    bar = "".join(f'<span style="width:{ty[c] / total * 100:.1f}%;background:{COL[c]}" title="{ty[c]} {w}"></span>'
+                  for c, w in (("green", "support buying"), ("amber", "neutral"), ("red", "against")) if ty[c])
     reasons = "".join(f"<li>{esc(r)}</li>" for r in rd["reasons"])
-    record = f'<p class="record">Record of this warning: {esc(rd["record"])}.</p>' if rd.get("record") else ""
-    kinds = {"valuation": "Valuation", "stress": "Stress and credit, by family", "turn": "Turn signals"}
+    kinds = {"valuation": "Price and trend", "stress": "Stress and credit, by group", "turn": "Signs of a turn"}
     blocks, last = [], None
     for s in feed["sections"]:
         if s["kind"] != last:
             blocks.append(f'<h3>{kinds[s["kind"]]}</h3>')
             last = s["kind"]
-        blocks.append(section_block(s, dials))
+        blocks.append(section_block(s, dials, pl["groups"].get(s["id"], "")))
     srcs = "".join(
         f'<tr><td>{esc(v["credit"])}</td><td>{esc((v["last_ok"] or "never")[:16].replace("T", " "))} UTC</td>'
         f'<td>{"check only" if v["check_only"] else ""}{" · failing: " + str(v["fails_in_a_row"]) + " runs" if v["fails_in_a_row"] else ""}'
@@ -106,8 +107,8 @@ def render(feed):
     b = feed["bitcoin"]
     price_line = ""
     if b.get("price"):
-        price_line = (f'Bitcoin ${b["price"]:,.0f} · realised price ${b["realised_price"]:,.0f} ({b["ratio_to_realised"]:.2f}x) · '
-                      f'long-term holder cost ${b["lth_cost"]:,.0f} · short-term holder cost ${b["sth_cost"]:,.0f}')
+        price_line = (f'Bitcoin ${b["price"]:,.0f} · average price holders paid ${b["realised_price"]:,.0f} ({b["ratio_to_realised"]:.2f}x) · '
+                      f'long-term holders paid ${b["lth_cost"]:,.0f} · recent buyers paid ${b["sth_cost"]:,.0f}')
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -125,32 +126,34 @@ def render(feed):
 body{{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 padding:env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom))}}
 main{{max-width:1180px;margin:0 auto}}
-h1{{font-size:15px;font-weight:600;letter-spacing:.04em;color:var(--mute);margin:14px 0 8px;text-transform:uppercase}}
+h1{{font-size:15px;font-weight:600;letter-spacing:.04em;color:var(--mute);margin:14px 0 8px;text-transform:uppercase;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}}
 h3{{font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);margin:26px 0 8px}}
 h4{{font-size:15px;font-weight:600;margin:0 0 4px}}
 p{{margin:0}}
-.banner{{background:var(--card);border:1px solid var(--line);border-left:6px solid {COL[regcol]};border-radius:12px;padding:14px 16px}}
-.banner .name{{font-size:26px;font-weight:700;line-height:1.15}}
-.banner .detail{{color:var(--mute);margin-top:4px}}
-.banner .early{{font-size:14px;margin-top:6px}}
-.upd{{font-size:14px;color:var(--mute);margin-top:8px}} .upd.late{{color:var(--amber);font-weight:600}}
+.upd{{font-size:13px;color:var(--mute);font-weight:400;letter-spacing:0;text-transform:none}} .upd.late{{color:var(--amber);font-weight:600}}
 .card{{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:12px}}
-.reading{{border-left:6px solid {COL[rcol]}}}
-.reading .head{{font-size:22px;font-weight:700;line-height:1.2}}
-.disc{{font-size:13px;color:var(--mute);margin-top:2px}}
-.reading ul{{margin:10px 0 8px;padding-left:20px}} .reading li{{margin:3px 0}}
-.lbl{{font-size:13px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}}
-.sub{{display:grid;grid-template-columns:1fr;gap:10px;margin-top:12px}}
-.line{{border-top:1px solid var(--line);padding-top:10px}}
-.line b{{font-size:17px}}
-.note{{font-size:14px;color:var(--mute);margin-top:10px;font-style:italic}}
-.record{{font-size:14px;margin-top:6px}}
+.top{{display:grid;grid-template-columns:1fr;gap:14px;align-items:center}}
+.lamp{{width:132px;height:132px;border-radius:50%;margin:0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+background:{COL[hl["colour"]]};color:#0b0b0b;box-shadow:0 0 0 6px #0b0d0e,0 0 0 8px {COL[hl["colour"]]}}}
+.lamp .sym{{font-size:22px;line-height:1}} .lamp .w{{font-size:30px;font-weight:800;letter-spacing:.03em;line-height:1.1}}
+.why .sentence{{font-size:20px;font-weight:600;line-height:1.3}}
+.disc{{font-size:13px;color:var(--mute);margin-top:6px}}
+.note{{font-size:13px;color:var(--mute);margin-top:4px;font-style:italic}}
+.tally{{margin-top:14px}} .tally p{{font-size:15px}}
+.bar{{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;margin-top:6px;background:#0b0d0e}} .bar span{{display:block}}
+.lines{{display:grid;grid-template-columns:1fr;gap:0;margin-top:12px}}
+.line{{border-top:1px solid var(--line);padding:10px 0}}
+.line b{{font-size:16px}} .line .disc{{margin-top:2px}}
+.lbl{{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.05em}}
+details.more{{border-top:1px solid var(--line);padding-top:10px}} details.more summary{{display:block;padding:0;cursor:pointer;color:#9ecbff;font-size:14px}}
+details.more ul{{margin:10px 0 8px;padding-left:20px;font-size:15px}} details.more li{{margin:3px 0}}
 details.fam{{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-top:8px}}
-summary{{list-style:none;cursor:pointer;padding:12px 14px;display:grid;grid-template-columns:14px 1fr auto;gap:4px 10px;align-items:center}}
+details.fam summary{{list-style:none;cursor:pointer;padding:12px 14px;display:grid;grid-template-columns:14px 1fr auto;gap:4px 10px;align-items:center}}
 summary::-webkit-details-marker{{display:none}}
 .dot{{width:12px;height:12px;border-radius:50%}}
 .famname{{font-weight:600}} .famword{{font-weight:600;font-size:14px;white-space:nowrap}}
-.famline{{grid-column:2 / -1;font-size:14px;color:var(--mute)}}
+.famline{{grid-column:2 / -1;font-size:14px;color:#c9ced4}}
+.count{{padding:0 14px 8px 38px;font-size:13px;color:var(--mute)}}
 .grid{{display:grid;grid-template-columns:1fr;gap:10px;padding:4px 12px 14px}}
 .dial{{background:#15181b;border:1px solid var(--line);border-radius:10px;padding:12px}}
 .dial svg{{display:block;width:100%;max-width:230px;margin:2px auto 0}}
@@ -162,29 +165,32 @@ summary::-webkit-details-marker{{display:none}}
 .tag{{font-size:11px;border:1px solid currentColor;border-radius:8px;padding:0 6px;margin-left:4px;vertical-align:middle}}
 table{{width:100%;border-collapse:collapse;font-size:13px;color:var(--mute)}} td{{padding:4px 6px 4px 0;border-top:1px solid var(--line);vertical-align:top}}
 footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:8px}} a{{color:#9ecbff}}
-@media(min-width:700px){{.grid{{grid-template-columns:repeat(2,1fr)}}.sub{{grid-template-columns:1fr 1fr}}.line{{border-top:0;border-left:1px solid var(--line);padding:0 0 0 14px}}.sub .line:first-child{{border-left:0;padding-left:0}}}}
+@media(min-width:700px){{.top{{grid-template-columns:150px 1fr;gap:22px}}.lamp{{margin:0}}.grid{{grid-template-columns:repeat(2,1fr)}}
+.lines{{grid-template-columns:repeat(3,1fr);gap:18px}}.line{{border-top:0;border-left:1px solid var(--line);padding:0 0 0 14px}}.lines .line:first-child{{border-left:0;padding-left:0}}}}
 @media(min-width:1040px){{.grid{{grid-template-columns:repeat(3,1fr)}}}}
 </style></head><body><main>
-<h1>macro-hub</h1>
-<section class="banner" aria-label="Regime">
-<p class="lbl">Regime</p><p class="name">{esc(rg["name"])}</p>
-<p class="detail">{esc(rg["detail"])}{" · " + inforce(rg) if inforce(rg) else ""}</p>
-{f'<p class="early">{esc(rg["early_line"])}</p>' if rg.get("early_line") else ""}
-<p class="upd" id="upd" data-t="{esc(feed["generated_at"])}">updated {esc(feed["generated_at_hkt"])}</p>
-</section>
+<h1><span>macro-hub</span><span class="upd" id="upd" data-t="{esc(feed["generated_at"])}">updated {esc(feed["generated_at_hkt"])}</span></h1>
 
-<section class="card reading" aria-label="Reading">
-<p class="lbl">Bitcoin reading</p>
-<p class="head"><span aria-hidden="true" style="color:{COL[rcol]}">{SYM[rcol]}</span> {esc(rd["headline"])}</p>
-<p class="disc">{esc(feed["disclaimer"])}{" · " + inforce(rd) if inforce(rd) else ""}</p>
-<p class="note">{esc(feed["exit_note"])}</p>{record}
-<ul>{reasons}</ul>
-<p><span class="lbl">What would change it</span><br>{esc(rd["change"])}</p>
-{f'<p class="disc" style="margin-top:8px">{esc(price_line)}</p>' if price_line else ""}
-<div class="sub">
-<div class="line"><p class="lbl">Altcoins</p><p><b><span aria-hidden="true" style="color:{COL[acol]}">{SYM[acol]}</span> {esc(alt["headline"])}</b></p><p class="disc">{esc(alt["why"])}</p></div>
-<div class="line"><p class="lbl">Trend exit (weekly-close filter)</p><p><b><span aria-hidden="true" style="color:{COL[tcol]}">{SYM[tcol]}</span> {esc(tr["state"])}</b></p><p class="disc">{esc(tr["text"])}{" · " + inforce(tr) if inforce(tr) else ""}</p></div>
+<section class="card" aria-label="Reading">
+<div class="top">
+<div class="lamp" role="img" aria-label="{esc(hl["word"])}"><span class="sym" aria-hidden="true">{hl["symbol"]}</span><span class="w">{esc(hl["word"])}</span></div>
+<div class="why">
+<p class="sentence">{esc(hl["sentence"])}</p>
+<p class="disc">{esc(feed["disclaimer"])}{since}</p>
+<p class="note">{esc(small)}</p>
 </div>
+</div>
+<div class="tally"><p>{esc(ty["text"])}</p><div class="bar" role="img" aria-label="{esc(ty["text"])}">{bar}</div></div>
+<div class="lines">
+<div class="line"><p class="lbl">Backdrop</p><p><b>{esc(bd["text"])}</b></p>{f'<p class="disc">{esc(bd["early"])}</p>' if bd["early"] else ""}</div>
+<div class="line"><p class="lbl">Bitcoin's weekly trend</p><p><b><span aria-hidden="true" style="color:{COL[tr["colour"]]}">{SYM[tr["colour"]]}</span> {esc(tr["text"])}</b></p><p class="disc">{esc(tr.get("detail", ""))}</p></div>
+<div class="line"><p class="lbl">Altcoins</p><p><b><span aria-hidden="true" style="color:{COL[acol]}">{SYM[acol]}</span> {esc(aword)}</b></p><p class="disc">{esc(alt["why"][:1].upper() + alt["why"][1:])}.</p></div>
+</div>
+<details class="more"><summary>The detail behind this reading</summary>
+<ul>{reasons}</ul>
+<p><span class="lbl">What would change it</span><br>{esc(pl["what_would_change"])}</p>
+{f'<p class="disc" style="margin-top:8px">{esc(price_line)}</p>' if price_line else ""}
+</details>
 </section>
 
 {"".join(blocks)}
@@ -202,8 +208,8 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 </footer>
 </main>
 <script>
-(function(){{var e=document.getElementById('upd');if(!e)return;function f(){{var m=Math.round((Date.now()-new Date(e.dataset.t).getTime())/60000);
-var t=e.textContent.split(' · ')[0];e.textContent=t+' · '+(m<1?'just now':m<120?m+' min ago':Math.round(m/60)+' h ago');
+(function(){{var e=document.getElementById('upd');if(!e)return;var t0=e.textContent;function f(){{var m=Math.round((Date.now()-new Date(e.dataset.t).getTime())/60000);
+e.textContent=t0+' · '+(m<1?'just now':m<120?m+' min ago':Math.round(m/60)+' h ago');
 e.className='upd'+(m>{int(feed.get("stale_minutes", 60))}?' late':'');}}f();setInterval(f,60000);
 if(window.matchMedia('(min-width:1040px)').matches){{document.querySelectorAll('details.fam').forEach(function(d){{d.open=true}})}}
 }})();
