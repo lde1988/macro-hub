@@ -74,7 +74,7 @@ For these, green = the turn signal has fired, amber = not fired, red = moving th
 | 21 | Fed buying: bank reserves, 4-week change | Up **$150bn** or more | Between | Down $150bn or more | **Widened from $75bn**, which fired 12 times in two years. Never confirms a turn on its own | +$17bn: amber |
 | 22 | Stablecoin supply turning | 30-day change positive | Negative but less negative than 30 days ago | Negative and getting worse | Owner's signal | -5.9%, worse than a month ago: red |
 | 23 | Bitcoin weekly close reclaim | Weekly close above $73,000 ends a break; stays green for 12 weeks while weekly closes hold above $70,000 | No break in force | Break in force | Owner's level. The 12 weeks is mine, so an old reclaim does not count as a fresh turn forever | red |
-| 24 | Treasury buybacks, liquidity-support operations only: latest 4 weeks against the average 4 weeks of the prior 12 | **2.0x** or more (step up) | Between | 0.67x or less (step down) | **Widened from 1.5x**, which fired 11 times in two years. See the note below: at 2.0x the August 2026 step-up Coutts cites does not fire | 0.7x: amber |
+| 24 | Treasury buybacks, liquidity-support operations only: latest 4 weeks against the average 4 weeks of the prior 12 | 1.5x or more (step up) | Between | 0.67x or less (step down) | Owner's level, kept at 1.5x so the August 2026 step-up Coutts cites fires (it reached 1.6x). It fires often (11 times in two years); the freshness rule and the two-family rule limit what that can do | 0.7x: amber |
 | 25 | Rate hikes being priced out: dial 6a, 20-day change | Down **30bp** or more | Between | Up 10bp or more | **Widened from 20bp**, which fired 9 times in two years. Dial 6a itself keeps its approved 20bp band | -6bp: amber |
 
 ## Families (owner's change 3)
@@ -91,7 +91,7 @@ Each family counts once. A buy is blocked only by a *fresh* red (within 5 tradin
 | Crypto leverage | Funding rate, altcoin open interest, stablecoin supply | No |
 | Equities | S&P 500, margin debt | No |
 
-My placements, for the owner to overrule: the two Fed stress indexes sit in credit spreads; stablecoin supply in crypto leverage; margin debt in equities; CPI, breakeven and the liquidity proxy in rates and dollar.
+Placements agreed by the owner (25 Nov): the two Fed stress indexes sit in credit spreads; stablecoin supply in crypto leverage; margin debt in equities; CPI, breakeven and the liquidity proxy in rates and dollar.
 
 ## Buy / hold / sell rules as built (owner's changes 1 to 3)
 
@@ -102,7 +102,9 @@ Checked in this order; the first that applies wins.
 3. **BUY (STAGED):** price dial green AND (LTH-SOPR 30-day green OR net realised losses green) AND no fresh red in those three families. No turn signal needed.
 4. **HOLD:** everything else, always saying which kind. CAUTION is added when the weekly close is below $70,000 and the price dial is not green.
 
-**Turn confirmed** = the dollar reversal dial is green, OR two of these families are green together: rates (dials 20, 25); Fed and Treasury (T-bill holdings, buybacks); crypto liquidity (dial 22). Bank reserves are in no family, so alone they never confirm a turn. The weekly-close reclaim (dial 23) is a price signal and is in no family either.
+**Turn confirmed** = the dollar reversal dial is *freshly* green, OR two of these families are freshly green together: rates (dials 20, 25); Fed and Treasury (T-bill holdings, buybacks); crypto liquidity (dial 22). Bank reserves are in no family, so alone they never confirm a turn. The weekly-close reclaim (dial 23) is a price signal and is in no family either.
+
+**Fresh** (owner's decision, 25 Nov) = the dial turned green within the last 13 weeks. Dial colours stay as approved: a dial green for longer still shows green, but it no longer counts toward "turn confirmed" or the TURN regime. TURN needs at least one freshly green group D dial.
 
 **Altcoins:** BUY only when the Bitcoin reading is BUY and altcoin open interest is below its 50th percentile.
 
@@ -114,25 +116,44 @@ Replayed day by day with the no-flapping rule, using only what was known each da
 
 | Dial | Times it turned green | Share of days green | Action |
 |---|---|---|---|
-| 19 Dollar reversal | 2 | **80%** | See the open question |
+| 19 Dollar reversal | 2 | 80% | Counts only while fresh (13 weeks) |
 | 20 Front-end easing (2-year down 25bp) | 4 | 3% | Kept |
-| 25 Hikes priced out | 9 at 20bp | 9% | **Widened to 30bp: 3 times, 1% of days** |
-| 21 T-bill holdings up $20bn | 2 | 33% | Kept (two long spells while the Fed was buying bills) |
-| 21 Bank reserves | 12 at $75bn | 23% | **Widened to $150bn: 3 times, 4% of days** |
-| 24 Buybacks step up | 11 at 1.5x | 16% | **Widened to 2.0x: 1 time (3 to 22 Oct 2026), 3% of days** |
-| 22 Stablecoin supply turning | 5 | **74%** | See the open question |
-| 23 Weekly close reclaim | 3 | 28% | Kept (uses today's $70,000 / $73,000 levels throughout) |
+| 25 Hikes priced out | 9 at 20bp | 9% | Widened to 30bp: 3 times, 1% of days |
+| 21 T-bill holdings up $20bn | 2 | 33% | Kept; counts only while fresh |
+| 21 Bank reserves | 12 at $75bn | 23% | Widened to $150bn: 3 times, 4% of days |
+| 24 Buybacks step up | 11 at 1.5x | 16% | **Kept at 1.5x by the owner** (2.0x fired once) |
+| 22 Stablecoin supply turning | 5 | 74% | Counts only while fresh |
+| 23 Weekly close reclaim | 3 | 28% | Kept |
 
-Two honest notes:
+## "Turn confirmed" under the fresh rule (owner's question, 25 Nov)
 
-- **Buybacks.** At 2.0x the one firing is October 2026. The August 2026 step-up that Coutts dates Bitcoin's turn to reached 1.6x by this measure on 30 August, so it fires at 1.5x but not at 2.0x. Lowering it again brings back the 11 firings.
-- **"Turn confirmed" was true on 82% of days** in those two years, almost entirely because the dollar sat below 102.5 from April 2025 to November 2026. Without the dollar dial, two families were green together on 23% of days (9 separate spells).
+| Setting | Share of days "turn confirmed" | Separate spells | TURN regime share of days |
+|---|---|---|---|
+| Before the fresh rule | 82% | 4 | 99% (721 of 730) |
+| Fresh rule, buybacks at 1.5x (as built) | **24.7%** | 9 | 70% |
+| Fresh rule, buybacks at 2.0x | 23.4% | 7 | 67% |
 
-## Open question for the owner
+Putting buybacks back to 1.5x costs little: 1.3 points of days and two extra short spells (27–28 Nov 2024 and 7–11 Dec 2024).
 
-The dollar reversal and stablecoin dials are green whenever a *condition holds* (dollar below 102.5; supply growing), which over the past two years was most of the time. A turn is an *event*. As written, the regime banner would have read TURN on 721 of 730 days, and BUY (CONFIRMED) would mean little more than "price at or below 1.3x realised price while the dollar is below 102.5".
+Spells at 1.5x: 27–28 Nov 2024; 7–11 Dec 2024; 4–7 Apr 2025; 11 Apr–10 Jul 2025 (the dollar's fall through 102.5); 26 Dec 2025–5 Jan 2026; 18–22 Jan 2026; 3–26 Mar 2026; 26 Aug–10 Sep 2026; 1–22 Oct 2026.
 
-Proposal, not built: dial colours stay as approved, but for confirming a turn and for the TURN regime a group D dial counts only while its green is **fresh: within 13 weeks of switching on**. This is the same idea already approved for the weekly-close reclaim (12 weeks).
+**Still worth knowing:** the TURN *regime* (any one fresh turn dial) would have shown on 70% of days, mostly as "TURN (early, not confirmed)", because eight dials each stay fresh for 13 weeks. The banner always says whether the turn is confirmed. If that is too loose, the simple fix is to show TURN only when the turn is confirmed; this is the owner's call and is not built.
+
+## Levels for the history replay (owner's decision, 25 Nov)
+
+Fixed dollar levels mean nothing in earlier cycles, so the replay uses moving stand-ins:
+
+| Live level (colours the dial) | Replay stand-in | Today |
+|---|---|---|
+| Value zone $58,600 | 1.10x realised price | $58,400 |
+| Reclaim line $73,000 | Short-term holder realised price | $72,400 |
+| Break line $70,000 | 0.96x short-term holder realised price | $69,500 |
+
+Live dials keep the fixed levels and show the moving equivalents beside them, so drift between the two is visible.
+
+## Dashboard layout (owner's instruction, for point 7)
+
+Lead with the reading and one line per family (colour plus a sentence). Individual dials go underneath, grouped by family, so a phone screen is not 39 dials long.
 
 ## Dollar index accuracy over a longer window
 
