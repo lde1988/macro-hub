@@ -565,3 +565,9 @@ def test_alt_open_interest_is_labelled_a_proxy_until_matched(tmp_path):
     data = {"OI_ALT": daily([1.0 + (i % 100) / 100 for i in range(400)]), "OI_BTC": flat(1.0, 400)}
     assert "proxy, not matched to Coutts" in D.alt_oi(view(tmp_path, data), cfg(alt_oi={"matched_to_coutts": False})).text
     assert "proxy" not in D.alt_oi(view(tmp_path / "b", data), cfg(alt_oi={"matched_to_coutts": True})).text
+
+
+def test_percentiles_read_as_proper_ordinals():
+    from hub.signals.core import ordinal
+    assert [ordinal(n) for n in (1, 2, 3, 4, 11, 12, 13, 21, 51, 62, 86, 98, 100)] == \
+        ["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "51st", "62nd", "86th", "98th", "100th"]

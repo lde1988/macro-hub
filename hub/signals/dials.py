@@ -6,7 +6,7 @@ red = argues against. Band edges live in config/thresholds.yaml.
 import pandas as pd
 
 from hub.signals.core import (A, G, R, Raw, band, bn, change, dxy_from_ecb, finished_month_ends, gauge,
-                              level_state, money, pct_change_days, percentile_of_last, value_days_ago,
+                              level_state, money, ordinal, pct_change_days, percentile_of_last, value_days_ago,
                               weekly_closes, weekly_state)
 
 DIALS = []  # filled by @dial, in dashboard order
@@ -183,8 +183,8 @@ def net_loss(v, c, prev=None):
     col = G if pct >= k["green_percentile"] else A
     feb = -float(df.iloc[-1, 0]) / float(c["levels"]["feb_2026_net_loss_peak"])
     what = f"net loss {x:.2f}% of realised cap" if x > 0 else f"net profit {-x:.2f}% of realised cap"
-    return Raw(pct, col, f"{what} · {pct:.0f}th percentile",
-               f"Green at or above the {k['green_percentile']}th percentile of all history: losses spiking as in a capitulation.",
+    return Raw(pct, col, f"{what} · {ordinal(pct)} percentile",
+               f"Green at or above the {ordinal(k['green_percentile'])} percentile of all history: losses spiking as in a capitulation.",
                df.index[-1], gauge(0, 100, [k["green_percentile"]], [A, G]),
                {"net_loss_pct_of_realised_cap": x, "share_of_feb_2026_peak": feb})
 
@@ -456,7 +456,7 @@ def alt_oi(v, c, prev=None):
     pct = percentile_of_last(r)
     col = band(pct, [k["green_below"], k["red_at_or_above"]], [G, A, R], right=False)
     tag = "" if k.get("matched_to_coutts") else " · proxy, not matched to Coutts"
-    return Raw(pct, col, f"{r.iloc[-1]:.2f}x · {pct:.0f}th percentile since {r.index[0]:%b %Y}{tag}",
+    return Raw(pct, col, f"{r.iloc[-1]:.2f}x · {ordinal(pct)} percentile since {r.index[0]:%b %Y}{tag}",
                "Green below its 50th percentile; red at or above the 90th (altcoin leverage is stretched).", df.index[-1],
                gauge(0, 100, [k["green_below"], k["red_at_or_above"]], [G, A, R]),
                {"ratio": float(r.iloc[-1]), "matched_to_coutts": bool(k.get("matched_to_coutts"))})
