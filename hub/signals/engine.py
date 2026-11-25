@@ -6,7 +6,7 @@ Fixed, written rules only. No machine learning and no hidden weights.
 import numpy as np
 import pandas as pd
 
-from hub.signals.core import A, G, R, WORD, Raw
+from hub.signals.core import A, G, R, WORD, Raw, band
 from hub.signals.dials import DIALS
 
 GROUP_NAMES = {"A": "Is it cheap?", "B": "Is stress still building?", "C": "Credit-event risk", "D": "Has the turn started?"}
@@ -15,18 +15,23 @@ FAMILY_NAMES = {"rates_dollar": "rates and dollar", "money_market": "money-marke
                 "equities": "equities"}
 
 
+# dial facts carried from run to run, so a failed calculation cannot silently clear a BREAK, FRAGILE or RISK-OFF
+KEEP = ("break_in_force", "break_level", "reclaim_level", "month_end_break", "fired_latched", "ratio_to_realised")
+
+
 def step(prev, raw_colour, now, confirm_runs, mode="run"):
     """No-flapping rule for one dial. Returns (new state, colour it changed from or None).
 
-    A dial changes colour only after `confirm_runs` runs in a row showing the new
-    colour. mode "none" is for dials whose own calculation already confirms
-    (weekly closes; the dollar's two-fixing rule). With no data the dial keeps
-    its last colour. The very first colour is a silent baseline.
+    A dial changes colour only after `confirm_runs` runs in a row away from its current
+    colour; it then takes the latest colour seen. A run with no data breaks the "in a row"
+    count and keeps the last colour. mode "none" is for dials whose own calculation already
+    confirms (weekly closes; the dollar's two-fixing rule). The very first colour is a silent baseline.
     """
     st = {"colour": prev.get("colour"), "pending": prev.get("pending"), "count": prev.get("count", 0),
-          "since": prev.get("since"), "baseline": prev.get("baseline", False)}
+          "since": prev.get("since"), "baseline": prev.get("baseline", False), "extra": prev.get("extra", {})}
     cur = st["colour"]
     if raw_colour is None:
+        st.update(pending=None, count=0)        # no data: not "beyond the edge", so the count starts again
         return st, None
     if cur is None:
         st.update(colour=raw_colour, pending=None, count=0, since=str(now), baseline=True)
@@ -35,7 +40,7 @@ def step(prev, raw_colour, now, confirm_runs, mode="run"):
         st.update(pending=None, count=0)
         return st, None
     if mode != "none":
-        st["count"] = st["count"] + 1 if st["pending"] == raw_colour else 1
+        st["count"] = st["count"] + 1           # another run away from the current colour (whichever other colour)
         st["pending"] = raw_colour
         if st["count"] < confirm_runs:
             return st, None
@@ -63,7 +68,11 @@ def evaluate_dials(view, cfg, state):
         too_old = bool(cfg["general"].get("enforce_max_age", True)) and age is not None and age > limit
         if too_old:
             raw.colour = None
+        # facts the regime and reading rely on must not vanish when a dial has no data this run
+        if raw.colour is None and not any(k in raw.extra for k in KEEP):
+            raw.extra = {**prev.get("extra", {}), **raw.extra}
         st, changed_from = step(prev, raw.colour, view.now, runs, d["confirm"])
+        st["extra"] = {k: raw.extra[k] for k in KEEP if k in raw.extra}
         new_state[d["id"]] = st
         fresh_red = (st["colour"] == R and not st["baseline"] and st["since"] is not None
                      and trading_days_between(st["since"], view.now) < cfg["general"]["fresh_red_trading_days"])
@@ -77,6 +86,15 @@ def evaluate_dials(view, cfg, state):
             "too_old": too_old, "age_days": age,
             "gauge": raw.gauge, "extra": raw.extra,
         }
+    # "price at or below 1.3x realised price" drives the reading, so it gets the same protection as a dial:
+    # a 2% buffer and two runs in a row, otherwise a price sitting on the line would flip the reading every run.
+    bp, mult = readings.get("btc_price"), cfg["btc_price"]["confirmed_buy_multiple"]
+    if bp is not None:
+        ratio, prev = bp["extra"].get("ratio_to_realised"), (state or {}).get("_near", {})
+        raw = band(ratio, [mult], ["yes", "no"], prev.get("colour"), cfg["general"]["price_buffer"], rel=True)
+        near, _ = step(prev, raw, view.now, runs)
+        new_state["_near"] = near
+        bp["extra"]["at_or_below_confirmed_multiple"] = (near["colour"] == "yes") if near["colour"] else None
     return readings, new_state
 
 
@@ -153,6 +171,9 @@ def reading(readings, cfg, rule="new"):
                           (f"{len(red_fams)} families red ({', '.join(red_fams)})", len(red_fams) >= 2)) if f]
     cheap = col("btc_price") == G
     ratio = ex("btc_price", "ratio_to_realised")
+    near = ex("btc_price", "at_or_below_confirmed_multiple")           # confirmed over two runs, with a 2% buffer
+    if near is None:
+        near = ratio is not None and ratio <= cfg["btc_price"]["confirmed_buy_multiple"]
     capit = [n for n, f in (("long-term holders are selling at a loss (LTH-SOPR green)", col("lth_sopr") == G),
                             ("net realised losses are spiking", col("net_loss") == G)) if f]
     block = [f"{fam[f]['name']} ({', '.join(fam[f]['fresh_red'])})" for f in cfg["buy_blocking_families"] if fam[f]["fresh_red"]]
@@ -161,7 +182,7 @@ def reading(readings, cfg, rule="new"):
     turned = old_turned if rule == "old" else turn["fresh_signals"]
     out = {"rule": rule, "caution": bool(ex("btc_weekly", "break_in_force")) and not cheap, "turn": turn}
 
-    not_cheap = ratio is None or ratio > cfg["btc_price"]["confirmed_buy_multiple"]   # frothy and cheap cannot both be true
+    not_cheap = not near                                               # frothy and cheap cannot both be true
     if froth and liq and not_cheap:
         out.update(label="FROTH WARNING", headline="Froth warning (reduce-risk watch)",
                    reasons=["Froth: " + "; ".join(froth), "Liquidity deteriorating: " + "; ".join(liq)],
@@ -171,10 +192,10 @@ def reading(readings, cfg, rule="new"):
         out.update(label="BUY", headline="Buy (in stages)",
                    reasons=["Price is in the value zone", "Turn signal: " + ", ".join(turned), "No group B or C dial newly red in 5 trading days"],
                    change="Back to hold if price leaves the value zone, the turn signals fade, or a stress dial turns red.")
-    elif rule == "new" and ratio is not None and ratio <= cfg["btc_price"]["confirmed_buy_multiple"] and turn["confirmed"] and not block:
+    elif rule == "new" and near and turn["confirmed"] and not block:
         how = "the dollar has reversed" if turn["dollar_reversal"] else "two turn families are green (" + ", ".join(f for f, g in turn["families"].items() if g) + ")"
         out.update(label="BUY", level="CONFIRMED", headline="Buy (confirmed)",
-                   reasons=[f"Price is {ratio:.2f}x realised price (at or below 1.3x)", f"Turn confirmed: {how}",
+                   reasons=[f"Price is {ratio:.2f}x realised price (at or below 1.3x)" if ratio is not None else "Price is at or below 1.3x realised price", f"Turn confirmed: {how}",
                             "No fresh red in money-market funding, credit spreads or banks"],
                    change="Back to hold if the turn is no longer confirmed, price rises above 1.3x realised price, or fresh stress appears in funding, credit or banks.")
     elif rule == "new" and cheap and capit and not block:
@@ -198,9 +219,9 @@ def reading(readings, cfg, rule="new"):
                 why = "fresh stress in " + "; ".join(block)
                 change = "Buy once that dial has been red for more than 5 trading days without a new one joining it, or it clears."
             kind, reasons = f"cheap, but {why}", ["Price is in the value zone"]
-        elif rule == "new" and ratio is not None and ratio <= cfg["btc_price"]["confirmed_buy_multiple"]:
+        elif rule == "new" and near:
             why = "the turn is not confirmed" if not turn["confirmed"] else "fresh stress in " + "; ".join(block)
-            kind, reasons = f"fairly cheap, but {why}", [f"Price is {ratio:.2f}x realised price, not yet in the value zone"]
+            kind, reasons = f"fairly cheap, but {why}", [f"Price is {ratio:.2f}x realised price, not yet in the value zone" if ratio is not None else "Price is at or below 1.3x realised price"]
             change = "Buy (confirmed) when the dollar reverses or two turn families go green; Buy (staged) if price falls into the value zone with a capitulation sign."
         else:
             kind, reasons = "neither cheap nor frothy", ["Price is outside the value zone and below the froth level"]

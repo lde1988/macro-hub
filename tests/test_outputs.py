@@ -286,7 +286,9 @@ def test_full_run_baseline_then_change_then_failed_push_is_retried(tmp_path):
     assert {"Trend exit: RISK-OFF", "macro-hub daily digest"} <= {t for t, _ in sent}
     assert json.loads((data / "state" / "hub.json").read_text())["outbox"] == []
     log = (data / "log" / "verdicts.csv").read_text()
-    assert "RISK-OFF" in log and log.count("\n") == 3                     # one new row for the change (the digest shared it)
+    # one row for the trend/regime change (the digest shared it), then one when the reading itself
+    # changed a run later: the "at or below 1.3x" test waits for two runs in a row, like every dial
+    assert "RISK-OFF" in log and log.count("\n") == 4 and "fairly cheap" in log.splitlines()[-1]
     assert "btc_weekly" in (data / "log" / "dial_changes.csv").read_text()
 
 
@@ -307,3 +309,16 @@ def test_go_live_does_not_push_changes_that_are_only_the_warm_up_settling(tmp_pa
     for i in (1, 2, 3):
         main(data, site, rt, now=t0 + dt.timedelta(minutes=15 * i), fetchers=src, sender=sender)
     assert sent == [] and not (data / "log" / "dial_changes.csv").exists()
+
+
+def test_with_pushes_switched_off_waiting_pushes_are_kept_not_discarded(tmp_path):
+    data, site, rt = tmp_path / "data", tmp_path / "site", tmp_path / "rt"
+    t0 = dt.datetime(2026, 11, 25, 9, 0, tzinfo=dt.timezone.utc)
+    src = fake_sources([80000] * 30, 2.1)
+    main(data, site, rt, now=t0, fetchers=src, sender=lambda *a, **k: (True, "sent"))
+    hub = data / "state" / "hub.json"
+    st = json.loads(hub.read_text())
+    st["outbox"] = [{"title": "waiting", "message": "m", "priority": 3}]
+    hub.write_text(json.dumps(st))
+    main(data, site, rt, now=t0 + dt.timedelta(minutes=15), fetchers=src, push=False)
+    assert [p["title"] for p in json.loads(hub.read_text())["outbox"]] == ["waiting"]

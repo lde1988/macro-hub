@@ -135,6 +135,8 @@ def main(data, site, runtime, push=True, now=None, fetchers=None, sender=None):
         print(f'push "{p["title"]}" priority {p["priority"]}: {why}')
         if not ok and push:
             left.append(p)                                # retry next run
+    if not push:
+        left = st["outbox"]                               # pushes switched off: keep what was already waiting
     st.update(dials=out["state"]["dials"], summary=cur, outbox=left[-cfg["alerts"]["max_outbox"]:])
     save_json(data / "state" / "hub.json", st)
     save_json(data / "state" / "source_health.json",

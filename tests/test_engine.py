@@ -33,11 +33,21 @@ def test_a_single_blip_is_ignored():
     assert st["colour"] == G and changed is None
 
 
-def test_two_different_colours_do_not_add_up():
+def test_two_runs_away_from_the_current_colour_change_it_even_if_they_differ():
     st, _ = step({}, G, T0, 2)
     st, _ = step(st, R, T0, 2)
-    st, changed = step(st, A, T0, 2)
-    assert st["colour"] == G and st["pending"] == A and st["count"] == 1
+    st, changed = step(st, A, T0, 2)                           # red then amber: both beyond green's edge
+    assert st["colour"] == A and changed == G                  # takes the latest; never stuck on green
+
+
+def test_a_run_with_no_data_breaks_the_in_a_row_count():
+    st, _ = step({}, G, T0, 2)
+    st, _ = step(st, R, T0, 2)
+    st, _ = step(st, None, T0, 2)
+    st, changed = step(st, R, T0, 2)                           # red, no data, red is not two in a row
+    assert st["colour"] == G and changed is None
+    st, changed = step(st, R, T0, 2)
+    assert st["colour"] == R
 
 
 def test_no_data_keeps_the_last_colour():
@@ -326,3 +336,43 @@ def test_one_broken_dial_does_not_stop_the_others(tmp_path, monkeypatch):
     monkeypatch.setitem(d, "fn", lambda v, c, p: 1 / 0)
     out = evaluate(view(tmp_path, {"NFCI": flat(-0.5, 5)}), C)
     assert "calculation error" in out["readings"]["breakeven"]["text"] and out["readings"]["nfci"]["colour"] == G
+
+
+# ------------------------------------------------------------------ review fixes (point 8)
+def near_flag(tmp_path, prices, rp=60000.0):
+    """Run the engine over a sequence of live prices; return the 'at or below 1.3x' flag and headline each run."""
+    out, state = [], None
+    for i, p in enumerate(prices):
+        data = {"BTCUSD": flat(100000, 30), "BV_REALIZED_PRICE": flat(rp, 30), "BV_STH_REALIZED_PRICE": flat(50000, 30)}
+        v = view(tmp_path / str(i), data, now=T0 + pd.Timedelta(minutes=15 * i), live={"BTCUSD": p})
+        o = evaluate(v, C, state)
+        state = o["state"]
+        out.append((o["readings"]["btc_price"]["extra"]["at_or_below_confirmed_multiple"], o["reading"]["headline"]))
+    return out
+
+
+def test_price_hovering_on_the_1_3x_line_does_not_flip_the_reading(tmp_path):
+    runs = near_flag(tmp_path, [77900, 78100, 77900, 78100, 77900, 78100])     # 1.3x of 60,000 is 78,000
+    assert len({h for _, h in runs}) == 1 and all(flag is True for flag, _ in runs)
+
+
+def test_the_1_3x_flag_changes_after_two_runs_clearly_beyond_the_line(tmp_path):
+    runs = near_flag(tmp_path, [77000, 80000, 80000, 80000])                    # 80,000 is more than 2% above 78,000
+    assert [f for f, _ in runs] == [True, True, False, False]
+    assert "fairly cheap" in runs[0][1] and "neither cheap nor frothy" in runs[-1][1]
+
+
+def test_break_and_risk_off_survive_a_dial_that_fails_for_a_run(tmp_path, monkeypatch):
+    data = {"BTCUSD": weekly(), "BV_REALIZED_PRICE": flat(53000, 30)}
+    o1 = evaluate(view(tmp_path, data, live={"BTCUSD": 61000}), C)
+    assert o1["regime"]["name"] == "BREAK" and o1["trend_exit"]["state"] == "RISK-OFF"
+    d = next(x for x in DIALS if x["id"] == "btc_weekly")
+    monkeypatch.setitem(d, "fn", lambda v, c, p: 1 / 0)
+    o2 = evaluate(view(tmp_path / "b", data, now=T0 + pd.Timedelta(minutes=15), live={"BTCUSD": 61000}), C, o1["state"])
+    assert "calculation error" in o2["readings"]["btc_weekly"]["text"]
+    assert o2["regime"]["name"] == "BREAK" and o2["trend_exit"]["state"] == "RISK-OFF"      # not silently cleared
+
+
+def weekly():
+    from tests.helpers import weekly_btc
+    return weekly_btc([80000, 61000])

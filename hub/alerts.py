@@ -71,6 +71,14 @@ def source_pushes(status, registry, cfg, already_down):
         meta = registry["sources"].get(name, {})
         if meta.get("check_only"):
             continue
+        part = sorted(k for k, c in (st.get("series_fails") or {}).items() if c >= n)
+        key = name + ":" + ",".join(part)
+        for old in [d for d in down if d.startswith(name + ":") and d != key]:
+            down.discard(old)
+        if part and st.get("fails", 0) < n and key not in down:
+            down.add(key)
+            out.append({"title": f"Source partly down: {meta.get('credit', name)}", "priority": cfg["alerts"]["source_down_priority"], "tags": ["warning"],
+                        "message": f"{meta.get('credit', name)} has failed {n} runs in a row for: {', '.join(part)}. The dials that use them keep their last colour until the data returns."})
         if st.get("fails", 0) >= n and name not in down:
             down.add(name)
             out.append({"title": f"Source down: {meta.get('credit', name)}", "priority": cfg["alerts"]["source_down_priority"], "tags": ["warning"],

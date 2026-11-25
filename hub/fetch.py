@@ -73,6 +73,8 @@ def run_fetch(data_dir, backfill=False, only=None, now=None, registry=None, root
                 live[sid] = {"value": v, "time": t}
             got = [e["id"] for e in entries if e["id"] in res.history and len(res.history[e["id"]])]
             st["series_errors"] = {k: scrub(v)[:200] for k, v in res.errors.items()}
+            # one working series must not hide another that keeps failing: count failures in a row per series
+            st["series_fails"] = {k: st.get("series_fails", {}).get(k, 0) + 1 for k in res.errors}
             if got or not res.errors:
                 st.update(fails=0, last_ok=now.isoformat(), last_error="")
             else:

@@ -34,16 +34,27 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--failed", default="")
+    ap.add_argument("--runtime", default="runtime")
     args = ap.parse_args()
     if args.failed:
+        # a broken run repeats every 15 minutes: remember when the last failure push went, and send at most one an hour
         import datetime
-        # a broken run repeats every 15 minutes; only the first run of each hour sends this
-        if datetime.datetime.now(datetime.timezone.utc).minute < 15:
+        import pathlib
+        mark = pathlib.Path(args.runtime) / "last_failure_push.txt"
+        now = datetime.datetime.now(datetime.timezone.utc)
+        try:
+            recent = (now - datetime.datetime.fromisoformat(mark.read_text().strip())).total_seconds() < 3600
+        except Exception:
+            recent = False
+        if not recent:
             ok, why = send("macro-hub: run failed",
                            f"Something went wrong in {args.failed}, so readings may be out of date. "
                            "Open the repository's Actions tab to see the error. This repeats at most once an hour while it lasts.",
                            priority=4, tags=["rotating_light"])
             print("failure push:", why)
+            if ok:
+                mark.parent.mkdir(parents=True, exist_ok=True)
+                mark.write_text(now.isoformat())
         sys.exit(0)
     if args.test:
         ok, why = send("macro-hub: test push",

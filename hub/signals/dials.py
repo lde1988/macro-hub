@@ -343,29 +343,37 @@ def breakeven(v, c, prev=None):
                gauge(1.5, 3.5, [k["green_at_or_below"], k["red_above"]], [G, A, R]))
 
 
-def liquidity_total(v, at):
-    """Fed + ECB + Bank of Japan assets and US M2, in millions of dollars, as of date `at`."""
-    def asof(sid):
+def liquidity_totals(v):
+    """(total now, total a year earlier, oldest weekly date), in millions of dollars: Fed + ECB +
+    Bank of Japan assets and US M2. Each part is compared with its OWN value 365 days before its
+    own latest figure, so a part that is published late does not shorten the year."""
+    def pair(sid):
         s = v.s(sid)
-        s = s[s.index <= at]
-        return float(s.iloc[-1]) if len(s) else None
-    fed, ecb, boj, m2, usd, jpy = (asof(x) for x in ("WALCL", "ECBASSETSW", "JPNASSETS", "M2SL", "ECB_USD", "ECB_JPY"))
-    if None in (fed, ecb, boj, m2, usd, jpy):
+        if not len(s):
+            return None
+        old = s[s.index <= s.index[-1] - pd.Timedelta(days=365)]
+        return (float(s.iloc[-1]), float(old.iloc[-1]), s.index[-1]) if len(old) else None
+    parts = {k: pair(k) for k in ("WALCL", "ECBASSETSW", "JPNASSETS", "M2SL", "ECB_USD", "ECB_JPY")}
+    if any(p is None for p in parts.values()):
         return None
-    return fed + ecb * usd + boj * 100 / (jpy / usd) + m2 * 1000
+    usd, jpy = parts["ECB_USD"], parts["ECB_JPY"]
+
+    def total(i):
+        return (parts["WALCL"][i] + parts["ECBASSETSW"][i] * usd[i] + parts["JPNASSETS"][i] * 100 / (jpy[i] / usd[i])
+                + parts["M2SL"][i] * 1000)
+    return total(0), total(1), min(parts["WALCL"][2], parts["ECBASSETSW"][2])
 
 
 @dial("liquidity", "B", "Global liquidity proxy")
 def liquidity(v, c, prev=None):
-    k, t = c["liquidity"], v.now.normalize()
-    now_, then = liquidity_total(v, t), liquidity_total(v, t - pd.Timedelta(days=365))
-    if not now_ or not then:
+    k, tot = c["liquidity"], liquidity_totals(v)
+    if not tot:
         return Raw()
+    now_, then, obs = tot
     x = (now_ / then - 1) * 100
     col = band(x, [k["red_below"], k["green_at_or_above"]], [R, A, G], right=False)
     return Raw(x, col, f"{x:+.1f}% year on year · ${now_ / 1e6:,.1f}tn (proxy)",
-               "Green at +5% a year or more; red when shrinking. A proxy: not Coutts' own index.",
-               min(v.s("WALCL").index[-1], v.s("ECBASSETSW").index[-1]),
+               "Green at +5% a year or more; red when shrinking. A proxy: not Coutts' own index.", obs,
                gauge(-10, 20, [k["red_below"], k["green_at_or_above"]], [R, A, G]), {"total_usd_millions": now_})
 
 
@@ -651,6 +659,9 @@ def weekly_reclaim(v, c, prev=None):
 
 @dial("buybacks", "D", "Treasury buybacks (liquidity support)")
 def buybacks(v, c, prev=None):
+    """Driven by the calendar: with no new operations the latest-4-weeks total falls on its own.
+    So its date is "today" (a quiet spell is information, not stale data); a Treasury outage is
+    caught by the source-down alert instead."""
     k, s, cm, t = c["buybacks"], v.s("BUYBACK_LS"), v.s("BUYBACK_CM"), v.now.normalize()
     if not len(s):
         return Raw()
@@ -659,14 +670,17 @@ def buybacks(v, c, prev=None):
     recent = float(s[(s.index > a) & (s.index <= t)].sum())
     prior = float(s[(s.index > b) & (s.index <= a)].sum()) / (k["prior_days"] / k["recent_days"])
     cmr = float(cm[(cm.index > a) & (cm.index <= t)].sum()) if len(cm) else 0.0
-    if prior <= 0:
-        return Raw(text="no data (no buybacks in the comparison period)")
+    g = gauge(0, 3, [k["red_at_or_below"], k["green_at_or_above"]], [R, A, G])
+    last = f"last operation {s.index[-1]:%d %b %Y}"
+    extra = {"recent_usd": recent, "prior_avg_usd": prior, "cash_management_usd": cmr, "last_operation": str(s.index[-1])[:10]}
+    moves = f"Green when the latest 4 weeks are {k['green_at_or_above']:.1f} times the average of the prior 12 weeks (a step up)."
+    if prior <= 0:   # nothing to compare with: a restart from nothing is a step up, continued silence is neutral
+        col = G if recent > 0 else A
+        return Raw(None, col, f"{bn(recent / 1e9)} in 4 weeks; none in the 12 weeks before · {last}", moves, t, g, extra)
     x = recent / prior
     col = band(x, [k["red_at_or_below"], k["green_at_or_above"]], [R, A, G], right=[True, False])
-    return Raw(x, col, f"{x:.1f}x · {bn(recent / 1e9)} in 4 weeks vs {bn(prior / 1e9)} average · cash-management {bn(cmr / 1e9)}",
-               f"Green when the latest 4 weeks are {k['green_at_or_above']:.1f} times the average of the prior 12 weeks (a step up).", s.index[-1],
-               gauge(0, 3, [k["red_at_or_below"], k["green_at_or_above"]], [R, A, G]),
-               {"recent_usd": recent, "prior_avg_usd": prior, "cash_management_usd": cmr})
+    return Raw(x, col, f"{x:.1f}x · {bn(recent / 1e9)} in 4 weeks vs {bn(prior / 1e9)} average · cash-management {bn(cmr / 1e9)} · {last}",
+               moves, t, g, extra)
 
 
 @dial("hikes_out", "D", "Rate hikes being priced out")

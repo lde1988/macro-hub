@@ -301,3 +301,28 @@ def test_bookkeeping_can_live_outside_the_data_folder(tmp_path):
     rt = tmp_path / "rt"
     F.run_fetch(tmp_path / "data", now=NOW, registry=MINI, fetchers={"ecb": fake(), "fred": fake()}, state_dir=rt)
     assert (rt / "sources.json").exists() and not (tmp_path / "data" / "state" / "sources.json").exists()
+
+
+def test_nasdaq_never_stores_a_session_that_is_still_trading():
+    from hub.sources.nasdaq import last_finished_session
+    assert last_finished_session(pd.Timestamp("2026-11-24 19:00", tz="UTC")) == pd.Timestamp("2026-11-23")   # 14:00 New York: Tuesday still trading
+    assert last_finished_session(pd.Timestamp("2026-11-24 22:30", tz="UTC")) == pd.Timestamp("2026-11-24")   # 17:30 New York: Tuesday finished
+    assert last_finished_session(pd.Timestamp("2026-11-25 03:00", tz="UTC")) == pd.Timestamp("2026-11-24")   # still Tuesday evening in New York
+    assert last_finished_session(pd.Timestamp("2026-07-01 20:30", tz="UTC")) == pd.Timestamp("2026-06-30")   # summer time: 16:30 New York
+
+
+def test_one_working_series_does_not_hide_another_that_keeps_failing(tmp_path):
+    from hub import alerts
+    from hub.util import load_config
+    ok = pd.Series({pd.Timestamp("2026-11-24"): 4.6})
+    reg = {"sources": {"fred": {"every": 60, "credit": "FRED"}},
+           "series": [{"id": "DGS2", "source": "fred", "start": "2026-01-01"}, {"id": "DGS10", "source": "fred", "start": "2026-01-01"}]}
+    part = lambda entries, ctx: Result(history={"DGS2": ok}, errors={"DGS10": "HTTP 500"})
+    for i in range(4):
+        _, _, status = F.run_fetch(tmp_path, now=NOW + dt.timedelta(hours=i), registry=reg, fetchers={"fred": part})
+    assert status["fred"]["fails"] == 0 and status["fred"]["series_fails"] == {"DGS10": 4}
+    pushes, down = alerts.source_pushes(status, reg, load_config(), [])
+    assert len(pushes) == 1 and pushes[0]["title"] == "Source partly down: FRED" and "DGS10" in pushes[0]["message"]
+    assert alerts.source_pushes(status, reg, load_config(), down)[0] == []                     # not repeated
+    _, _, status = F.run_fetch(tmp_path, now=NOW + dt.timedelta(hours=5), registry=reg, fetchers={"fred": lambda e, c: Result(history={"DGS2": ok, "DGS10": ok})})
+    assert status["fred"]["series_fails"] == {}

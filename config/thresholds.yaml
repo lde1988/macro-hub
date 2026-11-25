@@ -22,13 +22,12 @@ max_age_days:                # a dial is greyed out as "stale" when its newest d
   weekly_reclaim: 9          # weekly close
   margin_debt: 75            # monthly, published about 3 to 4 weeks after month end
   cpi_mom: 80                # monthly, dated the 1st of its month
-  liquidity: 16              # weekly central-bank balance sheets
+  liquidity: 21              # weekly central-bank balance sheets (FRED's ECB series can run a week behind)
   nfci: 16                   # weekly
   stlfsi: 16                 # weekly
   discount_window: 12        # weekly
   fed_bills: 12              # weekly
   fed_reserves: 12           # weekly
-  buybacks: 21               # operations are roughly weekly, with gaps
 
 alerts:
   digest_hour_hkt: 8         # one quiet daily digest at 08:00 Hong Kong time; it doubles as a heartbeat

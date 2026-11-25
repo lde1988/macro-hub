@@ -64,7 +64,7 @@ def fetch(entries, ctx):
         uni = load_yaml(uni_path)
         btc, alt = uni.get("btc", []), uni.get("alt", [])
         syms, hist = btc + alt, {}
-        reach = min((ctx.today - pd.Timestamp(have)).days + 3, 90) if have is not None else 10
+        reach = min((ctx.today - pd.Timestamp(have)).days + 3, 400) if have is not None else 10
         t0 = int((ctx.today - pd.Timedelta(days=max(reach, 10))).timestamp())
         try:
             for i in range(0, len(syms), 20):

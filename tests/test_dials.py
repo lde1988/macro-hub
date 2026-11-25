@@ -251,9 +251,9 @@ def test_liquidity_proxy_year_on_year(tmp_path, growth, want):
 
 
 def test_liquidity_proxy_converts_everything_to_dollars(tmp_path):
-    data = {"WALCL": flat(6.0e6, 5), "ECBASSETSW": flat(5.0e6, 5), "JPNASSETS": flat(6.0e6, 5), "M2SL": flat(20000, 5),
-            "ECB_USD": flat(1.10, 5), "ECB_JPY": flat(165.0, 5)}
-    total = D.liquidity_total(view(tmp_path, data), pd.Timestamp(END))
+    data = {"WALCL": flat(6.0e6, 400), "ECBASSETSW": flat(5.0e6, 400), "JPNASSETS": flat(6.0e6, 400), "M2SL": flat(20000, 400),
+            "ECB_USD": flat(1.10, 400), "ECB_JPY": flat(165.0, 400)}
+    total, then, _ = D.liquidity_totals(view(tmp_path, data))
     # Fed 6.0tn + ECB 5.0tn euros x 1.10 + BoJ 600tn yen / 150 yen per dollar + M2 20tn  (in millions of dollars)
     assert round(total) == round(6.0e6 + 5.5e6 + 4.0e6 + 20.0e6)
 
@@ -477,7 +477,7 @@ def test_buybacks_step_up_uses_liquidity_support_only(tmp_path, recent, want):
     v = view(tmp_path, {"BUYBACK_LS": buyback_series(3.0, recent), "BUYBACK_CM": buyback_series(0.0, 40.0)})
     r = D.buybacks(v, C)
     assert r.colour == want                                 # huge cash-management buybacks change nothing
-    assert round(r.extra["cash_management_usd"] / 1e9) == 160
+    assert round(r.extra["cash_management_usd"] / 1e9) == 160 and r.obs == pd.Timestamp("2026-11-25")
 
 
 def test_every_dial_copes_with_no_data(tmp_path):
@@ -523,3 +523,39 @@ def test_liquidity_date_is_the_older_of_the_two_weekly_balance_sheets(tmp_path):
     data = {"WALCL": ramp(6.0e6, 6.3e6, n), "ECBASSETSW": ramp(6.0e6, 6.3e6, n, end="2026-11-01"),
             "JPNASSETS": flat(6.0e6, n), "M2SL": flat(22000, n), "ECB_USD": flat(1.10, n), "ECB_JPY": flat(165.0, n)}
     assert D.liquidity(view(tmp_path, data), C).obs == pd.Timestamp("2026-11-01")
+
+
+def test_liquidity_compares_each_part_with_its_own_year_earlier_figure(tmp_path):
+    """Every part grows exactly 6% a year, but M2 and the Bank of Japan are published one to two months late.
+    The reading must still be 6%, not shortened by the late parts."""
+    def grow(n_days, end):
+        idx = pd.date_range(end=end, periods=n_days, freq="D")
+        return pd.Series([100.0 * 1.06 ** (i / 365) for i in range(n_days)], index=idx)
+    data = {"WALCL": grow(800, "2026-11-24") * 6e4, "ECBASSETSW": grow(800, "2026-11-20") * 6e4,
+            "JPNASSETS": grow(800, "2026-10-01") * 6e4, "M2SL": grow(800, "2026-09-01") * 220,
+            "ECB_USD": flat(1.10, 900), "ECB_JPY": flat(165.0, 900)}
+    r = D.liquidity(view(tmp_path, data), C)
+    assert abs(r.value - 6.0) < 0.05 and r.colour == G
+
+
+def test_buybacks_keep_judging_when_operations_stop(tmp_path):
+    """A step-up, then no operations at all: the dial must fall back, not stay green as 'stale'."""
+    idx = pd.date_range(end="2026-10-20", periods=16, freq="7D")
+    s = pd.Series([3e9] * 12 + [6e9] * 4, index=idx)
+    assert D.buybacks(view(tmp_path / "a", {"BUYBACK_LS": s}, now="2026-10-21 09:00"), C).colour == G
+    later = D.buybacks(view(tmp_path / "b", {"BUYBACK_LS": s}, now="2026-11-25 09:00"), C)
+    assert later.colour == R and later.obs == pd.Timestamp("2026-11-25") and "last operation 20 Oct 2026" in later.text
+    long_after = D.buybacks(view(tmp_path / "c", {"BUYBACK_LS": s}, now="2027-06-01 09:00"), C)
+    assert long_after.colour == A                                # nothing in either period: neutral, never a kept green
+
+
+def test_buybacks_are_never_frozen_by_the_stale_rule(tmp_path):
+    from hub.signals.engine import evaluate
+    idx = pd.date_range(end="2026-10-20", periods=16, freq="7D")
+    s = pd.Series([3e9] * 12 + [6e9] * 4, index=idx)
+    state = None
+    for i, now in enumerate(["2026-10-21 09:00", "2026-11-25 09:00", "2026-11-25 09:15", "2026-11-25 09:30"]):
+        o = evaluate(view(tmp_path / str(i), {"BUYBACK_LS": s}, now=now), C, state)
+        state = o["state"]
+    b = o["readings"]["buybacks"]
+    assert b["colour"] == R and b["too_old"] is False and b["fresh_green"] is False

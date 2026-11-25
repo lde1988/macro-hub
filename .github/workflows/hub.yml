@@ -39,20 +39,20 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: python -m hub.run --data data --site site --runtime runtime
       - run: tools/data_branch.sh save "Hub run"
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
+      - name: Tell the phone if the run failed or timed out (at most once an hour)
+        if: failure() || cancelled()
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python -m hub.notify --failed "the hub run" --runtime runtime
       - name: Save fast-changing bookkeeping
         if: always()
         uses: actions/cache/save@v4
         with:
           path: runtime
           key: runtime-${{ github.run_id }}
-      - uses: actions/upload-pages-artifact@v4
-        with:
-          path: site
-      - name: Tell the phone if the run failed (at most once an hour)
-        if: failure()
-        env:
-          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
-        run: python -m hub.notify --failed "the hub run"
   publish:
     needs: run
     runs-on: ubuntu-latest
@@ -63,12 +63,13 @@ jobs:
     steps:
       - id: deploy
         uses: actions/deploy-pages@v4
-      - name: Tell the phone if publishing failed (at most once an hour)
-        if: failure()
+      - name: Tell the phone if publishing failed (at most twice an hour)
+        if: failure() || cancelled()
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
         run: |
-          if [ "$(date -u +%M)" -lt 15 ]; then
+          m=$((10#$(date -u +%M)))
+          if [ "$m" -ge 15 ] && [ "$m" -lt 45 ]; then
             curl -sS -o /dev/null -H "Title: macro-hub: publishing failed" -H "Priority: 4" \
               -d "The dashboard could not be published this run, so the page may be out of date. Data and alerts are unaffected." \
               "https://ntfy.sh/${NTFY_TOPIC}" || true
