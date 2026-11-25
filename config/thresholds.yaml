@@ -141,12 +141,13 @@ srf:   {median_days: 5, green_at_or_below: 1.0, red_above: 10.0}    # billions o
 
 front_end:   {change_days: 20, green_at_or_below: -25.0, red_at_or_above: 25.0}  # 2-year yield, basis points
 fed_bills:   {weeks: 4, green_at_or_above: 20.0, red_at_or_below: -20.0}         # billions of dollars
-fed_reserves: {weeks: 4, green_at_or_above: 75.0, red_at_or_below: -75.0}  # billions of dollars
+fed_reserves: {weeks: 4, green_at_or_above: 150.0, red_at_or_below: -150.0}  # billions; widened from 75 (fired 12 times in 2 years)
+hikes_out:   {change_days: 20, green_at_or_below: -30.0, red_at_or_above: 10.0}  # dial 25; widened from -20bp (fired 9 times in 2 years)
 weekly_reclaim: {green_weeks: 12}  # a reclaim counts as a fresh turn for 12 weeks
 buybacks:
   recent_days: 28  # the latest 4 weeks
   prior_days: 84  # the 12 weeks before that
-  green_at_or_above: 1.5     # latest 4 weeks at 1.5 times the prior average or more: a step up
+  green_at_or_above: 2.0     # latest 4 weeks at twice the prior average or more: a step up (widened from 1.5: fired 11 times in 2 years)
   red_at_or_below: 0.67  # a step down
 
 # Families: each counts once. Only a fresh red in money_market, credit or banks blocks a buy.

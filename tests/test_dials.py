@@ -198,6 +198,11 @@ def test_rate_hike_pricing_bands(tmp_path, move, want):
                         "DFEDTARL": flat(3.75, 5), "DFEDTARU": flat(4.0, 5)})
     r = D.hike_pricing(v, C)
     assert r.colour == want and "Fed target 3.75-4.00%" in r.text
+
+
+@pytest.mark.parametrize("move,want", [(-0.30, G), (-0.29, A), (0.09, A), (0.10, R)])
+def test_hikes_priced_out_needs_a_30bp_fall(tmp_path, move, want):
+    v = view(tmp_path, {"DGS2": daily([4.60] * 25 + [4.60 + move], freq="B"), "DFF": flat(3.88, 26, freq="B")})
     assert D.hikes_out(v, C).colour == want
 
 
@@ -419,7 +424,7 @@ def test_front_end_easing(tmp_path, move, want):
     assert D.front_end(view(tmp_path, {"DGS2": daily([4.6] * 25 + [4.6 + move], freq="B")}), C).colour == want
 
 
-@pytest.mark.parametrize("dial,sid,unit", [(D.fed_bills, "WSHOBL", 20000), (D.fed_reserves, "WRESBAL", 75000)])
+@pytest.mark.parametrize("dial,sid,unit", [(D.fed_bills, "WSHOBL", 20000), (D.fed_reserves, "WRESBAL", 150000)])
 def test_fed_buying_units_are_millions(tmp_path, dial, sid, unit):
     for i, (mult, want) in enumerate([(1.0, G), (0.9, A), (-0.9, A), (-1.0, R)]):
         v = view(tmp_path / str(i), {sid: daily([500000.0] * 4 + [500000.0 + unit * mult], freq="W-WED")})
@@ -448,7 +453,7 @@ def buyback_series(prior_weekly, recent_weekly):
     return pd.Series([prior_weekly * 1e9] * 12 + [recent_weekly * 1e9] * 4, index=idx)
 
 
-@pytest.mark.parametrize("recent,want", [(4.5, G), (3.0, A), (2.0, R)])
+@pytest.mark.parametrize("recent,want", [(6.0, G), (4.5, A), (3.0, A), (2.0, R)])
 def test_buybacks_step_up_uses_liquidity_support_only(tmp_path, recent, want):
     v = view(tmp_path, {"BUYBACK_LS": buyback_series(3.0, recent), "BUYBACK_CM": buyback_series(0.0, 40.0)})
     r = D.buybacks(v, C)

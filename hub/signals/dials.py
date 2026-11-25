@@ -292,7 +292,7 @@ def _hike(v, c, key):
     lo, hi = v.s("DFEDTARL"), v.s("DFEDTARU")
     tgt = f" · Fed target {lo.iloc[-1]:.2f}-{hi.iloc[-1]:.2f}%" if len(lo) and len(hi) else ""
     return Raw(x, col, f"{x:+.0f}bp in 20 days · 2-year is {sp.iloc[-1] * 100:+.0f}bp vs Fed funds{tgt}",
-               "Green if the gap falls 20bp or more in 20 trading days (hikes priced out); red if it rises 10bp or more.",
+               f"Green if the gap falls {abs(k['green_at_or_below']):.0f}bp or more in 20 trading days (hikes priced out); red if it rises {k['red_at_or_above']:.0f}bp or more.",
                sp.index[-1], gauge(-60, 60, [k["green_at_or_below"], k["red_at_or_above"]], [G, A, R]), {"level_bp": float(sp.iloc[-1] * 100)})
 
 
@@ -635,14 +635,14 @@ def buybacks(v, c, prev=None):
     x = recent / prior
     col = band(x, [k["red_at_or_below"], k["green_at_or_above"]], [R, A, G], right=[True, False])
     return Raw(x, col, f"{x:.1f}x · {bn(recent / 1e9)} in 4 weeks vs {bn(prior / 1e9)} average · cash-management {bn(cmr / 1e9)}",
-               "Green when the latest 4 weeks are 1.5 times the average of the prior 12 weeks (a step up).", s.index[-1],
+               f"Green when the latest 4 weeks are {k['green_at_or_above']:.1f} times the average of the prior 12 weeks (a step up).", s.index[-1],
                gauge(0, 3, [k["red_at_or_below"], k["green_at_or_above"]], [R, A, G]),
                {"recent_usd": recent, "prior_avg_usd": prior, "cash_management_usd": cmr})
 
 
 @dial("hikes_out", "D", "Rate hikes being priced out")
 def hikes_out(v, c, prev=None):
-    return _hike(v, c, "hike_pricing")
+    return _hike(v, c, "hikes_out")
 
 
 for _d in DIALS:  # the dollar dials change only on a new ECB fixing, handled inside level_state
