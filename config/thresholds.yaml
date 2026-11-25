@@ -25,7 +25,7 @@ btc_price:
   confirmed_buy_multiple: 1.3  # BUY (CONFIRMED) needs price at or below this many times realised price
   # for history replays only: the value zone as a multiple of realised price (58,600 / 53,100 today).
   # null means "use levels.btc_value_zone".
-  value_zone_multiple: null
+  value_zone_multiple: null  # keep null for live use
 
 weekly_move:
   lookback_weeks: 52         # weekly moves are measured against the past year
@@ -46,15 +46,15 @@ btc_ndx:
   red_below: -0.02           # 2% or more below
 
 alt_value:
-  change_days: 30
+  change_days: 30  # days over which the change is measured
   green_at_or_above: 0.05    # altcoin value / Bitcoin value up 5% or more in 30 days
-  red_at_or_below: -0.05
+  red_at_or_below: -0.05  # down 5% or more: red
 
 alt_watch:
-  coins: [SUIUSD, SOLUSD, NEARUSD, LINKUSD, TAOUSD]
-  change_days: 30
+  coins: [SUIUSD, SOLUSD, NEARUSD, LINKUSD, TAOUSD]  # the five watchlist coins, priced in Bitcoin
+  change_days: 30  # days over which the change is measured
   green_at_or_above: 0.10    # watchlist up 10% or more against Bitcoin in 30 days
-  red_at_or_below: -0.10
+  red_at_or_below: -0.10  # down 10% or more: red
 
 margin_debt:
   fire_above: 1.0            # 3-month annualised growth above +100% ...
@@ -63,31 +63,31 @@ margin_debt:
   regime_latch_months: 12    # for the FRAGILE regime the signal stays "fired" this long once triggered
 
 sofr_iorb:
-  median_days: 5
+  median_days: 5  # days in the median
   green_at_or_below: 0.0     # basis points
-  red_above: 5.0
+  red_above: 5.0  # basis points; red above this
 
 yields:
   change_days: 20            # trading days
   green_at_or_below: -15.0   # basis points
-  red_at_or_above: 25.0
+  red_at_or_above: 25.0  # basis points; red at a rise this large
 
 hike_pricing:                # 2-year yield minus effective Fed funds, change over 20 trading days
-  change_days: 20
+  change_days: 20  # trading days
   green_at_or_below: -20.0   # basis points: hikes being priced out
   red_at_or_above: 10.0      # hikes being priced in (not "any rise": 1bp of noise must not flip it)
 
 cpi:
   green_at_or_below: 0.2     # percent month-on-month, rounded to one decimal as published
-  red_at_or_above: 0.4
+  red_at_or_above: 0.4  # percent month-on-month; red at this or more
 
 breakeven:
   green_at_or_below: 2.4     # percent
-  red_above: 2.7
+  red_above: 2.7  # percent; red above this
 
 liquidity:
   green_at_or_above: 5.0     # percent year-on-year
-  red_below: 0.0
+  red_below: 0.0  # percent year-on-year; red when shrinking
 
 dollar:
   level: 102.5               # the reversal level
@@ -97,72 +97,72 @@ dollar:
   rising_days: 20            # "rising" = higher than this many fixings ago
 
 sp500:
-  average_months: 10
+  average_months: 10  # months in the average of month-end closes
   amber_fall: 0.10           # 10% below the 1-year high
   red_fall: 0.20             # 20% below
 
 funding:
-  average_days: 30
+  average_days: 30  # days in the average
   intervals_per_day: 3       # funding is paid every 8 hours on the three exchanges used
   red_at_or_above: 30.0      # percent a year; green when negative
 
 alt_oi:
   green_below: 50            # percentile
-  red_at_or_above: 90
-  min_history_days: 365
+  red_at_or_above: 90  # percentile; red at or above
+  min_history_days: 365  # days of history needed before a percentile means anything
 
 stablecoins:
-  change_days: 30
+  change_days: 30  # days over which the change is measured
   red_below: -3.0            # percent; green when positive
 
 hy_spread:   {change_days: 63, green_below: 75.0,  red_above: 150.0}   # basis points over 3 months
 ccc_bb:      {change_days: 63, green_below: 150.0, red_above: 300.0}   # CCC minus BB gap
-bbb_spread:  {change_days: 63, green_below: 25.0,  red_above: 50.0}
+bbb_spread:  {change_days: 63, green_below: 25.0,  red_above: 50.0}  # BBB moves about a third as much as high yield
 
 nfci:    {green_at_or_below: -0.25, red_above: 0.0}   # zero = average conditions
 stlfsi:  {green_at_or_below: 0.0,   red_above: 1.0}   # zero = normal stress
 
 ai_basket:
-  members: [CRWV, ORCL, NBIS, APLD, IREN]
-  change_days: 63
+  members: [CRWV, ORCL, NBIS, APLD, IREN]  # equal-weight basket of debt-funded AI names
+  change_days: 63  # trading days (3 months)
   green_above: -10.0         # basket's 3-month return minus the S&P 500's, in percentage points
-  red_below: -25.0
+  red_below: -25.0  # red when trailing by more than 25 points
 
 bizd:  {high_days: 63,  green_below: 6.0,  red_at_or_above: 12.0}   # percent fall from the 3-month high
 kre:   {high_days: 252, green_below: 15.0, red_at_or_above: 25.0}   # percent fall from the 1-year high
 
 discount_window:             # billions of dollars
-  amber_level: 10.0
-  red_level: 25.0
-  amber_rise_4w: 5.0
-  red_rise_4w: 10.0
+  amber_level: 10.0  # amber above this level
+  red_level: 25.0  # red above this level
+  amber_rise_4w: 5.0  # amber on a rise this large in 4 weeks
+  red_rise_4w: 10.0  # red on a rise this large in 4 weeks
 
 srf:   {median_days: 5, green_at_or_below: 1.0, red_above: 10.0}    # billions of dollars
 
 front_end:   {change_days: 20, green_at_or_below: -25.0, red_at_or_above: 25.0}  # 2-year yield, basis points
 fed_bills:   {weeks: 4, green_at_or_above: 20.0, red_at_or_below: -20.0}         # billions of dollars
-fed_reserves: {weeks: 4, green_at_or_above: 75.0, red_at_or_below: -75.0}
+fed_reserves: {weeks: 4, green_at_or_above: 75.0, red_at_or_below: -75.0}  # billions of dollars
 weekly_reclaim: {green_weeks: 12}  # a reclaim counts as a fresh turn for 12 weeks
 buybacks:
-  recent_days: 28
-  prior_days: 84
+  recent_days: 28  # the latest 4 weeks
+  prior_days: 84  # the 12 weeks before that
   green_at_or_above: 1.5     # latest 4 weeks at 1.5 times the prior average or more: a step up
-  red_at_or_below: 0.67
+  red_at_or_below: 0.67  # a step down
 
 # Families: each counts once. Only a fresh red in money_market, credit or banks blocks a buy.
 families:
-  rates_dollar:    [y2_chg, y10_chg, hike_pricing, cpi_mom, breakeven, liquidity, dollar]
-  money_market:    [sofr_iorb, discount_window, srf]
-  credit:          [hy_spread, ccc_bb, bbb_spread, nfci, stlfsi]
-  ai_private:      [ai_basket, bizd]
-  banks:           [kre]
-  crypto_leverage: [funding, alt_oi, stable_30d]
-  equities:        [sp500, margin_debt]
-buy_blocking_families: [money_market, credit, banks]
+  rates_dollar:    [y2_chg, y10_chg, hike_pricing, cpi_mom, breakeven, liquidity, dollar]  # interest rates, inflation, liquidity and the dollar
+  money_market:    [sofr_iorb, discount_window, srf]  # overnight funding and Fed lending facilities
+  credit:          [hy_spread, ccc_bb, bbb_spread, nfci, stlfsi]  # bond spreads and the two Fed stress indexes
+  ai_private:      [ai_basket, bizd]  # AI-debt canaries and the private-credit fund
+  banks:           [kre]  # regional banks
+  crypto_leverage: [funding, alt_oi, stable_30d]  # funding rate, altcoin open interest, stablecoin supply
+  equities:        [sp500, margin_debt]  # S&P 500 and margin debt
+buy_blocking_families: [money_market, credit, banks]  # only these families can block a buy
 
 # Turn families. The turn is confirmed when the dollar reversal dial is green,
 # or when two of these three families are green together.
 turn_families:
-  rates:            [front_end, hikes_out]
+  rates:            [front_end, hikes_out]  # dials 20 and 25
   fed_treasury:     [fed_bills, buybacks]   # bank reserves alone never confirm a turn
-  crypto_liquidity: [stable_turn]
+  crypto_liquidity: [stable_turn]  # dial 22

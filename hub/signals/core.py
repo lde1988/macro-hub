@@ -88,7 +88,8 @@ def band(x, edges, colours, prev=None, buf=0.0, rel=False, right=True):
 
     def zone(v):
         for i, e in enumerate(edges):
-            if v < e or (rights[i] and v == e):
+            on_edge = abs(v - e) <= 1e-9 * max(1.0, abs(e))  # ignore rounding noise in the arithmetic
+            if (v < e and not on_edge) or (rights[i] and on_edge):
                 return i
         return len(edges)
 
@@ -159,9 +160,9 @@ def level_state(s, level, margin, n, lookback=750):
     up = down = flips = 0
     last = None
     for d, x in s.items():
-        if x >= level + margin:
+        if x >= level + margin - 1e-9:
             up, down = up + 1, 0
-        elif x <= level - margin:
+        elif x <= level - margin + 1e-9:
             down, up = down + 1, 0
         else:
             up = down = 0

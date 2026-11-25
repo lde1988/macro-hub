@@ -380,7 +380,8 @@ def sp500(v, c, prev=None):
     last, last_me = float(s.iloc[-1]), float(me.iloc[-1])
     fall = 1 - last / float(s[s.index > s.index[-1] - pd.Timedelta(days=365)].max())
     month_break = last_me < avg
-    col = R if (month_break or fall >= k["red_fall"]) else (A if (last < avg or fall >= k["amber_fall"]) else G)
+    fall_col = band(fall, [k["amber_fall"], k["red_fall"]], [G, A, R], right=False)
+    col = R if (month_break or fall_col == R) else (A if (last < avg or fall_col == A) else G)
     txt = f"{last:,.0f} · {fall:.1%} below 1-year high · 10-month average {avg:,.0f}"
     if month_break:
         txt += f" · {me.index[-1].strftime('%b')} closed below it"
@@ -536,8 +537,9 @@ def discount_window(v, c, prev=None):
     if len(s) < 5:
         return Raw()
     lvl, rise = float(s.iloc[-1]) / 1000, float(s.iloc[-1] - s.iloc[-5]) / 1000
-    col = (R if (lvl > k["red_level"] or rise >= k["red_rise_4w"])
-           else A if (lvl > k["amber_level"] or rise >= k["amber_rise_4w"]) else G)
+    by_level = band(lvl, [k["amber_level"], k["red_level"]], [G, A, R])
+    by_rise = band(rise, [k["amber_rise_4w"], k["red_rise_4w"]], [G, A, R], right=False)
+    col = R if R in (by_level, by_rise) else (A if A in (by_level, by_rise) else G)
     return Raw(lvl, col, f"{bn(lvl)} · {rise:+.1f}bn in 4 weeks", "Red above $25bn or a $10bn jump in 4 weeks: banks are short of cash.",
                s.index[-1], gauge(0, 50, [k["amber_level"], k["red_level"]], [G, A, R]), {"rise_4w_bn": rise})
 
