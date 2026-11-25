@@ -1,0 +1,79 @@
+{
+ "bitview": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ },
+ "coinbase": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ },
+ "coingecko": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ },
+ "coinmetrics": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ },
+ "defillama": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ },
+ "dxycheck": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ },
+ "ecb": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ },
+ "finra": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ },
+ "fred": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ },
+ "nasdaq": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ },
+ "treasury": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:13:48+00:00",
+  "last_try": "2026-11-25T09:13:48+00:00",
+  "series_errors": {}
+ }
+}
