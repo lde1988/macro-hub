@@ -184,10 +184,10 @@
   },
   "margin_debt": {
    "baseline": false,
-   "colour": "red",
-   "count": 1,
-   "pending": "amber",
-   "since": "2026-10-26 23:59:00"
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-25 10:37:58"
   },
   "net_loss": {
    "baseline": true,
@@ -310,7 +310,7 @@
    "kre": "green",
    "liquidity": "amber",
    "lth_sopr": "amber",
-   "margin_debt": "red",
+   "margin_debt": "amber",
    "net_loss": "amber",
    "nfci": "green",
    "sofr_iorb": "amber",
