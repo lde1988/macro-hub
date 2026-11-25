@@ -14,7 +14,7 @@ from hub.store import Store
 from hub.util import load_config, load_registry
 
 
-def replay(store, registry, cfg, start, end, warmup_days=5, each=None):
+def replay(store, registry, cfg, start, end, warmup_days=120, each=None):
     """Returns a DataFrame with one row per day: every dial's colour, the regime and both readings.
     `each(day, out)` is called for every day if given."""
     cache, state, rows = {}, None, []
@@ -27,7 +27,8 @@ def replay(store, registry, cfg, start, end, warmup_days=5, each=None):
             continue
         row = {"date": day, "regime": out["regime"]["name"], "reading": out["reading"]["label"],
                "level": out["reading"].get("level", ""), "headline": out["reading"]["headline"],
-               "old_reading": out["reading_old_rule"]["label"], "turn_confirmed": out["reading"]["turn"]["confirmed"]}
+               "old_reading": out["reading_old_rule"]["label"], "turn_confirmed": out["reading"]["turn"]["confirmed"],
+               "turn_any": out["reading"]["turn"]["any_signal"]}
         for i, r in out["readings"].items():
             row[i] = r["colour"]
             row[i + "__v"] = r["value"]

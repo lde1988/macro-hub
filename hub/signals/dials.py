@@ -33,6 +33,18 @@ def btc_weekly(v):
     return weekly_closes(v.s("BTCUSD"))
 
 
+def weekly_levels(v, c):
+    """Break and reclaim lines. Returns (break, reclaim, latest break, latest reclaim, dynamic break, dynamic reclaim).
+    Live: the fixed levels colour the dial. Replays: the lines follow short-term holder realised price."""
+    dyn, sth = c["dynamic_levels"], v.s("BV_STH_REALIZED_PRICE")
+    d_rec = float(sth.iloc[-1]) * dyn["reclaim_x_sth"] if len(sth) else None
+    d_brk = float(sth.iloc[-1]) * dyn["break_x_sth"] if len(sth) else None
+    if dyn["use_for_colours"]:
+        return sth * dyn["break_x_sth"], sth * dyn["reclaim_x_sth"], d_brk, d_rec, d_brk, d_rec
+    brk, rec = float(c["levels"]["btc_break"]), float(c["levels"]["btc_reclaim"])
+    return brk, rec, brk, rec, d_brk, d_rec
+
+
 def dxy(v):
     cols = [v.s(f"ECB_{k}") for k in ("USD", "JPY", "GBP", "CAD", "SEK", "CHF")]
     if any(len(x) == 0 for x in cols):
@@ -86,8 +98,9 @@ def btc_price(v, c, prev=None):
     if price is None:
         return Raw()
     rp, rp_src, rp_date = realised_price(v, c)
-    mult = c["btc_price"].get("value_zone_multiple")
-    zone = rp * mult if mult else float(c["levels"]["btc_value_zone"])
+    dyn = c["dynamic_levels"]
+    dyn_zone = rp * dyn["value_zone_x_realised"]
+    zone = dyn_zone if dyn["use_for_colours"] else float(c["levels"]["btc_value_zone"])
     froth = rp * c["btc_price"]["froth_multiple"]
     buf = c["general"]["price_buffer"]
     col = band(price, [zone, froth], [G, A, R], prev, buf, rel=True)
@@ -101,10 +114,11 @@ def btc_price(v, c, prev=None):
     moves = {G: f"Turns amber above {money(zone * (1 + buf))}.",
              A: f"Turns green at or below {money(zone * (1 - buf))}; red above {money(froth * (1 + buf))}.",
              R: f"Turns amber below {money(froth * (1 - buf))}."}.get(col, "")
-    return Raw(price, col, f"{money(price)} · {price / rp:.2f}x realised price", moves, pdate,
+    drift = "" if dyn["use_for_colours"] else f" · value zone {money(zone)} fixed, {money(dyn_zone)} at 1.10x realised"
+    return Raw(price, col, f"{money(price)} · {price / rp:.2f}x realised price{drift}", moves, pdate,
                gauge(rp * 0.7, froth * 1.15, [zone, froth], [G, A, R]),
                {"realised_price": rp, "realised_price_source": rp_src, "realised_price_date": str(rp_date)[:10],
-                "ratio_to_realised": price / rp, "value_zone": zone, "froth_level": froth,
+                "ratio_to_realised": price / rp, "value_zone": zone, "dynamic_value_zone": dyn_zone, "froth_level": froth,
                 "lth_cost": float(lth.iloc[-1]) if len(lth) else float(c["levels"]["lth_cost"]),
                 "sth_cost": float(sth.iloc[-1]) if len(sth) else float(c["levels"]["sth_cost"]), "notes": notes})
 
@@ -112,16 +126,20 @@ def btc_price(v, c, prev=None):
 @dial("btc_weekly", "A", "Bitcoin weekly close")
 def btc_weekly_dial(v, c, prev=None):
     w = btc_weekly(v)
-    if not len(w):
+    brk_l, rec_l, brk, rec, d_brk, d_rec = weekly_levels(v, c)
+    if not len(w) or brk is None:
         return Raw()
-    brk, rec = c["levels"]["btc_break"], c["levels"]["btc_reclaim"]
-    in_break, _ = weekly_state(w, brk, rec)
+    in_break, _ = weekly_state(w, brk_l, rec_l)
     last = float(w.iloc[-1])
     col = R if in_break else (G if last > rec else A)
     moves = (f"Stays red until a weekly close above {money(rec)}." if in_break
              else f"Turns red on a weekly close below {money(brk)}.")
-    return Raw(last, col, f"{money(last)} on {w.index[-1]:%d %b}" + (" · break in force" if in_break else ""),
-               moves, w.index[-1], gauge(brk * 0.7, rec * 1.3, [brk, rec], [R, A, G]), {"break_in_force": in_break})
+    drift = "" if (c["dynamic_levels"]["use_for_colours"] or d_rec is None) else \
+        f" · lines {money(brk)} / {money(rec)} fixed, {money(d_brk)} / {money(d_rec)} from short-term holder cost"
+    return Raw(last, col, f"{money(last)} on {w.index[-1]:%d %b}" + (" · break in force" if in_break else "") + drift,
+               moves, w.index[-1], gauge(brk * 0.7, rec * 1.3, [brk, rec], [R, A, G]),
+               {"break_in_force": in_break, "break_level": brk, "reclaim_level": rec,
+                "dynamic_break_level": d_brk, "dynamic_reclaim_level": d_rec})
 
 
 @dial("weekly_move", "A", "Size of latest weekly move")
@@ -610,8 +628,10 @@ def weekly_reclaim(v, c, prev=None):
     w = btc_weekly(v)
     if not len(w):
         return Raw()
-    brk, rec = c["levels"]["btc_break"], c["levels"]["btc_reclaim"]
-    in_break, when = weekly_state(w, brk, rec)
+    brk_l, rec_l, brk, rec, _, _ = weekly_levels(v, c)
+    if brk is None:
+        return Raw()
+    in_break, when = weekly_state(w, brk_l, rec_l)
     fresh = when is not None and (w.index[-1] - when).days < c["weekly_reclaim"]["green_weeks"] * 7
     col = R if in_break else (G if fresh else A)
     text = (f"break in force (weekly close {money(w.iloc[-1])})" if in_break

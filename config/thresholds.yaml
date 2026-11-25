@@ -20,12 +20,16 @@ levels:                      # fixed levels; Coutts' posts may update these auto
   levels_as_of: "2026-11-15" # date of the fallback levels above, shown when they are in use
   feb_2026_net_loss_peak: 30.0e9  # 30-day net realised loss at its February 2026 peak (20 Feb), a marker only
 
+dynamic_levels:              # the fixed levels above, re-expressed so they move with the market
+  value_zone_x_realised: 1.10  # value zone = 1.10 times realised price (58,600 / 53,100 in Nov 2026)
+  reclaim_x_sth: 1.0         # reclaim line = short-term holder realised price (stand-in for 73,000)
+  break_x_sth: 0.96          # break line = 0.96 times it (stand-in for 70,000; 70,000 / 73,000 = 0.96)
+  use_for_colours: false     # false = live: fixed levels colour the dials, dynamic ones are shown beside them.
+                             # true = history replays only, where fixed dollar levels mean nothing.
+
 btc_price:
   froth_multiple: 2.4        # red above this many times realised price
   confirmed_buy_multiple: 1.3  # BUY (CONFIRMED) needs price at or below this many times realised price
-  # for history replays only: the value zone as a multiple of realised price (58,600 / 53,100 today).
-  # null means "use levels.btc_value_zone".
-  value_zone_multiple: null  # keep null for live use
 
 weekly_move:
   lookback_weeks: 52         # weekly moves are measured against the past year
@@ -147,7 +151,7 @@ weekly_reclaim: {green_weeks: 12}  # a reclaim counts as a fresh turn for 12 wee
 buybacks:
   recent_days: 28  # the latest 4 weeks
   prior_days: 84  # the 12 weeks before that
-  green_at_or_above: 2.0     # latest 4 weeks at twice the prior average or more: a step up (widened from 1.5: fired 11 times in 2 years)
+  green_at_or_above: 1.5     # latest 4 weeks at 1.5 times the prior average or more: a step up (owner kept 1.5 so August 2026 fires)
   red_at_or_below: 0.67  # a step down
 
 # Families: each counts once. Only a fresh red in money_market, credit or banks blocks a buy.
@@ -160,6 +164,9 @@ families:
   crypto_leverage: [funding, alt_oi, stable_30d]  # funding rate, altcoin open interest, stablecoin supply
   equities:        [sp500, margin_debt]  # S&P 500 and margin debt
 buy_blocking_families: [money_market, credit, banks]  # only these families can block a buy
+
+turn:
+  fresh_weeks: 13            # a group D dial counts toward "turn confirmed" and the TURN regime only this long after turning green
 
 # Turn families. The turn is confirmed when the dollar reversal dial is green,
 # or when two of these three families are green together.

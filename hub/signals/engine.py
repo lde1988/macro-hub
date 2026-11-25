@@ -61,11 +61,13 @@ def evaluate_dials(view, cfg, state):
         new_state[d["id"]] = st
         fresh_red = (st["colour"] == R and not st["baseline"] and st["since"] is not None
                      and trading_days_between(st["since"], view.now) < cfg["general"]["fresh_red_trading_days"])
+        fresh_green = (st["colour"] == G and not st["baseline"] and st["since"] is not None
+                       and (view.now - pd.Timestamp(st["since"])).days < cfg["turn"]["fresh_weeks"] * 7)
         readings[d["id"]] = {
             "id": d["id"], "group": d["group"], "title": d["title"], "value": raw.value, "text": raw.text,
             "colour": st["colour"], "word": WORD[st["colour"]], "raw_colour": raw.colour, "moves": raw.moves,
             "obs_date": str(raw.obs)[:10] if raw.obs is not None else None, "since": st["since"],
-            "changed_from": changed_from, "fresh_red": fresh_red, "no_data": raw.colour is None,
+            "changed_from": changed_from, "fresh_red": fresh_red, "fresh_green": fresh_green, "no_data": raw.colour is None,
             "gauge": raw.gauge, "extra": raw.extra,
         }
     return readings, new_state
@@ -82,13 +84,18 @@ def families(readings, cfg):
 
 
 def turn_status(readings, cfg):
-    """The turn is confirmed when the dollar reversal dial is green, or when two of the
-    three turn families (rates; Fed and Treasury; crypto liquidity) are green together.
-    Bank reserves are not in any family, so on their own they never confirm a turn."""
-    fams = {f: any(readings.get(i, {}).get("colour") == G for i in ids) for f, ids in cfg["turn_families"].items()}
-    dollar = readings.get("dollar_reversal", {}).get("colour") == G
+    """The turn is confirmed when the dollar reversal dial is freshly green, or when two of the
+    three turn families (rates; Fed and Treasury; crypto liquidity) are freshly green together.
+
+    "Fresh" = the dial turned green within the last 13 weeks. A dial that has simply been
+    green for a long time (a low dollar, growing stablecoins) is a state, not a turn.
+    Bank reserves are in no family, so on their own they never confirm a turn."""
+    fresh = lambda i: bool(readings.get(i, {}).get("fresh_green"))
+    fams = {f: any(fresh(i) for i in ids) for f, ids in cfg["turn_families"].items()}
+    dollar = fresh("dollar_reversal")
+    fired = [r["title"] for r in readings.values() if r["group"] == "D" and r.get("fresh_green")]
     return {"confirmed": dollar or sum(fams.values()) >= 2, "dollar_reversal": dollar, "families": fams,
-            "any_signal": any(r["colour"] == G for r in readings.values() if r["group"] == "D")}
+            "any_signal": bool(fired), "fresh_signals": fired}
 
 
 def regime(readings, cfg):
@@ -97,8 +104,7 @@ def regime(readings, cfg):
     x = lambda i, k: bool(readings.get(i, {}).get("extra", {}).get(k))
     red_bc = [r["title"] for r in readings.values() if r["group"] in "BC" and r["colour"] == R]
     if turn["any_signal"]:
-        fired = [r["title"] for r in readings.values() if r["group"] == "D" and r["colour"] == G]
-        return {"name": "TURN", "detail": ("confirmed" if turn["confirmed"] else "early, not confirmed") + ": " + ", ".join(fired)}
+        return {"name": "TURN", "detail": ("confirmed" if turn["confirmed"] else "early, not confirmed") + ": " + ", ".join(turn["fresh_signals"])}
     if x("sp500", "month_end_break") or x("btc_weekly", "break_in_force"):
         why = [n for n, f in (("S&P 500 month-end close below its 10-month average", x("sp500", "month_end_break")),
                               ("Bitcoin weekly close below the break level", x("btc_weekly", "break_in_force"))) if f]
@@ -130,7 +136,8 @@ def reading(readings, cfg, rule="new"):
                             ("net realised losses are spiking", col("net_loss") == G)) if f]
     block = [f"{fam[f]['name']} ({', '.join(fam[f]['fresh_red'])})" for f in cfg["buy_blocking_families"] if fam[f]["fresh_red"]]
     any_fresh = [r["title"] for r in readings.values() if r["group"] in "BC" and r["fresh_red"]]
-    turned = [r["title"] for r in readings.values() if r["group"] == "D" and r["colour"] == G]
+    old_turned = [r["title"] for r in readings.values() if r["group"] == "D" and r["colour"] == G]  # original rule: any green
+    turned = old_turned if rule == "old" else turn["fresh_signals"]
     out = {"rule": rule, "caution": bool(ex("btc_weekly", "break_in_force")) and not cheap, "turn": turn}
 
     if froth and liq:
@@ -175,7 +182,7 @@ def reading(readings, cfg, rule="new"):
             kind, reasons = "neither cheap nor frothy", ["Price is outside the value zone and below the froth level"]
             change = "Buy needs a cheaper price or a confirmed turn; sell needs froth with deteriorating liquidity."
         if not turn["confirmed"]:
-            reasons.append("Turn not confirmed" + (": " + ", ".join(turned) + " only" if turned else ": no turn signal is green"))
+            reasons.append("Turn not confirmed" + (": " + ", ".join(turned) + " only" if turned else ": no turn signal is freshly green"))
         if liq:
             reasons.append("Liquidity deteriorating: " + "; ".join(liq))
         elif red_fams:

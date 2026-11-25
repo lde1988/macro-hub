@@ -63,10 +63,29 @@ def test_btc_price_flags_sources_more_than_five_percent_apart(tmp_path):
     assert r.extra["notes"] == []
 
 
-def test_btc_price_value_zone_can_follow_realised_price_for_replays(tmp_path):
-    c = cfg(btc_price={"value_zone_multiple": 1.10})
-    assert D.btc_price(price_view(tmp_path, 10900, rp=10000), c).colour == G
-    assert D.btc_price(price_view(tmp_path / "b", 11100, rp=10000), c).colour == A
+def test_replays_use_dynamic_levels_live_use_fixed_and_shows_both(tmp_path):
+    replay = cfg(dynamic_levels={"use_for_colours": True})
+    assert D.btc_price(price_view(tmp_path, 11000, rp=10000), replay).colour == G      # 1.10x realised price
+    assert D.btc_price(price_view(tmp_path / "b", 11100, rp=10000), replay).colour == A
+    live = D.btc_price(price_view(tmp_path / "c", 59200), C)                            # fixed 58,600 colours the dial
+    assert live.extra["value_zone"] == 58600 and round(live.extra["dynamic_value_zone"]) == 58300
+    assert "fixed" in live.text and "1.10x" in live.text
+
+
+def test_weekly_lines_follow_short_term_holder_cost_in_replays(tmp_path):
+    replay = cfg(dynamic_levels={"use_for_colours": True})
+    data = {"BTCUSD": weekly_btc([12000, 9500, 9900, 10100]), "BV_STH_REALIZED_PRICE": flat(10000, 60)}
+    assert D.btc_weekly_dial(view(tmp_path / "a", {**data, "BTCUSD": weekly_btc([12000, 9500])}), replay).colour == R       # below 0.96 x 10,000
+    assert D.btc_weekly_dial(view(tmp_path / "b", {**data, "BTCUSD": weekly_btc([12000, 9500, 9900])}), replay).colour == R  # above break, below reclaim
+    assert D.btc_weekly_dial(view(tmp_path / "c", data), replay).colour == G                                                  # above 10,000: reclaimed
+    assert D.weekly_reclaim(view(tmp_path / "d", data), replay).colour == G
+    assert D.btc_weekly_dial(view(tmp_path / "e", {**data, "BTCUSD": weekly_btc([12000, 9700])}), replay).colour == A
+
+
+def test_live_weekly_dial_shows_the_dynamic_lines_beside_the_fixed_ones(tmp_path):
+    r = D.btc_weekly_dial(view(tmp_path, {"BTCUSD": weekly_btc([80000, 61163]), "BV_STH_REALIZED_PRICE": flat(72410, 30)}), C)
+    assert r.colour == R and r.extra["reclaim_level"] == 73000 and r.extra["dynamic_reclaim_level"] == 72410
+    assert round(r.extra["dynamic_break_level"]) == round(72410 * 0.96) and "short-term holder cost" in r.text
 
 
 @pytest.mark.parametrize("weeks,want,brk", [
@@ -453,7 +472,7 @@ def buyback_series(prior_weekly, recent_weekly):
     return pd.Series([prior_weekly * 1e9] * 12 + [recent_weekly * 1e9] * 4, index=idx)
 
 
-@pytest.mark.parametrize("recent,want", [(6.0, G), (4.5, A), (3.0, A), (2.0, R)])
+@pytest.mark.parametrize("recent,want", [(4.5, G), (4.4, A), (3.0, A), (2.0, R)])
 def test_buybacks_step_up_uses_liquidity_support_only(tmp_path, recent, want):
     v = view(tmp_path, {"BUYBACK_LS": buyback_series(3.0, recent), "BUYBACK_CM": buyback_series(0.0, 40.0)})
     r = D.buybacks(v, C)

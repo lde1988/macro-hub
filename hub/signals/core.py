@@ -174,12 +174,21 @@ def level_state(s, level, margin, n, lookback=750):
 
 
 def weekly_state(weekly, brk, reclaim):
-    """(break in force, date of the reclaim that ended the last break or None)."""
+    """(break in force, date of the reclaim that ended the last break or None).
+    brk and reclaim are numbers, or Series giving the level in force on each date."""
+    def at(level, d):
+        if not isinstance(level, pd.Series):
+            return level
+        cut = level[level.index <= d]
+        return float(cut.iloc[-1]) if len(cut) else None
     in_break, when = False, None
     for d, x in weekly.items():
-        if x < brk:
+        b, r = at(brk, d), at(reclaim, d)
+        if b is None or r is None:
+            continue
+        if x < b:
             in_break, when = True, None
-        elif x > reclaim and in_break:
+        elif x > r and in_break:
             in_break, when = False, d
     return in_break, when
 

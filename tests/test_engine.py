@@ -70,8 +70,12 @@ def R_(**colours):
             out[i]["extra"][key] = v
         elif v == "fresh":
             out[k].update(colour=R, fresh_red=True)
+        elif v == "old green":                      # green for longer than 13 weeks
+            out[k].update(colour=G, fresh_green=False)
         else:
             out[k]["colour"] = v
+    for r in out.values():
+        r.setdefault("fresh_green", r["colour"] == G)
     return out
 
 
@@ -108,6 +112,18 @@ def test_turn_confirmed_by_the_dollar_alone():
     ([], False)])
 def test_turn_needs_two_families(greens, want):
     assert turn_status(R_(**{g: G for g in greens}), C)["confirmed"] is want
+
+
+def test_a_green_older_than_13_weeks_is_a_state_not_a_turn():
+    assert turn_status(R_(dollar_reversal="old green"), C)["confirmed"] is False
+    assert turn_status(R_(front_end=G, stable_turn="old green"), C)["confirmed"] is False
+    assert turn_status(R_(front_end=G, stable_turn=G), C)["confirmed"] is True
+    assert regime(R_(dollar_reversal="old green", stable_turn="old green"), C)["name"] == "CALM"
+    assert reading(R_(btc_price__ratio_to_realised=1.2, dollar_reversal="old green"), C)["label"] == "HOLD"
+
+
+def test_the_original_rule_still_counts_any_green_turn_dial():
+    assert reading(R_(**CHEAP, dollar_reversal="old green"), C, "old")["label"] == "BUY"
 
 
 # ------------------------------------------------------------------ regime, first match wins
@@ -229,6 +245,30 @@ def test_evaluate_end_to_end_and_fresh_red_window(tmp_path):
     assert out3["regime"]["name"] == "STRESS BUILDING"
     out4 = evaluate(view(tmp_path / "d", data, now="2026-12-03 09:30"), C, out3["state"])
     assert out4["readings"]["breakeven"]["colour"] == R and out4["readings"]["breakeven"]["fresh_red"] is False
+
+
+def test_green_is_fresh_for_13_weeks_after_switching_on(tmp_path):
+    def run(level, now, state=None):
+        return evaluate(view(tmp_path / now.replace(" ", "_").replace(":", ""), {"WSHOBL": weeks(level)}, now=now), C, state)
+
+    def weeks(last):
+        return pd.Series([500000.0] * 4 + [last], index=pd.date_range(end="2026-06-03", periods=5, freq="W-WED"))
+    o = run(500000.0, "2026-06-04 09:00")                       # baseline: amber
+    o = run(530000.0, "2026-06-04 09:15", o["state"])
+    o = run(530000.0, "2026-06-04 09:30", o["state"])           # second run: turns green
+    assert o["readings"]["fed_bills"]["colour"] == G and o["readings"]["fed_bills"]["fresh_green"] is True
+    assert o["regime"]["name"] == "TURN" and "early" in o["regime"]["detail"]
+    later = run(530000.0, "2026-09-02 09:30", o["state"])       # 90 days on: still fresh
+    assert later["readings"]["fed_bills"]["fresh_green"] is True
+    stale = run(530000.0, "2026-09-04 09:30", o["state"])       # 92 days on: still green, no longer a turn
+    assert stale["readings"]["fed_bills"]["colour"] == G and stale["readings"]["fed_bills"]["fresh_green"] is False
+    assert stale["regime"]["name"] == "CALM"
+
+
+def test_a_baseline_green_is_not_treated_as_fresh(tmp_path):
+    s = pd.Series([500000.0] * 4 + [530000.0], index=pd.date_range(end="2026-06-03", periods=5, freq="W-WED"))
+    o = evaluate(view(tmp_path, {"WSHOBL": s}, now="2026-06-04 09:00"), C)
+    assert o["readings"]["fed_bills"]["colour"] == G and o["readings"]["fed_bills"]["fresh_green"] is False
 
 
 def test_a_baseline_red_is_not_treated_as_newly_red(tmp_path):
