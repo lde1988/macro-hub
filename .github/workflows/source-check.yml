@@ -1,0 +1,34 @@
+# One-off check that every data source answers from a GitHub runner.
+# Run by hand (Actions tab -> Source check -> Run workflow) or by a push to the source-check branch.
+name: Source check
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/source-check]
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet pandas requests openpyxl
+      - name: Run source check
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          COINALYZE_API_KEY: ${{ secrets.COINALYZE_API_KEY }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python tools/source_check.py out
+      - name: Publish the result table to a side branch
+        run: |
+          cd out
+          git init -q -b source-check-results
+          git config user.name "macro-hub bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add source_check.md source_check.json
+          git commit -q -m "Source check result"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" source-check-results
