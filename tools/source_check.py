@@ -142,9 +142,11 @@ def check_coinbase():
 # ---------------------------------------------------------------- Bitview
 BV = "https://bitview.space"
 BV_SERIES = ["realized_price", "lth_realized_price", "sth_realized_price", "lth_sopr_24h",
-             "lth_sopr_1w", "lth_sopr_1m", "realized_loss_sum_1m", "lth_realized_loss_sum_1m"]
+             "lth_sopr_1w", "lth_sopr_1m", "realized_loss_sum_1m", "lth_realized_loss_sum_1m",
+             "net_realized_pnl_sum_1m", "sth_net_realized_pnl_sum_1m", "realized_loss_sum_1w"]
 BV_EPOCH = dt.date(2009, 1, 1)  # day1 index 0
 REAL = {}
+STABLE = {}
 
 
 def check_bitview():
@@ -164,11 +166,12 @@ def check_bitview():
         note = f"today so far {data[-1]:,.4g}"
         if sid == "realized_price":
             REAL["bitview"] = (d, val)
-        if sid == "realized_loss_sum_1m":
+        if "realized_loss" in sid or "net_realized" in sid:
             s = pd.Series(data, index=[BV_EPOCH + dt.timedelta(days=blk["start"] + i) for i in range(len(data))])
-            feb = s[(s.index >= dt.date(2026, 2, 1)) & (s.index <= dt.date(2026, 3, 15))]
-            if len(feb):
-                note += f"; Feb-Mar 2026 peak {feb.max():,.4g} on {feb.idxmax()}; now/peak = {val / feb.max():.2f}"
+            feb = s[(s.index >= dt.date(2026, 1, 25)) & (s.index <= dt.date(2026, 3, 20))]
+            pk = feb.abs().idxmax()
+            note += (f"; Feb 2026 peak {feb[pk]:,.4g} on {pk}; share of that peak on 15 Nov "
+                     f"{s[dt.date(2026, 11, 15)] / feb[pk]:.2f}, now {val / feb[pk]:.2f}")
         if sid.startswith("lth_sopr"):
             s = pd.Series(data, index=[BV_EPOCH + dt.timedelta(days=blk["start"] + i) for i in range(len(data))])
             mid = s[(s.index >= dt.date(2026, 11, 10)) & (s.index <= dt.date(2026, 11, 20))]
@@ -210,6 +213,7 @@ def check_defillama():
                    x["totalCirculatingUSD"]["peggedUSD"] for x in d if x.get("totalCirculatingUSD")})
     s_all = pd.Series({dt.datetime.fromtimestamp(int(x["date"]), dt.timezone.utc).date():
                        sum(x["totalCirculatingUSD"].values()) for x in d if x.get("totalCirculatingUSD")})
+    STABLE["usd"] = float(s_all.iloc[-1])
     last = s.index[-1]
     chg = s.iloc[-1] / s.iloc[-31] - 1
     row("stablecoin supply, USD-pegged", "DefiLlama", True, f"${s.iloc[-1] / 1e9:,.1f}bn; 30d {chg:+.1%}",
@@ -247,13 +251,16 @@ def check_ecb():
 def check_dxy_published():
     """Verification only (not a production source): find a published DXY close to compare."""
     try:
-        r = get("https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB", params={"range": "1mo", "interval": "1d"})
+        r = get("https://query1.finance.yahoo.com/v8/finance/chart/DX-Y.NYB", params={"range": "1y", "interval": "1d"})
         j = r.json()["chart"]["result"][0]
         ts = [dt.datetime.fromtimestamp(t, dt.timezone.utc).date().isoformat() for t in j["timestamp"]]
         cl = j["indicators"]["quote"][0]["close"]
         pub = {d: c for d, c in zip(ts, cl) if c}
         cmp_ = [(d, pub[d], DXY[d], DXY[d] - pub[d]) for d in sorted(pub) if d in DXY]
         worst = max(abs(x[3]) for x in cmp_)
+        gaps = [abs(x[3]) for x in cmp_]
+        NOTES.append(f"DXY gap stats over {len(gaps)} days: mean {sum(gaps) / len(gaps):.2f}, "
+                     f"within 0.3 on {sum(g <= 0.3 for g in gaps)} days, worst {worst:.2f}")
         NOTES.append("DXY check, published close (Yahoo DX-Y.NYB, verification only) vs computed from ECB: "
                      + ", ".join(f"{d} {p:.2f}/{c:.2f} ({g:+.2f})" for d, p, c, g in cmp_[-10:])
                      + f" | worst gap over {len(cmp_)} days: {worst:.2f}")
@@ -295,6 +302,11 @@ def check_treasury():
     d["amt"] = pd.to_numeric(d["total_par_amt_accepted"], errors="coerce")
     d["operation_date"] = pd.to_datetime(d["operation_date"])
     m = d.groupby(d["operation_date"].dt.to_period("M"))["amt"].sum().tail(8) / 1e9
+    recent = d[d["operation_date"] >= "2026-01-01"]
+    split = (recent.groupby([recent["operation_date"].dt.to_period("M"), "operation_type"])["amt"].sum() / 1e9).unstack().round(1)
+    NOTES.append("Buybacks by type, $bn par accepted per month 2026: " + split.fillna(0).to_string().replace("\n", " ; "))
+    NOTES.append("Buyback ops with type 'null' or zero accepted: "
+                 + str(d[(d["operation_type"] == "null") | d["amt"].isna()][["operation_date", "operation_type", "total_par_amt_accepted"]].head(5).to_dict("records")))
     row("buyback operations (par accepted)", "Treasury fiscal data", True,
         f"${d['amt'].iloc[0] / 1e9:.2f}bn latest op", d["operation_date"].iloc[0].date(),
         d["operation_date"].min().date(),
@@ -311,8 +323,9 @@ def check_nasdaq():
             rows = r.json()["data"]["tradesTable"]["rows"]
             d = dt.datetime.strptime(rows[0]["date"], "%m/%d/%Y").date()
             h = dt.datetime.strptime(rows[-1]["date"], "%m/%d/%Y").date()
+            cl = [float(x["close"].replace("$", "").replace(",", "")) for x in rows]
             row(sym, "Nasdaq quote service (unofficial)", True, rows[0]["close"], d, h,
-                "close is not adjusted for dividends")
+                f"not dividend-adjusted; fall from 3-month high {cl[0] / max(cl[:63]) - 1:+.1%}; from 1-year high {cl[0] / max(cl[:252]) - 1:+.1%}")
         except Exception as e:
             row(sym, "Nasdaq quote service (unofficial)", False, note=f"{type(e).__name__}: {e}")
 
@@ -335,46 +348,91 @@ def check_coingecko():
     d = r.json()["data"]
     tot = d["total_market_cap"]["usd"]
     dom = d["market_cap_percentage"]["btc"]
+    stable = STABLE.get("usd", float("nan"))
+    alts = tot * (1 - dom / 100) - stable
     row("BTC dominance / total crypto value", "CoinGecko (no key)", True,
-        f"dominance {dom:.1f}%; total ${tot / 1e12:.2f}tn; alts ${tot * (1 - dom / 100) / 1e12:.2f}tn",
+        f"dominance {dom:.1f}%; total ${tot / 1e12:.2f}tn; alts excluding stablecoins ${alts / 1e12:.3f}tn "
+        f"= {alts / (tot * dom / 100):.2f}x Bitcoin's value",
         dt.datetime.fromtimestamp(d["updated_at"], dt.timezone.utc).date(),
-        note="current value only; no free history. alts here include stablecoins")
+        note="current value only; no free history. Stablecoin supply (DefiLlama, all pegs) subtracted")
 
 
 # ---------------------------------------------------------------- Coinalyze
+CZ = "https://api.coinalyze.net/v1"
+
+
+def cz(path, **params):
+    """One Coinalyze call; waits and retries when the rate limit says so."""
+    import time
+    for _ in range(6):
+        r = get(CZ + path, headers={"api_key": COINALYZE_KEY}, params=params, timeout=90)
+        if r.status_code == 429:
+            time.sleep(float(r.headers.get("Retry-After", 20)) + 1)
+            continue
+        if r.status_code != 200:
+            raise RuntimeError(f"HTTP {r.status_code} {r.text[:120]}")
+        return r
+    raise RuntimeError("still rate-limited after 6 tries")
+
+
 def check_coinalyze():
+    import time
     if not COINALYZE_KEY:
         row("funding rate, open interest", "Coinalyze", None, note="COINALYZE_API_KEY not set yet")
         return
-    H = {"api_key": COINALYZE_KEY}
-    base = "https://api.coinalyze.net/v1"
-    mk = get(base + "/future-markets", headers=H)
-    if mk.status_code != 200:
-        raise RuntimeError(f"HTTP {mk.status_code} {mk.text[:100]}")
-    mk = mk.json()
+    ex = {e["code"]: e["name"] for e in cz("/exchanges").json()}
+    mk = cz("/future-markets").json()
     perp = [m for m in mk if m.get("is_perpetual")]
-    bases = {}
-    for m in perp:
-        bases.setdefault(m["base_asset"], []).append(m["symbol"])
-    NOTES.append(f"Coinalyze: {len(mk)} futures markets, {len(perp)} perpetuals, {len(bases)} base assets; "
-                 f"BTC perps: {len(bases.get('BTC', []))}; examples {bases.get('BTC', [])[:12]}")
-    ex = get(base + "/exchanges", headers=H).json()
-    NOTES.append("Coinalyze exchanges: " + ", ".join(f'{e["code"]}={e["name"]}' for e in ex))
+    NOTES.append("Coinalyze sample market record: " + json.dumps(perp[0]))
+    by_ex = pd.Series([ex.get(m["exchange"], m["exchange"]) for m in perp]).value_counts()
+    NOTES.append(f"Coinalyze: {len(mk)} futures markets, {len(perp)} perpetuals, "
+                 f"{len(set(m['base_asset'] for m in perp))} base assets. Perps per exchange: {by_ex.to_dict()}")
+    btc = [m for m in perp if m["base_asset"] == "BTC"]
+    NOTES.append("Coinalyze BTC perps: " + ", ".join(f'{m["symbol"]}({ex.get(m["exchange"])})' for m in btc))
+    # how is the rate limit counted? 4 quick calls of 20 symbols each = 80 symbols
+    syms = [m["symbol"] for m in perp]
+    t0 = time.time(); codes = []
+    for i in range(4):
+        r = get(CZ + "/open-interest", headers={"api_key": COINALYZE_KEY},
+                params={"symbols": ",".join(syms[i * 20:(i + 1) * 20]), "convert_to_usd": "true"}, timeout=60)
+        codes.append(f"{r.status_code}(retry-after {r.headers.get('Retry-After')})" if r.status_code != 200 else "200")
+    NOTES.append(f"Coinalyze rate-limit test, 4 calls x 20 symbols in {time.time() - t0:.1f}s: {codes}; "
+                 f"headers {dict((k, v) for k, v in r.headers.items() if 'rate' in k.lower() or 'retry' in k.lower())}")
+    # current BTC open interest by exchange
+    cur = []
+    bs = [m["symbol"] for m in btc]
+    for i in range(0, len(bs), 20):
+        cur += cz("/open-interest", symbols=",".join(bs[i:i + 20]), convert_to_usd="true").json()
+    tot = sum(x["value"] for x in cur)
+    top = sorted(cur, key=lambda x: -x["value"])[:12]
+    upd = dt.datetime.fromtimestamp(max(x["update"] for x in cur) / 1000, dt.timezone.utc)
+    row("BTC perpetual open interest, all exchanges", "Coinalyze", True, f"${tot / 1e9:,.1f}bn", upd.date(),
+        note="largest: " + ", ".join(f'{x["symbol"]} {x["value"] / 1e9:.1f}' for x in top))
+    # funding history for the three largest USDT perps
     t1 = int(NOW.timestamp())
-    for label, t0 in [("5 years", t1 - 5 * 365 * 86400), ("60 days", t1 - 60 * 86400)]:
-        for kind, sym in [("funding-rate-history", "BTCUSDT_PERP.A"), ("open-interest-history", "BTCUSDT_PERP.A"),
-                          ("open-interest-history", "ETHUSDT_PERP.A"), ("open-interest-history", "SOLUSDT_PERP.A")]:
-            r = get(f"{base}/{kind}", headers=H,
-                    params={"symbols": sym, "interval": "daily", "from": t0, "to": t1, "convert_to_usd": "true"})
-            try:
-                h = r.json()[0]["history"]
-                d0 = dt.datetime.fromtimestamp(h[0]["t"], dt.timezone.utc).date()
-                d1 = dt.datetime.fromtimestamp(h[-1]["t"], dt.timezone.utc).date()
-                if label == "5 years":
-                    row(f"{kind} {sym}", "Coinalyze", True, h[-1]["c"], d1, d0, f"{len(h)} daily rows asked back {label}")
-            except Exception as e:
-                row(f"{kind} {sym} ({label})", "Coinalyze", False, note=f"HTTP {r.status_code} {r.text[:120]}")
-    NOTES.append("Coinalyze rate limit headers: " + str({k: v for k, v in r.headers.items() if "limit" in k.lower()}))
+    for sym in ["BTCUSDT_PERP.A", "BTCUSDT.6", "BTCUSDT_PERP.3", "BTC.H"]:
+        try:
+            if sym not in bs:
+                NOTES.append(f"Coinalyze: {sym} is not a listed symbol")
+                continue
+            h = cz("/funding-rate-history", symbols=sym, interval="daily", **{"from": 1262304000, "to": t1}).json()[0]["history"]
+            f = pd.Series({dt.datetime.fromtimestamp(x["t"], dt.timezone.utc).date(): x["c"] for x in h})
+            neg = int((f.tail(30) < 0).sum())
+            row(f"funding-rate-history {sym}", "Coinalyze", True,
+                f"last {f.iloc[-1]:.4f}% per interval; 30d mean {f.tail(30).mean():.4f}%", f.index[-1], f.index[0],
+                f"{len(f)} daily rows; days negative in last 30: {neg}; last 5: {[round(v, 4) for v in f.tail(5)]}; record {json.dumps(h[-1])}")
+        except Exception as e:
+            row(f"funding-rate-history {sym}", "Coinalyze", False, note=f"{type(e).__name__}: {e}")
+    # open-interest history depth
+    for sym in ["BTCUSDT_PERP.A", "ETHUSDT_PERP.A", "SOLUSDT_PERP.A"]:
+        try:
+            h = cz("/open-interest-history", symbols=sym, interval="daily", convert_to_usd="true",
+                   **{"from": 1262304000, "to": t1}).json()[0]["history"]
+            d0 = dt.datetime.fromtimestamp(h[0]["t"], dt.timezone.utc).date()
+            d1 = dt.datetime.fromtimestamp(h[-1]["t"], dt.timezone.utc).date()
+            row(f"open-interest-history {sym}", "Coinalyze", True, f'${h[-1]["c"] / 1e9:.2f}bn', d1, d0, f"{len(h)} daily rows")
+        except Exception as e:
+            row(f"open-interest-history {sym}", "Coinalyze", False, note=f"{type(e).__name__}: {e}")
 
 
 def check_misc():
