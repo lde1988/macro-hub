@@ -1,0 +1,332 @@
+{
+ "dials": {
+  "ai_basket": {
+   "baseline": false,
+   "colour": "red",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-01 23:59:00"
+  },
+  "alt_oi": {
+   "baseline": false,
+   "colour": null,
+   "count": 0,
+   "pending": null,
+   "since": null
+  },
+  "alt_value": {
+   "baseline": false,
+   "colour": null,
+   "count": 0,
+   "pending": null,
+   "since": null
+  },
+  "alt_watch": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-19 23:59:00"
+  },
+  "bbb_spread": {
+   "baseline": true,
+   "colour": "green",
+   "count": 0,
+   "pending": null,
+   "since": "2026-02-27 23:59:00"
+  },
+  "bizd": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-10-24 23:59:00"
+  },
+  "breakeven": {
+   "baseline": false,
+   "colour": "green",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-04 23:59:00"
+  },
+  "btc_ndx": {
+   "baseline": false,
+   "colour": "red",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-15 23:59:00"
+  },
+  "btc_price": {
+   "baseline": true,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-02-27 23:59:00"
+  },
+  "btc_weekly": {
+   "baseline": false,
+   "colour": "red",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-16 23:59:00"
+  },
+  "buybacks": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-13 23:59:00"
+  },
+  "ccc_bb": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-10-30 23:59:00"
+  },
+  "cpi_mom": {
+   "baseline": false,
+   "colour": "red",
+   "count": 0,
+   "pending": null,
+   "since": "2026-09-16 23:59:00"
+  },
+  "discount_window": {
+   "baseline": false,
+   "colour": "green",
+   "count": 0,
+   "pending": null,
+   "since": "2026-10-23 23:59:00"
+  },
+  "dollar": {
+   "baseline": false,
+   "colour": "red",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-13 23:59:00"
+  },
+  "dollar_reversal": {
+   "baseline": false,
+   "colour": "red",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-13 23:59:00"
+  },
+  "fed_bills": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-09-11 23:59:00"
+  },
+  "fed_reserves": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-08-21 23:59:00"
+  },
+  "front_end": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-10-10 23:59:00"
+  },
+  "funding": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-05-22 23:59:00"
+  },
+  "hike_pricing": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-18 23:59:00"
+  },
+  "hikes_out": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-18 23:59:00"
+  },
+  "hy_spread": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-20 23:59:00"
+  },
+  "kre": {
+   "baseline": true,
+   "colour": "green",
+   "count": 0,
+   "pending": null,
+   "since": "2026-02-27 23:59:00"
+  },
+  "liquidity": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-10-09 23:59:00"
+  },
+  "lth_sopr": {
+   "baseline": true,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-02-27 23:59:00"
+  },
+  "margin_debt": {
+   "baseline": false,
+   "colour": "red",
+   "count": 1,
+   "pending": "amber",
+   "since": "2026-10-26 23:59:00"
+  },
+  "net_loss": {
+   "baseline": true,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-02-27 23:59:00"
+  },
+  "nfci": {
+   "baseline": true,
+   "colour": "green",
+   "count": 0,
+   "pending": null,
+   "since": "2026-02-27 23:59:00"
+  },
+  "sofr_iorb": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-21 23:59:00"
+  },
+  "sp500": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-21 23:59:00"
+  },
+  "srf": {
+   "baseline": true,
+   "colour": "green",
+   "count": 0,
+   "pending": null,
+   "since": "2026-02-27 23:59:00"
+  },
+  "stable_30d": {
+   "baseline": false,
+   "colour": "red",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-04 23:59:00"
+  },
+  "stable_turn": {
+   "baseline": false,
+   "colour": "red",
+   "count": 0,
+   "pending": null,
+   "since": "2026-10-23 23:59:00"
+  },
+  "stlfsi": {
+   "baseline": true,
+   "colour": "green",
+   "count": 0,
+   "pending": null,
+   "since": "2026-02-27 23:59:00"
+  },
+  "weekly_move": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-24 23:59:00"
+  },
+  "weekly_reclaim": {
+   "baseline": false,
+   "colour": "red",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-16 23:59:00"
+  },
+  "y10_chg": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-14 23:59:00"
+  },
+  "y2_chg": {
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
+   "pending": null,
+   "since": "2026-11-12 23:59:00"
+  }
+ },
+ "down": [],
+ "last_digest": "2026-11-25",
+ "outbox": [],
+ "since": {
+  "reading": "2026-11-16",
+  "regime": "2026-11-16",
+  "trend_exit": "2026-11-16"
+ },
+ "summary": {
+  "dials": {
+   "ai_basket": "red",
+   "alt_oi": null,
+   "alt_value": null,
+   "alt_watch": "amber",
+   "bbb_spread": "green",
+   "bizd": "amber",
+   "breakeven": "green",
+   "btc_ndx": "red",
+   "btc_price": "amber",
+   "btc_weekly": "red",
+   "buybacks": "amber",
+   "ccc_bb": "amber",
+   "cpi_mom": "red",
+   "discount_window": "green",
+   "dollar": "red",
+   "dollar_reversal": "red",
+   "fed_bills": "amber",
+   "fed_reserves": "amber",
+   "front_end": "amber",
+   "funding": "amber",
+   "hike_pricing": "amber",
+   "hikes_out": "amber",
+   "hy_spread": "amber",
+   "kre": "green",
+   "liquidity": "amber",
+   "lth_sopr": "amber",
+   "margin_debt": "red",
+   "net_loss": "amber",
+   "nfci": "green",
+   "sofr_iorb": "amber",
+   "sp500": "amber",
+   "srf": "green",
+   "stable_30d": "red",
+   "stable_turn": "red",
+   "stlfsi": "green",
+   "weekly_move": "amber",
+   "weekly_reclaim": "red",
+   "y10_chg": "amber",
+   "y2_chg": "amber"
+  },
+  "label": "HOLD",
+  "reading": "Hold: fairly cheap, but the turn is not confirmed",
+  "regime": "BREAK",
+  "trend_exit": "RISK-OFF"
+ }
+}

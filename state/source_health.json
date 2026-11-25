@@ -1,0 +1,62 @@
+{
+ "bitview": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "coinalyze": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "coinbase": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "coingecko": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "coinmetrics": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "defillama": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "dxycheck": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "ecb": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "finra": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "fred": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "nasdaq": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ },
+ "treasury": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25"
+ }
+}
