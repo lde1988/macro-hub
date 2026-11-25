@@ -1,6 +1,6 @@
 # Point 7: dashboard
 
-Date: 25 November 2026. Status: **built and running; waiting for the owner to switch GitHub Pages on** so it has an address.
+Date: 25 November 2026. Status: **live at https://lde1988.github.io/macro-hub/** (not yet on a schedule; that is point 9). Waiting for the owner to compare Bitcoin, the S&P 500 and the dollar index against their phone.
 
 ## What was built
 
@@ -33,7 +33,23 @@ Froth warning with the 1.3x guard; the trend-exit line; STRESS BUILDING needing 
 - No push was sent: the first run is the silent baseline.
 - **The publishing step failed because GitHub Pages is not switched on for the repository.** That needs one setting only the owner can change: Settings → Pages → Source: GitHub Actions.
 
+## Going live (10:40 UTC, 18:40 Hong Kong time)
+
+- The owner switched Pages on. Two publishing attempts then failed: the first with GitHub's "try again later", the second because the publish step could not find the page bundle uploaded earlier in the same job. Publishing was moved into its own job (GitHub's standard arrangement) and the third attempt succeeded.
+- Checked on the live site: page loads with no errors; manifest, icons, `latest.json`, `FEED.md`, the verdict log and the history files all answer.
+- Fast-changing bookkeeping survived between runs as designed: the second run asked only Coinbase again, not every source.
+- No pushes were sent by these runs (silent baseline, then no changes).
+
+### Figures on the dashboard at go-live, for the owner's comparison
+
+| Figure | Dashboard | What it is |
+|---|---|---|
+| Bitcoin | $58,941 | Live Coinbase price at the time of the run |
+| S&P 500 | 7,237 | **Close of Monday 23 November.** FRED posts each close a day late, so this will differ from a phone showing Tuesday's close or a live quote |
+| Dollar index | 103.88 | **ECB fixing of Tuesday 24 November**, computed. The published close for the same day, shown beside it, was 103.81. A phone shows a live quote |
+
 ## Known gaps at this stop
 
 - Funding and altcoin open-interest: funding history is loaded; the open-interest totals wait on the one-off Coinalyze pull.
-- The owner's comparison of Bitcoin, the S&P 500 and the dollar index against their phone has not happened yet (needs the live address).
+- The owner's comparison against their phone is pending.
+- The S&P 500 is a day behind because of FRED. Nasdaq's quote service could supply a same-day close if the owner wants it; not changed without their say.
