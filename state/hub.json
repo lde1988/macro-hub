@@ -17,12 +17,12 @@
    "since": "2026-11-01 23:59:00"
   },
   "alt_oi": {
-   "baseline": false,
-   "colour": null,
+   "baseline": true,
+   "colour": "amber",
    "count": 0,
    "extra": {},
    "pending": null,
-   "since": null
+   "since": "2026-11-25 13:03:38"
   },
   "alt_value": {
    "baseline": false,
@@ -77,7 +77,7 @@
    "colour": "amber",
    "count": 0,
    "extra": {
-    "ratio_to_realised": 1.1056928315560695
+    "ratio_to_realised": 1.1028041343513522
    },
    "pending": null,
    "since": "2026-02-27 23:59:00"
@@ -333,6 +333,7 @@
  },
  "down": [],
  "last_digest": "2026-11-25",
+ "last_run": "2026-11-25T13:03:38Z",
  "outbox": [],
  "since": {
   "reading": "2026-11-16",
@@ -342,7 +343,7 @@
  "summary": {
   "dials": {
    "ai_basket": "red",
-   "alt_oi": null,
+   "alt_oi": "amber",
    "alt_value": null,
    "alt_watch": "amber",
    "bbb_spread": "green",
