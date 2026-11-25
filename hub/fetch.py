@@ -34,13 +34,19 @@ def is_due(status, every_minutes, now):
     return (now - pd.Timestamp(last)).total_seconds() >= every_minutes * 60 - 120
 
 
-def run_fetch(data_dir, backfill=False, only=None, now=None, registry=None, root=ROOT, fetchers=None):
-    """Returns (store, live, status). `fetchers` lets tests replace the web calls."""
+def run_fetch(data_dir, backfill=False, only=None, now=None, registry=None, root=ROOT, fetchers=None, state_dir=None):
+    """Returns (store, live, status). `fetchers` lets tests replace the web calls.
+    state_dir holds the fast-changing bookkeeping (when each source was last asked, live values).
+    The scheduled run keeps it outside the data branch so that branch is not committed every run."""
     now = now or utcnow()
     reg = registry or load_registry()
     store = Store(data_dir)
-    status = load_json(Path(data_dir) / "state" / "sources.json", {})
-    live = load_json(Path(data_dir) / "state" / "live.json", {})
+    state_dir = Path(state_dir) if state_dir else Path(data_dir) / "state"
+    status = load_json(state_dir / "sources.json", None)
+    if status is None:   # bookkeeping lost: start from the health record kept in the data branch
+        status = {k: {"fails": v.get("fails", 0), "last_ok": v.get("last_ok", "")}
+                  for k, v in load_json(Path(data_dir) / "state" / "source_health.json", {}).items()}
+    live = load_json(state_dir / "live.json", {})
     now_ts = pd.Timestamp(now)
     for name in NAMES:
         if only and name not in only:
@@ -77,8 +83,8 @@ def run_fetch(data_dir, backfill=False, only=None, now=None, registry=None, root
             st.update(fails=st.get("fails", 0) + 1, last_error=scrub(f"{type(ex).__name__}: {ex}")[:200])
             print(f"{name}: FAILED ({st['last_error']})", flush=True)
     store.save()
-    save_json(Path(data_dir) / "state" / "sources.json", status)
-    save_json(Path(data_dir) / "state" / "live.json", live)
+    save_json(state_dir / "sources.json", status)
+    save_json(state_dir / "live.json", live)
     return store, live, status
 
 

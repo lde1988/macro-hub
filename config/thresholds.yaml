@@ -10,6 +10,33 @@ general:
   source_down_runs: 4        # a source failing this many runs in a row raises a "source down" push
   cross_check_gap: 0.05      # flag when two sources for the same metric differ by more than 5%
 
+max_age_days:                # a dial is greyed out as "stale" when its newest data is older than this
+  default: 5                 # daily series: allows a long weekend plus a holiday
+  btc_weekly: 9              # weekly close
+  weekly_move: 9             # weekly close
+  weekly_reclaim: 9          # weekly close
+  margin_debt: 75            # monthly, published about 3 to 4 weeks after month end
+  cpi_mom: 80                # monthly, dated the 1st of its month
+  liquidity: 16              # weekly central-bank balance sheets
+  nfci: 16                   # weekly
+  stlfsi: 16                 # weekly
+  discount_window: 12        # weekly
+  fed_bills: 12              # weekly
+  fed_reserves: 12           # weekly
+  buybacks: 21               # operations are roughly weekly, with gaps
+
+alerts:
+  digest_hour_hkt: 8         # one quiet daily digest at 08:00 Hong Kong time; it doubles as a heartbeat
+  digest_priority: 2         # low: no sound
+  reading_priority: 5        # buy / hold change
+  regime_priority: 5         # regime change
+  trend_exit_priority: 5     # trend exit turning RISK-OFF or RISK-ON
+  dial_red_priority: 4       # a dial turning red
+  dial_change_priority: 3    # a dial turning amber from green
+  improvement_priority: 2    # a dial turning green, or amber from red
+  source_down_priority: 3    # a source failing 4 runs in a row
+  max_outbox: 20             # unsent pushes kept for retry
+
 levels:                      # fixed levels; Coutts' posts may update these automatically (Phase 2), within 15%
   btc_value_zone: 58600      # first-half 2026 low: at or below this the price dial is green
   btc_break: 70000           # a weekly close below this is a BREAK
@@ -164,6 +191,10 @@ families:
   crypto_leverage: [funding, alt_oi, stable_30d]  # funding rate, altcoin open interest, stablecoin supply
   equities:        [sp500, margin_debt]  # S&P 500 and margin debt
 buy_blocking_families: [money_market, credit, banks]  # only these families can block a buy
+
+froth_warning:
+  record: "right on 3 of 8 past occasions"  # shown beside the warning; from the history replay (reports/06b), update if re-run
+  push_priority: 4           # a froth warning pushes at priority 4, not 5: its record is weak
 
 turn:
   fresh_weeks: 13            # a group D dial counts toward "turn confirmed" and the TURN regime only this long after turning green

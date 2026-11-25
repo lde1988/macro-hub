@@ -28,7 +28,7 @@ def replay(store, registry, cfg, start, end, warmup_days=120, each=None, blackou
         row = {"date": day, "regime": out["regime"]["name"], "reading": out["reading"]["label"],
                "level": out["reading"].get("level", ""), "headline": out["reading"]["headline"],
                "old_reading": out["reading_old_rule"]["label"], "old_headline": out["reading_old_rule"]["headline"],
-               "early": out["regime"]["early_line"], "turn_confirmed": out["reading"]["turn"]["confirmed"],
+               "early": out["regime"]["early_line"], "trend": out["trend_exit"]["state"], "turn_confirmed": out["reading"]["turn"]["confirmed"],
                "turn_any": out["reading"]["turn"]["any_signal"]}
         for i, r in out["readings"].items():
             row[i] = r["colour"]

@@ -4,9 +4,14 @@
   price; break line = 0.96x it (the owner's stand-ins for 58,600 / 73,000 / 70,000).
 - A spell = BUY (or SELL) days joined when less than 15 days apart.
 - A BUY spell is "right" if Bitcoin is higher 365 days after the spell's first day, "wrong" if lower.
-  A SELL spell is "right" if Bitcoin is lower 365 days after its first day. Too recent = not judged.
+  A FROTH WARNING spell is "right" if Bitcoin is lower 365 days after its first day. Too recent = not judged.
+- Trend exit (fixed before running, not adjusted after): every RISK-OFF spell runs from the weekly close
+  that broke the line to the weekly close that reclaimed it. It is judged the same way (right if
+  Bitcoin is lower 365 days after it began) and also by the plain outcome: the price when it turned
+  RISK-OFF against the price when it turned RISK-ON again (lower re-entry = the exit saved money).
 - At an episode (a cycle low or high) a rule is "silent" if it gave no BUY (low) or SELL (high)
   within 60 days either side.
+  For trend exit, a low is "protected" if the line was RISK-OFF on the day; a high is "missed" if it was still RISK-ON 60 days after.
 Nothing in config/thresholds.yaml is changed to fit the result.
 
     python tools/replay_report.py DATA_DIR OUT_DIR
@@ -98,7 +103,21 @@ def main(data, out):
     L += spell_table("New rule: BUY (CONFIRMED)", (df["reading"] == "BUY") & (df["level"] == "CONFIRMED"), "buy")
     L += spell_table("New rule: any BUY", df["reading"] == "BUY", "buy")
     L += spell_table("Original rule: BUY", df["old_reading"] == "BUY", "buy")
-    L += spell_table("SELL (same rule in both)", df["reading"] == "SELL", "sell")
+    L += spell_table("FROTH WARNING (same rule in both)", df["reading"] == "FROTH WARNING", "sell")
+    off = df["trend"] == "RISK-OFF"
+    L += spell_table("Trend exit: RISK-OFF spells", off, "sell")
+    L += ["### Trend exit: what each RISK-OFF spell did", "", "| risk-off from | price then | risk-on again | price then | days out | re-entry vs exit | lowest price while out |", "|---|---|---|---|---|---|---|"]
+    saved = []
+    for a, b in spells(off, gap=2):
+        p0 = float(price.asof(a))
+        nxt = b + pd.Timedelta(days=1)
+        ended = nxt in df.index
+        p1 = float(price.asof(nxt)) if ended else float(price.iloc[-1])
+        low = float(price[a:b].min())
+        saved.append(p1 / p0 - 1)
+        L.append(f"| {a:%d %b %Y} | ${p0:,.0f} | {nxt.strftime('%d %b %Y') if ended else 'still risk-off'} | ${p1:,.0f} | {(b - a).days + 1} | {p1 / p0 - 1:+.0%} | ${low:,.0f} ({low / p0 - 1:+.0%}) |")
+    L += ["", f"RISK-OFF spells: {len(saved)}; re-entry below the exit price in {sum(1 for x in saved if x < 0)}, above it in {sum(1 for x in saved if x >= 0)}. "
+          f"Days risk-off: {int(off.sum())} of {len(df)} ({off.mean():.0%}).", ""]
 
     L += ["## Episode by episode", ""]
     for name, kind, a, b in EPISODES:
@@ -106,7 +125,7 @@ def main(data, out):
         d = w.idxmin() if kind == "low" else w.idxmax()
         lo, hi = d - pd.Timedelta(days=60), d + pd.Timedelta(days=60)
         win = df[lo:hi]
-        want = "BUY" if kind == "low" else "SELL"
+        want = "BUY" if kind == "low" else "FROTH WARNING"
         row = df.loc[d] if d in df.index else None
         L += [f"### {name}: {d:%d %b %Y}, ${price[d]:,.0f}", ""]
         for label, col, hl in (("New rule", "reading", "headline"), ("Original rule", "old_reading", "old_headline")):
@@ -123,6 +142,8 @@ def main(data, out):
             if row is not None:
                 L.append(f"  - On the day: {row[hl]}")
         if row is not None:
+            after = df["trend"].asof(d + pd.Timedelta(days=60)) if d + pd.Timedelta(days=60) <= df.index[-1] else "n/a"
+            L.append(f"- **Trend exit** on the day: {row['trend']}; 60 days later: {after}")
             L.append(f"- Regime on the day: {row['regime']}" + (f" ({row['early']})" if row["early"] else ""))
             nodata = [i for i in ids if pd.isna(row[i])]
             cols = {c: [i for i in ids if row[i] == c] for c in ("green", "red")}

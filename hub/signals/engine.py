@@ -101,10 +101,15 @@ def turn_status(readings, cfg):
 def regime(readings, cfg):
     """TURN is shown only when the turn is confirmed. Otherwise the underlying regime is
     shown (first match wins: BREAK > STRESS BUILDING > FRAGILE > CALM) with a line
-    listing any early turn signals (freshly green group D dials)."""
+    listing any early turn signals (freshly green group D dials).
+    STRESS BUILDING = two or more stress families red, or any one of the buy-blocking families red."""
     turn = turn_status(readings, cfg)
     x = lambda i, k: bool(readings.get(i, {}).get("extra", {}).get(k))
     red_bc = [r["title"] for r in readings.values() if r["group"] in "BC" and r["colour"] == R]
+    fam = families(readings, cfg)
+    red_fams = [f for f, v in fam.items() if v["red"]]
+    # stress needs two or more families red, or any one of the buy-blocking families (funding, credit spreads, banks)
+    stress = len(red_fams) >= 2 or any(f in cfg["buy_blocking_families"] for f in red_fams)
     early = turn["fresh_signals"]
     n = len(early)
     early_line = "" if not n else f"{n} early turn signal{'s' if n > 1 else ''}: " + ", ".join(early)
@@ -115,7 +120,7 @@ def regime(readings, cfg):
         why = [n_ for n_, f in (("S&P 500 month-end close below its 10-month average", x("sp500", "month_end_break")),
                                 ("Bitcoin weekly close below the break level", x("btc_weekly", "break_in_force"))) if f]
         out = {"name": "BREAK", "detail": "; ".join(why)}
-    elif red_bc:
+    elif stress:
         out = {"name": "STRESS BUILDING", "detail": "red: " + ", ".join(red_bc)}
     elif x("margin_debt", "fired_latched"):
         out = {"name": "FRAGILE", "detail": "the margin-debt signal fired within the past 12 months"}
@@ -149,9 +154,12 @@ def reading(readings, cfg, rule="new"):
     turned = old_turned if rule == "old" else turn["fresh_signals"]
     out = {"rule": rule, "caution": bool(ex("btc_weekly", "break_in_force")) and not cheap, "turn": turn}
 
-    if froth and liq:
-        out.update(label="SELL", headline="Sell (reduce risk)", reasons=["Froth: " + "; ".join(froth), "Liquidity deteriorating: " + "; ".join(liq)],
-                   change="Back to hold when the froth clears or liquidity stops deteriorating.")
+    not_cheap = ratio is None or ratio > cfg["btc_price"]["confirmed_buy_multiple"]   # frothy and cheap cannot both be true
+    if froth and liq and not_cheap:
+        out.update(label="FROTH WARNING", headline="Froth warning (reduce-risk watch)",
+                   reasons=["Froth: " + "; ".join(froth), "Liquidity deteriorating: " + "; ".join(liq)],
+                   change="Back to hold when the froth clears, liquidity stops deteriorating, or price falls to 1.3x realised price or below.",
+                   record=cfg["froth_warning"]["record"])
     elif rule == "old" and cheap and turned and not any_fresh:
         out.update(label="BUY", headline="Buy (in stages)",
                    reasons=["Price is in the value zone", "Turn signal: " + ", ".join(turned), "No group B or C dial newly red in 5 trading days"],
@@ -171,7 +179,7 @@ def reading(readings, cfg, rule="new"):
     else:
         if froth:
             kind, reasons = "frothy, but liquidity is not deteriorating", ["Froth: " + "; ".join(froth)]
-            change = "Sell if the margin-debt signal fires, the dollar rises through 102.5, or two families turn red."
+            change = "Froth warning if the margin-debt signal fires, the dollar rises through 102.5, or two families turn red (and price is above 1.3x realised price)."
         elif cheap:
             if rule == "old":
                 why = "no turn signal has fired" if not turned else "a stress dial turned red in the past 5 trading days (" + ", ".join(any_fresh) + ")"
@@ -189,7 +197,7 @@ def reading(readings, cfg, rule="new"):
             change = "Buy (confirmed) when the dollar reverses or two turn families go green; Buy (staged) if price falls into the value zone with a capitulation sign."
         else:
             kind, reasons = "neither cheap nor frothy", ["Price is outside the value zone and below the froth level"]
-            change = "Buy needs a cheaper price or a confirmed turn; sell needs froth with deteriorating liquidity."
+            change = "Buy needs a cheaper price or a confirmed turn; a froth warning needs froth with deteriorating liquidity."
         if not turn["confirmed"]:
             reasons.append("Turn not confirmed" + (": " + ", ".join(turned) + " only" if turned else ": no turn signal is freshly green"))
         if liq:
@@ -203,8 +211,8 @@ def reading(readings, cfg, rule="new"):
     alt_green = col("alt_oi") == G
     if out["label"] == "BUY" and alt_green:
         out["alts"] = {"label": "BUY", "headline": out["headline"], "why": "Bitcoin reading is Buy and altcoin open interest is below its 50th percentile"}
-    elif out["label"] == "SELL":
-        out["alts"] = {"label": "SELL", "headline": "Sell (reduce risk)", "why": "altcoins take the brunt of a deleveraging"}
+    elif out["label"] == "FROTH WARNING":
+        out["alts"] = {"label": "FROTH WARNING", "headline": "Froth warning (reduce-risk watch)", "why": "altcoins take the brunt of a deleveraging"}
     else:
         why = ("the Bitcoin reading is not Buy" if out["label"] != "BUY"
                else "altcoin open interest is not below its 50th percentile" if col("alt_oi") else "altcoin open interest has no reading yet")
@@ -212,9 +220,25 @@ def reading(readings, cfg, rule="new"):
     return out
 
 
+def trend_exit(readings):
+    """Coutts' regime filter as its own line, separate from buy / hold.
+    RISK-OFF after a weekly close below the break line; back to RISK-ON on a weekly close above the reclaim line."""
+    r = readings.get("btc_weekly", {})
+    ex = r.get("extra", {})
+    if r.get("colour") is None or "break_in_force" not in ex:
+        return {"state": "NO DATA", "text": "no weekly close available"}
+    off = bool(ex["break_in_force"])
+    brk, rec = ex.get("break_level"), ex.get("reclaim_level")
+    return {"state": "RISK-OFF" if off else "RISK-ON",
+            "text": (f"weekly close below the break line; back to risk-on on a weekly close above ${rec:,.0f}" if off
+                     else f"no break in force; risk-off on a weekly close below ${brk:,.0f}"),
+            "break_level": brk, "reclaim_level": rec, "weekly_close": r.get("value")}
+
+
 def evaluate(view, cfg, state=None):
     """Everything for one run. state: {"dials": {...}} from the previous run."""
     readings, dial_state = evaluate_dials(view, cfg, (state or {}).get("dials"))
     return {"readings": readings, "families": families(readings, cfg), "regime": regime(readings, cfg),
             "reading": reading(readings, cfg, "new"), "reading_old_rule": reading(readings, cfg, "old"),
+            "trend_exit": trend_exit(readings), "turn": turn_status(readings, cfg),
             "state": {"dials": dial_state}}

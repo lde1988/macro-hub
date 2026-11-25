@@ -4,7 +4,7 @@ import pytest
 
 from hub.signals.core import A, G, R
 from hub.signals.dials import DIALS
-from hub.signals.engine import evaluate, families, reading, regime, step, trading_days_between, turn_status
+from hub.signals.engine import evaluate, families, reading, regime, step, trading_days_between, trend_exit, turn_status
 from tests.helpers import cfg, flat, view
 
 C = cfg()
@@ -131,6 +131,7 @@ def test_regime_order():
     assert regime(R_(), C)["name"] == "CALM"
     assert regime(R_(margin_debt__fired_latched=True), C)["name"] == "FRAGILE"
     assert regime(R_(margin_debt__fired_latched=True, hy_spread=R), C)["name"] == "STRESS BUILDING"
+    assert regime(R_(margin_debt__fired_latched=True, dollar=R), C)["name"] == "FRAGILE"     # one non-blocking family: not stress
     assert regime(R_(hy_spread=R, btc_weekly__break_in_force=True), C)["name"] == "BREAK"
     assert regime(R_(sp500__month_end_break=True), C)["name"] == "BREAK"
     t = regime(R_(hy_spread=R, btc_weekly__break_in_force=True, dollar_reversal=G), C)
@@ -145,6 +146,15 @@ def test_unconfirmed_turn_signals_show_under_the_underlying_regime():
     one = regime(R_(fed_reserves=G), C)
     assert one["name"] == "CALM" and one["early_line"].startswith("1 early turn signal: ")
     assert regime(R_(), C)["early_line"] == ""
+
+
+@pytest.mark.parametrize("reds,want", [
+    (["sofr_iorb"], "STRESS BUILDING"), (["hy_spread"], "STRESS BUILDING"), (["kre"], "STRESS BUILDING"),   # one buy-blocking family is enough
+    (["dollar"], "CALM"), (["ai_basket"], "CALM"), (["funding"], "CALM"), (["sp500"], "CALM"),            # one other family is not
+    (["dollar", "cpi_mom", "y2_chg"], "CALM"),                                                             # three dials, one family
+    (["dollar", "ai_basket"], "STRESS BUILDING"), (["funding", "sp500"], "STRESS BUILDING")])             # two families
+def test_stress_building_needs_two_families_or_one_buy_blocking_family(reds, want):
+    assert regime(R_(**{r: R for r in reds}), C)["name"] == want
 
 
 def test_group_a_red_does_not_count_as_stress():
@@ -193,20 +203,46 @@ def test_a_red_that_is_no_longer_fresh_does_not_block():
 
 @pytest.mark.parametrize("froth", ["funding", "alt_oi", "btc_price"])
 @pytest.mark.parametrize("liq", [dict(margin_debt__fired_latched=True), dict(dollar=R), dict(hy_spread=R, kre=R)])
-def test_sell_needs_froth_and_deteriorating_liquidity(froth, liq):
-    assert reading(R_(**{froth: R}, **liq), C)["label"] == "SELL"
+def test_froth_warning_needs_froth_and_deteriorating_liquidity(froth, liq):
+    r = reading(R_(**{froth: R}, **liq), C)
+    assert r["label"] == "FROTH WARNING" and r["headline"] == "Froth warning (reduce-risk watch)"
+    assert r["record"] == C["froth_warning"]["record"]
 
 
-def test_sell_counts_families_not_dials():
-    r = reading(R_(funding=R, hy_spread=R, ccc_bb=R, bbb_spread=R), C)     # three dials, but only two families with funding
-    assert r["label"] == "SELL"                                             # crypto leverage + credit = two families
+def test_froth_warning_counts_families_not_dials():
+    r = reading(R_(funding=R, hy_spread=R, ccc_bb=R, bbb_spread=R), C)     # crypto leverage + credit = two families
+    assert r["label"] == "FROTH WARNING"
     r = reading(R_(btc_price=R, hy_spread=R, ccc_bb=R, bbb_spread=R), C)   # price froth; credit is one family
     assert r["label"] == "HOLD" and "frothy" in r["headline"]
+
+
+def test_froth_warning_cannot_fire_when_price_is_cheap():
+    # the March 2020 case: funding still frothy on a 30-day average while price had already collapsed
+    cheap = dict(funding=R, dollar=R, btc_price__ratio_to_realised=1.3)
+    assert reading(R_(**cheap), C)["label"] != "FROTH WARNING"
+    assert reading(R_(funding=R, dollar=R, btc_price__ratio_to_realised=1.31), C)["label"] == "FROTH WARNING"
+    assert reading(R_(funding=R, dollar=R, btc_price__ratio_to_realised=0.9, btc_price=G, lth_sopr=G), C)["label"] == "BUY"
 
 
 def test_froth_alone_or_bad_liquidity_alone_is_hold():
     assert reading(R_(funding=R), C)["label"] == "HOLD"
     assert reading(R_(dollar=R, margin_debt__fired_latched=True), C)["label"] == "HOLD"
+
+
+def test_trend_exit_is_its_own_line():
+    def wk(**extra):
+        r = R_()
+        r["btc_weekly"]["extra"].update(break_level=70000, reclaim_level=73000, **extra)
+        return r
+    off = trend_exit(wk(break_in_force=True))
+    assert off["state"] == "RISK-OFF" and "$73,000" in off["text"]
+    on = trend_exit(wk(break_in_force=False))
+    assert on["state"] == "RISK-ON" and "$70,000" in on["text"]
+    r = R_()
+    r["btc_weekly"]["colour"] = None
+    assert trend_exit(r)["state"] == "NO DATA"
+    # it does not change the buy / hold reading
+    assert reading(wk(break_in_force=True, **{}), C)["label"] == "HOLD"
 
 
 def test_hold_always_says_which_kind():
@@ -226,7 +262,7 @@ def test_altcoins_have_a_stricter_rule():
     assert reading(R_(**buy, alt_oi=G), C)["alts"]["label"] == "BUY"
     assert reading(R_(**buy), C)["alts"]["label"] == "HOLD"                # open interest not below its 50th percentile
     assert reading(R_(alt_oi=G), C)["alts"]["label"] == "HOLD"             # Bitcoin reading is not Buy
-    assert reading(R_(funding=R, dollar=R), C)["alts"]["label"] == "SELL"
+    assert reading(R_(funding=R, dollar=R), C)["alts"]["label"] == "FROTH WARNING"
 
 
 # ------------------------------------------------------------------ old rule, kept for the side-by-side replay
@@ -251,7 +287,7 @@ def test_evaluate_end_to_end_and_fresh_red_window(tmp_path):
     out3 = evaluate(view(tmp_path / "c", data, now="2026-11-25 09:30"), C, out2["state"])
     b = out3["readings"]["breakeven"]
     assert b["colour"] == R and b["changed_from"] == G and b["fresh_red"] is True
-    assert out3["regime"]["name"] == "STRESS BUILDING"
+    assert out3["regime"]["name"] == "CALM"            # one red dial in a non-blocking family is not "stress building"
     out4 = evaluate(view(tmp_path / "d", data, now="2026-12-03 09:30"), C, out3["state"])
     assert out4["readings"]["breakeven"]["colour"] == R and out4["readings"]["breakeven"]["fresh_red"] is False
 

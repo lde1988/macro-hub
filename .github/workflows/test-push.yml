@@ -1,10 +1,10 @@
 # Sends one test push to the phone. Run by hand (Actions tab -> Test push -> Run workflow)
-# or by changing ops/test-push-request.
+# or, on the build branch only, by changing ops/test-push-request.
 name: Test push
 on:
   workflow_dispatch:
   push:
-    branches: [claude/build, main]
+    branches: [claude/build]
     paths: [ops/test-push-request]
 jobs:
   push:

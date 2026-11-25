@@ -8,7 +8,7 @@ on:
         description: "Sources to load, comma separated (empty = all)"
         default: ""
   push:
-    branches: [claude/build, main]
+    branches: [claude/build]
     paths: [ops/backfill-request]
 permissions:
   contents: write
