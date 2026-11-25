@@ -145,9 +145,9 @@ funding:
   red_at_or_above: 30.0      # percent a year; green when negative
 
 alt_oi:
-  matched_to_coutts: false   # false = dial is labelled "proxy, not matched to Coutts" and is kept out of the froth warning
-                             # and the altcoin buy line. Set true only once the stored series reproduces his 27 Sep 2026
-                             # figure (about 1.66x at about the 98th percentile). See reports/09.
+  matched_to_coutts: true    # true since 25 Nov 2026: the stored series reads 1.65x at the 99th percentile on 27 Sep 2026,
+                             # against Coutts' 1.66x at the 98th (reports/09). Set false to label the dial
+                             # "proxy, not matched to Coutts" and keep it out of the froth warning and the altcoin buy line.
   green_below: 50            # percentile
   red_at_or_above: 90  # percentile; red at or above
   min_history_days: 365  # days of history needed before a percentile means anything
