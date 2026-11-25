@@ -29,7 +29,7 @@ There is no machine learning and there are no hidden weights. The rules are in
 
 | What | When | Where to see it |
 |---|---|---|
-| **Hub run**: fetch, dials, dashboard, feed, pushes | Every 15 minutes (at :03, :18, :33, :48). GitHub's timer is "best effort" and is often 5 to 20 minutes late | Actions tab → Hub run |
+| **Hub run**: fetch, dials, dashboard, feed, pushes | Every 15 minutes (at :07, :22, :37, :52). GitHub's timer is "best effort" and is often 5 to 20 minutes late | Actions tab → Hub run |
 | **Open interest (daily)**: altcoin and Bitcoin open interest from about 1,060 markets | Once a day at 00:40 UTC; takes about half an hour | Actions tab → Open interest (daily) |
 | **Watchdog**: checks the dashboard is fresh and restarts the hub if not | Four times a day | Actions tab → Watchdog |
 | **Tests** | On every change to the code | Actions tab → Tests |

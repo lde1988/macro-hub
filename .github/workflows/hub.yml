@@ -5,7 +5,7 @@
 name: Hub run
 on:
   schedule:
-    - cron: "3,18,33,48 * * * *"   # every 15 minutes, off the hour (GitHub's busiest minute)
+    - cron: "7,22,37,52 * * * *"   # every 15 minutes, off the hour (GitHub's busiest minute)
   workflow_dispatch:
   push:
     branches: [main]
