@@ -59,12 +59,23 @@ The first table (1.91x at the 67th percentile) was wrong for three reasons, all 
 
 **Closest to Coutts: crypto only, with ETH.** It gives 1.64x to 1.70x at the 98th percentile on 27 September, against his 1.66x at the 98th. On 28 September it reads exactly 1.66x. Without ETH the percentile also matches (98th) but the level does not (1.02x), so his figure includes ETH.
 
-### What is live, and the "proxy" label
+### What is live: the check on the loaded series
 
-- The live dial uses that definition, restricted to the markets that hold 97% of crypto altcoin open interest (1,043 altcoin markets and all 18 Bitcoin markets). All 5,500 markets cannot be read daily at Coinalyze's limit of 40 a minute.
-- Because of that restriction the live series will read a little lower than the full count (about 3%). Its history is being loaded on exactly the same market list so the percentile is like-for-like.
-- **Until that loaded series is checked against 1.66x and the 98th percentile, the dial is labelled "proxy, not matched to Coutts" and is kept out of the froth warning and the altcoin buy line**, as instructed. With the dial out, the altcoin line cannot say Buy: it says so and gives the reason. The switch is one line in `config/thresholds.yaml` (`alt_oi.matched_to_coutts`).
-- Known weakness: the market list is chosen by today's open interest, so coins that were large in 2023 and have since faded are under-counted in the older history. The list also needs rebuilding a few times a year (README, Maintenance).
+The live dial uses "crypto only, with ETH", restricted to the markets holding 97% of crypto altcoin open interest (1,043 altcoin markets and all 18 Bitcoin markets), because all 5,500 cannot be read daily at Coinalyze's limit of 40 a minute. Its history was loaded on exactly that list (1,501 days, 16 Oct 2022 to 24 Nov 2026, no day without Bitcoin open interest).
+
+| Date | Loaded series | Percentile to that date | Coutts |
+|---|---|---|---|
+| 26 Sep 2026 | 1.62x | 99 | |
+| **27 Sep 2026** | **1.65x** | **99** | **1.66x, 98th** |
+| 28 Sep 2026 | 1.61x | 98 | |
+| 24 Nov 2026 (latest) | 1.20x | 51 | |
+
+**Result: matched.** 1.65x against his 1.66x; 99th percentile against his 98th. By the owner's test ("near 1.66x and the 98th percentile") the proxy label comes off, and the dial takes part in the froth warning and the altcoin buy line again. The switch is one line in `config/thresholds.yaml` (`alt_oi.matched_to_coutts`, now `true`); setting it to `false` restores the proxy label and both exclusions.
+
+Two honest caveats:
+
+- **Older history is under-counted.** The market list is chosen by today's open interest, so coins that were large in 2022 and 2023 and have since faded are missing from those years. The loaded series peaks at 1.32x in late 2022, where the full count showed 2.26x. That makes recent readings rank slightly higher than they should (99th here against 98th on the full count).
+- **The list ages.** New listings are not counted until it is rebuilt, and new share or commodity contracts must be added to the exclusion list (README, Maintenance).
 
 ## Queued work started
 
