@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
   push:
     branches: [claude/source-check]
+    paths: [tools/source_check.py]
 permissions:
   contents: write
 jobs:

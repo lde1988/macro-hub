@@ -1,0 +1,35 @@
+# One-off: pull open-interest history from Coinalyze (slow because of its rate limit).
+name: Open interest backfill
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/source-check]
+    paths: [tools/oi_backfill.py]
+permissions:
+  contents: write
+concurrency:
+  group: coinalyze
+  cancel-in-progress: false
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet pandas requests
+      - name: Pull history
+        env:
+          COINALYZE_API_KEY: ${{ secrets.COINALYZE_API_KEY }}
+        run: python tools/oi_backfill.py out
+      - name: Publish result to a side branch
+        run: |
+          cd out
+          git init -q -b oi-backfill-results
+          git config user.name "macro-hub bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add .
+          git commit -q -m "Open interest backfill result"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" oi-backfill-results
