@@ -1,0 +1,849 @@
+{
+ "run": "2026-11-25T08:52:37.743910+00:00",
+ "rows": [
+  {
+   "id": "SP500",
+   "source": "FRED",
+   "ok": true,
+   "latest": "7237.17 (Index)",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "2016-11-25",
+   "note": "S&P 500 | D | updated 2026-11-24"
+  },
+  {
+   "id": "NASDAQ100",
+   "source": "FRED",
+   "ok": true,
+   "latest": "26214.17 (Index)",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "1986-01-02",
+   "note": "NASDAQ-100 | D | updated 2026-11-24"
+  },
+  {
+   "id": "SOFR",
+   "source": "FRED",
+   "ok": true,
+   "latest": "3.92 (%)",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "2018-04-03",
+   "note": "Secured Overnight Financing Rate | D | updated 2026-11-24"
+  },
+  {
+   "id": "IORB",
+   "source": "FRED",
+   "ok": true,
+   "latest": "3.9 (%)",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "2021-07-29",
+   "note": "Interest Rate on Reserve Balances (IORB Rate) | D | updated 2026-11-24"
+  },
+  {
+   "id": "DGS2",
+   "source": "FRED",
+   "ok": true,
+   "latest": "4.63 (%)",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "1976-06-01",
+   "note": "Market Yield on U.S. Treasury Securities at 2-Year Constant Maturity, Quoted on an Investment Basis | D | updated 2026-11-24"
+  },
+  {
+   "id": "DGS10",
+   "source": "FRED",
+   "ok": true,
+   "latest": "4.92 (%)",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "1962-01-02",
+   "note": "Market Yield on U.S. Treasury Securities at 10-Year Constant Maturity, Quoted on an Investment Basis | D | updated 2026-11-24"
+  },
+  {
+   "id": "T10Y2Y",
+   "source": "FRED",
+   "ok": true,
+   "latest": "0.28 (%)",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "1976-06-01",
+   "note": "10-Year Treasury Constant Maturity Minus 2-Year Treasury Constant Maturity | D | updated 2026-11-24"
+  },
+  {
+   "id": "DFF",
+   "source": "FRED",
+   "ok": true,
+   "latest": "3.88 (%)",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "1954-07-01",
+   "note": "Federal Funds Effective Rate | D | updated 2026-11-24"
+  },
+  {
+   "id": "EFFR",
+   "source": "FRED",
+   "ok": true,
+   "latest": "3.88 (%)",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "2000-07-03",
+   "note": "Effective Federal Funds Rate | D | updated 2026-11-24"
+  },
+  {
+   "id": "DFEDTARU",
+   "source": "FRED",
+   "ok": true,
+   "latest": "4 (%)",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2008-12-16",
+   "note": "Federal Funds Target Range - Upper Limit | D | updated 2026-11-24"
+  },
+  {
+   "id": "DFEDTARL",
+   "source": "FRED",
+   "ok": true,
+   "latest": "3.75 (%)",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2008-12-16",
+   "note": "Federal Funds Target Range - Lower Limit | D | updated 2026-11-24"
+  },
+  {
+   "id": "CPIAUCSL",
+   "source": "FRED",
+   "ok": true,
+   "latest": "337.476 (Index 1982-1984=100)",
+   "obs_date": "2026-10-01",
+   "age": "55d",
+   "history_from": "1947-01-01",
+   "note": "Consumer Price Index for All Urban Consumers: All Items in U.S. City Average | M | updated 2026-11-10"
+  },
+  {
+   "id": "T5YIE",
+   "source": "FRED",
+   "ok": true,
+   "latest": "2.11 (%)",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2003-01-02",
+   "note": "5-Year Breakeven Inflation Rate | D | updated 2026-11-24"
+  },
+  {
+   "id": "WALCL",
+   "source": "FRED",
+   "ok": true,
+   "latest": "6741452 (Mil. of U.S. $)",
+   "obs_date": "2026-11-18",
+   "age": "7d",
+   "history_from": "2002-12-18",
+   "note": "Assets: Total Assets: Total Assets (Less Eliminations from Consolidation): Wednesday Level | W | updated 2026-11-19"
+  },
+  {
+   "id": "ECBASSETSW",
+   "source": "FRED",
+   "ok": true,
+   "latest": "5923063 (Mil. of Euros)",
+   "obs_date": "2026-11-20",
+   "age": "5d",
+   "history_from": "1999-01-01",
+   "note": "Central Bank Assets for Euro Area (11-19 Countries) | W | updated 2026-11-24"
+  },
+  {
+   "id": "JPNASSETS",
+   "source": "FRED",
+   "ok": true,
+   "latest": "6261882 (100 Mil. Yen)",
+   "obs_date": "2026-10-01",
+   "age": "55d",
+   "history_from": "1998-04-01",
+   "note": "Bank of Japan: Total Assets for Japan | M | updated 2026-11-04"
+  },
+  {
+   "id": "M2SL",
+   "source": "FRED",
+   "ok": true,
+   "latest": "23532.8 (Bil. of $)",
+   "obs_date": "2026-10-01",
+   "age": "55d",
+   "history_from": "1959-01-01",
+   "note": "M2 | M | updated 2026-11-24"
+  },
+  {
+   "id": "DEXUSEU",
+   "source": "FRED",
+   "ok": true,
+   "latest": "1.0981 (U.S. $ to  1 Euro)",
+   "obs_date": "2026-11-20",
+   "age": "5d",
+   "history_from": "1999-01-04",
+   "note": "U.S. Dollars to Euro Spot Exchange Rate | D | updated 2026-11-23"
+  },
+  {
+   "id": "DEXJPUS",
+   "source": "FRED",
+   "ok": true,
+   "latest": "158.76 (Japanese Yen to  1 U.S. $)",
+   "obs_date": "2026-11-20",
+   "age": "5d",
+   "history_from": "1971-01-04",
+   "note": "Japanese Yen to U.S. Dollar Spot Exchange Rate | D | updated 2026-11-23"
+  },
+  {
+   "id": "DEXUSUK",
+   "source": "FRED",
+   "ok": true,
+   "latest": "1.3104 (U.S. $ to  1 U.K. Pound Sterling)",
+   "obs_date": "2026-11-20",
+   "age": "5d",
+   "history_from": "1971-01-04",
+   "note": "U.S. Dollars to U.K. Pound Sterling Spot Exchange Rate | D | updated 2026-11-23"
+  },
+  {
+   "id": "DEXCAUS",
+   "source": "FRED",
+   "ok": true,
+   "latest": "1.4323 (Canadian $ to  1 U.S. $)",
+   "obs_date": "2026-11-20",
+   "age": "5d",
+   "history_from": "1971-01-04",
+   "note": "Canadian Dollars to U.S. Dollar Spot Exchange Rate | D | updated 2026-11-23"
+  },
+  {
+   "id": "DEXSDUS",
+   "source": "FRED",
+   "ok": true,
+   "latest": "10.2114 (Swedish Kronor to  1 U.S. $)",
+   "obs_date": "2026-11-20",
+   "age": "5d",
+   "history_from": "1971-01-04",
+   "note": "Swedish Kronor to U.S. Dollar Spot Exchange Rate | D | updated 2026-11-23"
+  },
+  {
+   "id": "DEXSZUS",
+   "source": "FRED",
+   "ok": true,
+   "latest": "0.8394 (Swiss Francs to  1 U.S. $)",
+   "obs_date": "2026-11-20",
+   "age": "5d",
+   "history_from": "1971-01-04",
+   "note": "Swiss Francs to U.S. Dollar Spot Exchange Rate | D | updated 2026-11-23"
+  },
+  {
+   "id": "DEXCHUS",
+   "source": "FRED",
+   "ok": true,
+   "latest": "6.677 (Chinese Yuan Renminbi to  1 U.S. $)",
+   "obs_date": "2026-11-20",
+   "age": "5d",
+   "history_from": "1981-01-02",
+   "note": "Chinese Yuan Renminbi to U.S. Dollar Spot Exchange Rate | D | updated 2026-11-23"
+  },
+  {
+   "id": "DTWEXBGS",
+   "source": "FRED",
+   "ok": true,
+   "latest": "123.5978 (Index Jan 2006=100)",
+   "obs_date": "2026-11-20",
+   "age": "5d",
+   "history_from": "2006-01-02",
+   "note": "Nominal Broad U.S. Dollar Index | D | updated 2026-11-23"
+  },
+  {
+   "id": "BAMLH0A0HYM2",
+   "source": "FRED",
+   "ok": true,
+   "latest": "3.63 (%)",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "2023-11-27",
+   "note": "ICE BofA US High Yield Index Option-Adjusted Spread | D | updated 2026-11-24"
+  },
+  {
+   "id": "BAMLH0A3HYC",
+   "source": "FRED",
+   "ok": true,
+   "latest": "13.87 (%)",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "2023-11-27",
+   "note": "ICE BofA CCC & Lower US High Yield Index Option-Adjusted Spread | D | updated 2026-11-24"
+  },
+  {
+   "id": "BAMLH0A1HYBB",
+   "source": "FRED",
+   "ok": true,
+   "latest": "2.19 (%)",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "2023-11-27",
+   "note": "ICE BofA BB US High Yield Index Option-Adjusted Spread | D | updated 2026-11-24"
+  },
+  {
+   "id": "BAMLC0A4CBBB",
+   "source": "FRED",
+   "ok": true,
+   "latest": "1.2 (%)",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "2023-11-27",
+   "note": "ICE BofA BBB US Corporate Index Option-Adjusted Spread | D | updated 2026-11-24"
+  },
+  {
+   "id": "NFCI",
+   "source": "FRED",
+   "ok": true,
+   "latest": "-0.478 (Index)",
+   "obs_date": "2026-11-13",
+   "age": "12d",
+   "history_from": "1971-01-08",
+   "note": "Chicago Fed National Financial Conditions Index | W | updated 2026-11-18"
+  },
+  {
+   "id": "STLFSI4",
+   "source": "FRED",
+   "ok": true,
+   "latest": "-0.8655 (Index)",
+   "obs_date": "2026-11-13",
+   "age": "12d",
+   "history_from": "1993-12-31",
+   "note": "St. Louis Fed Financial Stress Index | W | updated 2026-11-18"
+  },
+  {
+   "id": "WLCFLPCL",
+   "source": "FRED",
+   "ok": true,
+   "latest": "9055 (Mil. of U.S. $)",
+   "obs_date": "2026-11-18",
+   "age": "7d",
+   "history_from": "2002-12-18",
+   "note": "Assets: Liquidity and Credit Facilities: Loans: Primary Credit: Wednesday Level | W | updated 2026-11-19"
+  },
+  {
+   "id": "RPONTSYD",
+   "source": "FRED",
+   "ok": true,
+   "latest": "0.002 (Bil. of US $)",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2000-01-03",
+   "note": "Overnight Repurchase Agreements: Treasury Securities Purchased by the Federal Reserve in the Temporary Open Market Operations | D | updated 2026-11-24"
+  },
+  {
+   "id": "WSHOBL",
+   "source": "FRED",
+   "ok": true,
+   "latest": "580660 (Mil. of U.S. $)",
+   "obs_date": "2026-11-18",
+   "age": "7d",
+   "history_from": "2002-12-18",
+   "note": "Assets: Securities Held Outright: U.S. Treasury Securities: Bills: Wednesday Level | W | updated 2026-11-19"
+  },
+  {
+   "id": "WRESBAL",
+   "source": "FRED",
+   "ok": true,
+   "latest": "2979656 (Mil. of U.S. $)",
+   "obs_date": "2026-11-18",
+   "age": "7d",
+   "history_from": "1984-01-04",
+   "note": "Liabilities and Capital: Other Factors Draining Reserve Balances: Reserve Balances with Federal Reserve Banks: Week Average | W | updated 2026-11-19"
+  },
+  {
+   "id": "BTC-USD daily candles",
+   "source": "Coinbase",
+   "ok": true,
+   "latest": "close 59,741",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "350 candles per request; history pages back to 2015"
+  },
+  {
+   "id": "BTC weekly close (Sunday candle)",
+   "source": "Coinbase",
+   "ok": true,
+   "latest": "61,163",
+   "obs_date": "2026-11-22",
+   "age": "3d",
+   "history_from": "",
+   "note": "close of the daily candle that ends Sunday 24:00 UTC"
+  },
+  {
+   "id": "SOL-USD",
+   "source": "Coinbase",
+   "ok": true,
+   "latest": "67.94",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "",
+   "note": "priced in BTC by dividing by BTC-USD"
+  },
+  {
+   "id": "SUI-USD",
+   "source": "Coinbase",
+   "ok": true,
+   "latest": "0.6431",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "",
+   "note": "priced in BTC by dividing by BTC-USD"
+  },
+  {
+   "id": "NEAR-USD",
+   "source": "Coinbase",
+   "ok": true,
+   "latest": "2.8738",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "",
+   "note": "priced in BTC by dividing by BTC-USD"
+  },
+  {
+   "id": "LINK-USD",
+   "source": "Coinbase",
+   "ok": true,
+   "latest": "8.736",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "",
+   "note": "priced in BTC by dividing by BTC-USD"
+  },
+  {
+   "id": "TAO-USD",
+   "source": "Coinbase",
+   "ok": true,
+   "latest": "176.26",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "",
+   "note": "priced in BTC by dividing by BTC-USD"
+  },
+  {
+   "id": "realized_price",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "53,096.6",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far 5.309e+04; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "lth_realized_price",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "48,302.1",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far 4.83e+04; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "sth_realized_price",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "72,410.3",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far 7.237e+04; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "lth_sopr_24h",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "0.717504",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far 0.7192; 10-20 Nov 2026 range 0.645-1.154; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "lth_sopr_1w",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "0.717346",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far 0.7168; 10-20 Nov 2026 range 0.763-0.963; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "lth_sopr_1m",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "0.8753",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far 0.8744; 10-20 Nov 2026 range 0.901-0.990; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "realized_loss_sum_1m",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "2.8722e+10",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far 2.869e+10; Feb 2026 peak 4.062e+10 on 2026-02-20; share of that peak on 15 Nov 0.43, now 0.71; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "lth_realized_loss_sum_1m",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "1.05621e+10",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far 1.059e+10; Feb 2026 peak 7.939e+09 on 2026-02-27; share of that peak on 15 Nov 0.88, now 1.33; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "net_realized_pnl_sum_1m",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "-1.94642e+10",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far -1.968e+10; Feb 2026 peak -3.004e+10 on 2026-02-20; share of that peak on 15 Nov 0.12, now 0.65; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "sth_net_realized_pnl_sum_1m",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "-1.34882e+10",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far -1.366e+10; Feb 2026 peak -2.865e+10 on 2026-02-18; share of that peak on 15 Nov 0.08, now 0.47; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "realized_loss_sum_1w",
+   "source": "Bitview",
+   "ok": true,
+   "latest": "1.07e+10",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "",
+   "note": "today so far 1.054e+10; Feb 2026 peak 1.794e+10 on 2026-02-07; share of that peak on 15 Nov 0.40, now 0.60; 6538 daily rows (from 2009)"
+  },
+  {
+   "id": "BTC realised price = PriceUSD / CapMVRVCur",
+   "source": "Coin Metrics community",
+   "ok": true,
+   "latest": "53,099",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2010",
+   "note": "price 59,791, MVRV 1.126"
+  },
+  {
+   "id": "lth-sopr",
+   "source": "BGeometrics (free)",
+   "ok": true,
+   "latest": "0.7195",
+   "obs_date": "2026-11-18",
+   "age": "7d",
+   "history_from": "",
+   "note": "free plan withholds the latest 7 days"
+  },
+  {
+   "id": "stablecoin supply, USD-pegged",
+   "source": "DefiLlama",
+   "ok": true,
+   "latest": "$282.5bn; 30d -5.9%",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "2017-11-29",
+   "note": "all pegs $284.2bn; 30d -5.9%; mid-Nov (15th) USD-pegged $287.1bn"
+  },
+  {
+   "id": "ECB euro reference rates (USD JPY GBP CAD SEK CHF)",
+   "source": "ECB",
+   "ok": true,
+   "latest": "computed DXY 103.88",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "1999",
+   "note": "set about 14:15 Frankfurt time each business day, published about 16:00"
+  },
+  {
+   "id": "DXY published close (verification only)",
+   "source": "Yahoo chart",
+   "ok": true,
+   "latest": "104.01",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "",
+   "note": "worst gap vs computed over 63 days: 0.63"
+  },
+  {
+   "id": "DXY future dx.f (verification only)",
+   "source": "Stooq",
+   "ok": false,
+   "latest": "",
+   "obs_date": "",
+   "age": "",
+   "history_from": "",
+   "note": "KeyError: 'Date'"
+  },
+  {
+   "id": "margin debt (debit balances, $m)",
+   "source": "FINRA xlsx",
+   "ok": true,
+   "latest": "1,448,360; 3m annualised +9.1%",
+   "obs_date": "2026-10-01",
+   "age": "55d",
+   "history_from": "1997-01-01",
+   "note": "3m annualised, last 6 months: {'May 2026': '+62.8%', 'Jun 2026': '+129.1%', 'Jul 2026': '+39.4%', 'Aug 2026': '+11.3%', 'Sep 2026': '-5.7%', 'Oct 2026': '+9.1%'}"
+  },
+  {
+   "id": "buyback operations (par accepted)",
+   "source": "Treasury fiscal data",
+   "ok": true,
+   "latest": "$0.25bn latest op",
+   "obs_date": "2026-11-19",
+   "age": "6d",
+   "history_from": "2000-03-09",
+   "note": "monthly $bn: 2026-04 51.4, 2026-05 8.8, 2026-06 31.9, 2026-07 10.7, 2026-08 11.1, 2026-09 37.8, 2026-10 26.1, 2026-11 12.0 | types: ['Cash Management', 'Liquidity Support', 'Small Value', 'null']"
+  },
+  {
+   "id": "CRWV",
+   "source": "Nasdaq quote service (unofficial)",
+   "ok": true,
+   "latest": "$42.605",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2025-03-28",
+   "note": "not dividend-adjusted; fall from 3-month high -57.3%; from 1-year high -69.1%"
+  },
+  {
+   "id": "ORCL",
+   "source": "Nasdaq quote service (unofficial)",
+   "ok": true,
+   "latest": "$109.50",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2016-11-25",
+   "note": "not dividend-adjusted; fall from 3-month high -32.6%; from 1-year high -55.9%"
+  },
+  {
+   "id": "BIZD",
+   "source": "Nasdaq quote service (unofficial)",
+   "ok": true,
+   "latest": "12.21",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2016-11-25",
+   "note": "not dividend-adjusted; fall from 3-month high -9.6%; from 1-year high -18.9%"
+  },
+  {
+   "id": "KRE",
+   "source": "Nasdaq quote service (unofficial)",
+   "ok": true,
+   "latest": "69.76",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2016-11-25",
+   "note": "not dividend-adjusted; fall from 3-month high -7.3%; from 1-year high -10.5%"
+  },
+  {
+   "id": "NDX",
+   "source": "Nasdaq quote service (unofficial)",
+   "ok": true,
+   "latest": "26,746.10",
+   "obs_date": "2026-11-23",
+   "age": "2d",
+   "history_from": "2015-01-01",
+   "note": "not dividend-adjusted; fall from 3-month high -14.3%; from 1-year high -14.3%"
+  },
+  {
+   "id": "NBIS",
+   "source": "Nasdaq quote service (unofficial)",
+   "ok": true,
+   "latest": "$87.31",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2016-11-25",
+   "note": "not dividend-adjusted; fall from 3-month high -65.1%; from 1-year high -69.5%"
+  },
+  {
+   "id": "APLD",
+   "source": "Nasdaq quote service (unofficial)",
+   "ok": true,
+   "latest": "$12.22",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2021-06-16",
+   "note": "not dividend-adjusted; fall from 3-month high -57.2%; from 1-year high -75.4%"
+  },
+  {
+   "id": "IREN",
+   "source": "Nasdaq quote service (unofficial)",
+   "ok": true,
+   "latest": "$12.95",
+   "obs_date": "2026-11-24",
+   "age": "1d",
+   "history_from": "2021-11-17",
+   "note": "not dividend-adjusted; fall from 3-month high -73.3%; from 1-year high -80.9%"
+  },
+  {
+   "id": "kre.us",
+   "source": "Stooq",
+   "ok": false,
+   "latest": "",
+   "obs_date": "",
+   "age": "",
+   "history_from": "",
+   "note": "KeyError: 'Close'"
+  },
+  {
+   "id": "crwv.us",
+   "source": "Stooq",
+   "ok": false,
+   "latest": "",
+   "obs_date": "",
+   "age": "",
+   "history_from": "",
+   "note": "KeyError: 'Close'"
+  },
+  {
+   "id": "BTC dominance / total crypto value",
+   "source": "CoinGecko (no key)",
+   "ok": true,
+   "latest": "dominance 57.8%; total $2.06tn; alts excluding stablecoins $0.586tn = 0.49x Bitcoin's value",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "",
+   "note": "current value only; no free history. Stablecoin supply (DefiLlama, all pegs) subtracted"
+  },
+  {
+   "id": "BTC perpetual open interest, all exchanges",
+   "source": "Coinalyze",
+   "ok": true,
+   "latest": "$19.8bn",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "",
+   "note": "largest: BTCUSDT_PERP.A 5.8, BTCUSDT.6 4.1, BTC.H 2.1, BTCUSDT_PERP.3 1.9, BTCUSDC_PERP.A 1.5, BTCUSD_PERP.A 0.9, BTC-PERPETUAL.2 0.8, BTCUSD_PERP.3 0.7, BTCUSDT_PERP.F 0.5, BTCUSD.6 0.5, BTCUSDT_PERP.4 0.5, BTC_USDC-PERPETUAL.2 0.1"
+  },
+  {
+   "id": "funding-rate-history BTCUSDT_PERP.A",
+   "source": "Coinalyze",
+   "ok": true,
+   "latest": "last 0.0072% per interval; 30d mean 0.0061%",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "2020-01-21",
+   "note": "2501 daily rows; days negative in last 30: 2; last 5: [0.0009, -0.001, 0.0042, 0.0022, 0.0072]; record {\"t\": 1795564800, \"o\": 0.002227, \"h\": 0.007286, \"l\": 0.002227, \"c\": 0.007217}"
+  },
+  {
+   "id": "funding-rate-history BTCUSDT.6",
+   "source": "Coinalyze",
+   "ok": true,
+   "latest": "last 0.0003% per interval; 30d mean 0.0055%",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "2020-04-04",
+   "note": "2427 daily rows; days negative in last 30: 3; last 5: [-0.0011, -0.0004, 0.0019, 0.0034, 0.0003]; record {\"t\": 1795564800, \"o\": 0.003905, \"h\": 0.003905, \"l\": 0.000255, \"c\": 0.000255}"
+  },
+  {
+   "id": "funding-rate-history BTCUSDT_PERP.3",
+   "source": "Coinalyze",
+   "ok": true,
+   "latest": "last 0.0042% per interval; 30d mean 0.0048%",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "2020-03-28",
+   "note": "2434 daily rows; days negative in last 30: 7; last 5: [-0.0038, 0.0015, 0.0054, 0.0056, 0.0042]; record {\"t\": 1795564800, \"o\": 0.00550189519743, \"h\": 0.006953095496, \"l\": 0.00312879542107, \"c\": 0.004206961367910001}"
+  },
+  {
+   "id": "funding-rate-history BTC.H",
+   "source": "Coinalyze",
+   "ok": true,
+   "latest": "last -0.0002% per interval; 30d mean 0.0008%",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "2024-10-10",
+   "note": "777 daily rows; days negative in last 30: 5; last 5: [-0.0012, 0.0008, 0.0013, -0.0005, -0.0002]; record {\"t\": 1795564800, \"o\": -0.00046768, \"h\": -0.00015753, \"l\": -0.00128821, \"c\": -0.00022485}"
+  },
+  {
+   "id": "open-interest-history BTCUSDT_PERP.A",
+   "source": "Coinalyze",
+   "ok": true,
+   "latest": "$5.82bn",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "2022-10-16",
+   "note": "1502 daily rows"
+  },
+  {
+   "id": "open-interest-history ETHUSDT_PERP.A",
+   "source": "Coinalyze",
+   "ok": true,
+   "latest": "$3.95bn",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "2022-10-16",
+   "note": "1502 daily rows"
+  },
+  {
+   "id": "open-interest-history SOLUSDT_PERP.A",
+   "source": "Coinalyze",
+   "ok": true,
+   "latest": "$0.54bn",
+   "obs_date": "2026-11-25",
+   "age": "0d",
+   "history_from": "2022-10-16",
+   "note": "1502 daily rows"
+  },
+  {
+   "id": "ntfy health (no push sent)",
+   "source": "ntfy.sh",
+   "ok": true,
+   "latest": "{\"healthy\":true,\"role\":\"active\"}",
+   "obs_date": "",
+   "age": "",
+   "history_from": "",
+   "note": ""
+  },
+  {
+   "id": "Binance futures (expected blocked)",
+   "source": "Binance",
+   "ok": false,
+   "latest": "HTTP 451",
+   "obs_date": "",
+   "age": "",
+   "history_from": "",
+   "note": "{\n  \"code\": 0,\n  \"msg\": \"Service unavailable from a restricted location according to 'b. Eligibility' in https://www.bin"
+  }
+ ],
+ "notes": [
+  "FRED search 'People's Bank of China total assets': ",
+  "FRED search 'China M2': MYAGM2CNM189N \"M2 for China\" M National Currency to 2019-08-01 || CHNPRCNTO01MLQ \"Production: Construction: Total for China\" Q Square metres, Month to 2018-07-01 || CHNPRCNTO01MLM \"Production: Construction: Total for China\" M Square metres, Month to 2023-11-01 || MABMM201CNM189S \"M2 for China (DISCONTINUED)\" M National Currency to 2013-12-01 || MABMM201CNM189N \"M2 for China (DISCONTINUED)\" M National Currency to 2013-12-01 || DDDI05CNA156NWDB \"Liquid Liabilities to GDP for China\" A % to 2020-01-01",
+  "FRED search 'euro area M3': MABMM301EZM189S \"Monetary Aggregates and Their Components: Broad Money and Co\" M Euro to 2023-11-01 || MABMM301EZA657S \"Monetary Aggregates and Their Components: Broad Money and Co\" A Growth rate previous to 2025-01-01 || MYAGM3EZM196N \"M3 for Euro Area\" M Euros to 2017-03-01 || MABMM301EZM657S \"Monetary Aggregates and Their Components: Broad Money and Co\" M Growth rate previous to 2025-12-01 || EA19MABMM301GYSAM \"Monetary Aggregates and Their Components: Broad Money and Co\" M Growth rate same per to 2025-12-01 || MABMM301EZM189N \"Monetary Aggregates and Their Components: Broad Money and Co\" M Euro to 2023-11-01",
+  "FRED search 'Japan M2': MYAGM2JPM189S \"M2 for Japan\" M National Currency to 2017-02-01 || MYAGM2JPM189N \"M2 for Japan\" M National Currency to 2017-02-01 || MABMM201JPM189S \"M2 for Japan (DISCONTINUED)\" M National Currency to 2013-12-01 || MABMM201JPA189N \"M2 for Japan (DISCONTINUED)\" A National Currency to 2013-01-01 || MABMM201JPQ189S \"M2 for Japan (DISCONTINUED)\" Q National Currency to 2013-10-01 || MABMM201JPM189N \"M2 for Japan (DISCONTINUED)\" M National Currency to 2013-12-01",
+  "FRED search 'standing repo facility': ",
+  "FRED search 'discount window primary credit': DPCREDIT \"Discount Window Primary Credit Rate\" D % to 2026-11-23 || BORROW \"Total Borrowings from the Federal Reserve\" M Mil. of $ to 2026-10-01 || MPCREDIT \"Discount Window Primary Credit Rate\" M % to 2026-10-01 || RIFSRPF02ND \"Discount Window Primary Credit Rate\" D % to 2026-11-23 || WPCREDIT \"Discount Window Primary Credit Rate\" W % to 2026-11-18 || RIFSRPF02NA \"Discount Window Primary Credit Rate\" A % to 2025-01-01",
+  "FRED search 'margin debt': AMTCCDEBT0101 \"Bankrate Consumer Survey Poll: Do You Have More Credit Card \" A % to 2025-01-01 || UNEXPECTEDBR0103 \"Bankrate Consumer Survey Poll: How Would You Pay for a $1,00\" A % to 2024-01-01 || UNEXPECTEDBR0104 \"Bankrate Consumer Survey Poll: How Would You Pay for a $1,00\" A % to 2024-01-01 || AMTCCDEBT0102 \"Bankrate Consumer Survey Poll: Do You Have More Credit Card \" A % to 2025-01-01 || FINANCIALPRIO0101 \"Bankrate Consumer Survey Poll: What is Your Biggest Financia\" A % to 2025-01-01 || UNEXPECTEDBR0105 \"Bankrate Consumer Survey Poll: How Would You Pay for a $1,00\" A % to 2024-01-01",
+  "FRED search 'ICE BofA CCC option-adjusted spread': BAMLH0A3HYC \"ICE BofA CCC & Lower US High Yield Index Option-Adjusted Spr\" D % to 2026-11-23",
+  "Bitview version: \"389ae58\"",
+  "Coin Metrics CapRealUSD (realised cap) on the free tier: HTTP 403",
+  "ECB full history file: HTTP 200, ? bytes",
+  "Computed DXY, last 8 fixings: 2026-11-13 103.24, 2026-11-16 103.47, 2026-11-17 103.61, 2026-11-18 103.80, 2026-11-19 103.72, 2026-11-20 103.65, 2026-11-23 104.09, 2026-11-24 103.88",
+  "DXY gap stats over 63 days: mean 0.15, within 0.3 on 57 days, worst 0.63",
+  "DXY check, published close (Yahoo DX-Y.NYB, verification only) vs computed from ECB: 2026-11-11 102.91/102.60 (-0.31), 2026-11-12 103.17/102.97 (-0.20), 2026-11-13 103.41/103.24 (-0.17), 2026-11-16 103.55/103.47 (-0.08), 2026-11-17 103.49/103.61 (+0.12), 2026-11-18 103.86/103.80 (-0.06), 2026-11-19 103.90/103.72 (-0.18), 2026-11-20 103.81/103.65 (-0.16), 2026-11-23 104.32/104.09 (-0.23), 2026-11-24 103.81/103.88 (+0.07) | worst gap over 63 days: 0.63",
+  "Buybacks by type, $bn par accepted per month 2026: operation_type  Cash Management  Liquidity Support ; operation_date                                     ; 2026-01                     0.0                9.7 ; 2026-02                     0.0               12.3 ; 2026-03                    29.7                6.9 ; 2026-04                    45.0                6.4 ; 2026-05                     0.0                8.8 ; 2026-06                    24.6                7.3 ; 2026-07                     0.0               10.7 ; 2026-08                     0.0               11.1 ; 2026-09                    25.0               12.8 ; 2026-10                     0.0               26.1 ; 2026-11                     0.0               12.0",
+  "Buyback ops with type 'null' or zero accepted: [{'operation_date': Timestamp('2024-08-21 00:00:00'), 'operation_type': 'Liquidity Support', 'total_par_amt_accepted': 'null'}, {'operation_date': Timestamp('2024-07-17 00:00:00'), 'operation_type': 'Liquidity Support', 'total_par_amt_accepted': 'null'}, {'operation_date': Timestamp('2023-03-30 00:00:00'), 'operation_type': 'null', 'total_par_amt_accepted': '24000000.00'}, {'operation_date': Timestamp('2022-03-30 00:00:00'), 'operation_type': 'null', 'total_par_amt_accepted': '25000000.00'}, {'operation_date': Timestamp('2021-04-07 00:00:00'), 'operation_type': 'null', 'total_par_amt_accepted': '25000000.00'}]",
+  "Coinalyze sample market record: {\"symbol\": \"MNTUSDT.6\", \"exchange\": \"6\", \"symbol_on_exchange\": \"MNTUSDT\", \"base_asset\": \"MNT\", \"quote_asset\": \"USDT\", \"expire_at\": null, \"has_buy_sell_data\": true, \"is_perpetual\": true, \"margined\": \"STABLE\", \"oi_lq_vol_denominated_in\": \"BASE_ASSET\", \"has_long_short_ratio_data\": true, \"has_ohlcv_data\": true}",
+  "Coinalyze: 5776 futures markets, 5700 perpetuals, 1235 base assets. Perps per exchange: {'Gate.io': 1043, 'Bybit': 923, 'Binance': 832, 'OKX': 553, 'Aster': 549, 'Huobi': 435, 'WOO X': 221, 'Kraken': 196, 'Lighter': 191, 'Hyperliquid': 179, 'Deribit': 153, 'tradeXYZ': 125, 'Coinbase': 96, 'Polymarket': 84, 'dYdX': 57, 'Bitfinex': 55, 'Phemex': 8}",
+  "Coinalyze BTC perps: BTCUSD_PERP.A(Binance), BTCUSDT.6(Bybit), BTCUSD.6(Bybit), BTCUSDC_PERP.A(Binance), BTCUSDT_PERP.A(Binance), BTCU_PERP.A(Binance), BTCUSD1_PERP.A(Binance), pf_xbtusd.K(Kraken), BTCUSD_PERP.3(OKX), BTCUSDT_PERP.4(Huobi), BTCUSDT_PERP.F(Bitfinex), BTCUSDT_PERP.3(OKX), BTC.H(Hyperliquid), BTC-USD.8(dYdX), BTC-PERPETUAL.2(Deribit), PERP_BTC_USDT.W(WOO X), BTCUSD_PERP.4(Huobi), BTC_USDT.Y(Gate.io), BTC-PERP.C(Coinbase), BTC_USDC-PERPETUAL.2(Deribit), 1.T(Lighter), 6.O(Polymarket), BTCUSD.7(Phemex), BTCUSDT.S(Aster), BTCPERP.6(Bybit), BTC_USD.Y(Gate.io)",
+  "Coinalyze rate-limit test, 4 calls x 20 symbols in 0.8s: ['200', '429(retry-after 58.397)', '429(retry-after 58.21)', '429(retry-after 58.018)']; headers {'Retry-After': '58.018'}",
+  "Runner: Linux GitHub Actions 1000000007; time 2026-11-25T08:52:37Z",
+  "Realised price cross-check: Bitview 53,097 (2026-11-24) vs Coin Metrics 53,099 (2026-11-24): gap 0.01%"
+ ]
+}
