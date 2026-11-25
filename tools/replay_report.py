@@ -66,6 +66,7 @@ def main(data, out):
     store, reg = Store(data), load_registry()
     cfg = copy.deepcopy(load_config())
     cfg["dynamic_levels"]["use_for_colours"] = True
+    cfg["general"]["enforce_max_age"] = False   # back-filled history is dated by estimate, so the live staleness rule is not applied
     blackout = {m: AI_FROM for m in cfg["ai_basket"]["members"]}
     df = replay(store, reg, cfg, START, END, blackout=blackout)
     price = store.series("BTCUSD")

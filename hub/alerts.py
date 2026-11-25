@@ -14,7 +14,8 @@ def summary(feed):
     """The few facts alerts compare from run to run."""
     return {"reading": feed["reading"]["headline"].split(" (CAUTION")[0], "label": feed["reading"]["label"],
             "regime": feed["regime"]["name"], "trend_exit": feed["trend_exit"]["state"],
-            "dials": {d["id"]: d["colour"] for d in feed["dials"]}}
+            "dials": {d["id"]: d["colour"] for d in feed["dials"]},
+            "stale": sorted(d["id"] for d in feed["dials"] if d["stale"])}
 
 
 def plan(prev, feed, cfg, down_before=None):
@@ -52,6 +53,12 @@ def plan(prev, feed, cfg, down_before=None):
     if changes:
         title = changes[0].split(". ")[0] if len(changes) == 1 else f"{len(changes)} dials changed"
         out.append({"title": title, "message": "\n\n".join(changes)[:3000], "priority": top, "tags": ["control_knobs"]})
+    newly_stale = [d for d in feed["dials"] if d["stale"] and d["id"] not in prev.get("stale", [])]
+    if newly_stale:
+        out.append({"title": f"Stale data: {newly_stale[0]['title']}" if len(newly_stale) == 1 else f"Stale data on {len(newly_stale)} dials",
+                    "priority": a["stale_priority"], "tags": ["hourglass"],
+                    "message": "\n".join(f"{d['title']}: {d['stale_reason']}." for d in newly_stale)
+                    + "\nThese dials are greyed out and cannot change colour until fresh data arrives."})
     return out
 
 
@@ -91,5 +98,8 @@ def digest(feed, cfg):
              f'Bitcoin ${b["price"]:,.0f}, {b["ratio_to_realised"]:.2f}x realised price' if b.get("price") else "Bitcoin price unavailable",
              "Against: " + (", ".join(red) if red else "no family"),
              "Sources failing: " + ", ".join(bad) if bad else "All sources answering"]
+    stale = [d["title"] for d in feed["dials"] if d["stale"]]
+    if stale:
+        lines.append("Stale dials: " + ", ".join(stale))
     return {"title": "macro-hub daily digest", "message": "\n".join(lines) + f'\n{feed["disclaimer"]}.',
             "priority": cfg["alerts"]["digest_priority"], "tags": ["sunrise"]}

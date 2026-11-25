@@ -93,6 +93,10 @@ def main(data, site, runtime, push=True, now=None, fetchers=None, sender=None):
     first = st is None
     if first:
         dial_state, since = warm_start(store, registry, cfg, now)
+        # The replay sees back-filled data a little later than a live run does. Let the dials settle on the
+        # live view before the baseline is recorded, so go-live does not push "changes" that are not changes.
+        for _ in range(cfg["general"]["confirm_runs"]):
+            dial_state = evaluate(View(store, registry, now, live=live), cfg, dial_state)["state"]
         st = {"dials": dial_state["dials"], "since": since, "summary": None, "outbox": [], "down": [], "last_digest": ""}
     out = evaluate(View(store, registry, now, live=live), cfg, {"dials": st["dials"]})
     fd = feedmod.build(out, cfg, registry, now, status, st["since"])

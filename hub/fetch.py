@@ -82,6 +82,13 @@ def run_fetch(data_dir, backfill=False, only=None, now=None, registry=None, root
         except Exception as ex:
             st.update(fails=st.get("fails", 0) + 1, last_error=scrub(f"{type(ex).__name__}: {ex}")[:200])
             print(f"{name}: FAILED ({st['last_error']})", flush=True)
+    # a live value is only "now" while fresh: drop any older than twice its source's interval plus 15 minutes
+    src_of = {e["id"]: e["source"] for e in reg["series"]}
+    for sid in list(live):
+        limit = 2 * reg["sources"].get(src_of.get(sid), {}).get("every", 60) + 15
+        age = (now_ts - pd.Timestamp(live[sid]["time"])).total_seconds() / 60
+        if age > limit or age < -5:
+            del live[sid]
     store.save()
     save_json(state_dir / "sources.json", status)
     save_json(state_dir / "live.json", live)

@@ -13,7 +13,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: data-branch
+  group: hub-run     # same group as the hub run: only one job writes the data branch at a time
   cancel-in-progress: false
 jobs:
   backfill:

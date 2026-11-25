@@ -20,7 +20,7 @@ def small_feed(tmp_path, extra=None, state=None, now=NOW, status=None):
     data = {"BTCUSD": weekly_btc([80000, 61000]), "BV_REALIZED_PRICE": flat(53000, 30), "T5YIE": flat(2.1, 5), "NFCI": flat(-0.5, 5),
             "BV_STH_REALIZED_PRICE": flat(72400, 30)}
     data.update(extra or {})
-    out = evaluate(view(tmp_path, data, now=now), C, state)
+    out = evaluate(view(tmp_path, data, now=now, live={"BTCUSD": 61000}), C, state)
     fd = feedmod.build(out, C, REG, now, status or {"fred": {"fails": 0, "last_ok": "2026-11-25T08:45:00+00:00"}},
                        {"reading": "2026-11-16", "regime": "2026-11-16", "trend_exit": None})
     fd["stale_minutes"] = 60
@@ -49,18 +49,39 @@ def test_feed_sections_cover_every_dial_once_with_a_sentence(tmp_path):
     assert credit["colour"] == "green" and "no data yet" in credit["sentence"]
 
 
-def test_feed_marks_old_data_as_stale(tmp_path):
-    fd, _ = small_feed(tmp_path, {"T5YIE": flat(2.1, 5, end="2026-11-10")})
+def test_stale_data_keeps_the_last_colour_greyed_and_cannot_change_it(tmp_path):
+    _, out1 = small_feed(tmp_path)                                           # breakeven 2.1%: green
+    old_and_red = {"T5YIE": flat(3.0, 5, end="2026-11-10")}                  # 15 days old, and would be red
+    state = out1["state"]
+    for i in range(3):                                                       # however many runs pass
+        fd, out = small_feed(tmp_path / f"s{i}", old_and_red, state=state)
+        state = out["state"]
     d = next(x for x in fd["dials"] if x["id"] == "breakeven")
-    assert d["stale"] is True and d["colour"] == "green" and "15 days old" in d["stale_reason"]
+    assert d["colour"] == "green" and d["stale"] is True and "15 days old" in d["stale_reason"]
+    assert "Greyed out" in dashboard.render(fd)
     fresh, _ = small_feed(tmp_path / "b")
     assert next(x for x in fresh["dials"] if x["id"] == "breakeven")["stale"] is False
+
+
+def test_stale_data_seen_for_the_first_time_gets_no_colour(tmp_path):
+    fd, _ = small_feed(tmp_path, {"T5YIE": flat(3.0, 5, end="2026-11-10")})
+    d = next(x for x in fd["dials"] if x["id"] == "breakeven")
+    assert d["colour"] is None and "15 days old" in d["stale_reason"]
+
+
+def test_a_dial_going_stale_pushes_once(tmp_path):
+    fd1, out1 = small_feed(tmp_path)
+    fd2, _ = small_feed(tmp_path / "b", {"T5YIE": flat(2.1, 5, end="2026-11-10")}, state=out1["state"])
+    p = alerts.plan(alerts.summary(fd1), fd2, C)
+    assert len(p) == 1 and p[0]["title"] == "Stale data: 5-year breakeven inflation" and p[0]["priority"] == 3
+    assert alerts.plan(alerts.summary(fd2), fd2, C) == []                    # not repeated
+    assert "Stale dials: 5-year breakeven inflation" in alerts.digest(fd2, C)["message"]
 
 
 def test_feed_keeps_last_colour_greyed_when_a_source_stops(tmp_path):
     _, out1 = small_feed(tmp_path)
     data = {"BTCUSD": weekly_btc([80000, 61000]), "BV_REALIZED_PRICE": flat(53000, 30)}     # T5YIE gone
-    out2 = evaluate(view(tmp_path / "b", data), C, out1["state"])
+    out2 = evaluate(view(tmp_path / "b", data, live={"BTCUSD": 61000}), C, out1["state"])
     fd = feedmod.build(out2, C, REG, NOW, {}, {})
     d = next(x for x in fd["dials"] if x["id"] == "breakeven")
     assert d["colour"] == "green" and d["stale"] is True and "last colour kept" in d["stale_reason"]
@@ -220,7 +241,7 @@ def test_since_dates_move_only_when_something_changes():
 # ------------------------------------------------------------------ the whole run, twice
 def fake_sources(btc_weeks, breakeven):
     def coinbase(entries, ctx):
-        return Result(history={"BTCUSD": weekly_btc(btc_weeks)})
+        return Result(history={"BTCUSD": weekly_btc(btc_weeks)}, live={"BTCUSD": (float(btc_weeks[-1]), ctx.now.isoformat())})
 
     def bitview(entries, ctx):
         return Result(history={"BV_REALIZED_PRICE": flat(53000, 400), "BV_STH_REALIZED_PRICE": flat(72400, 400)})
@@ -254,7 +275,8 @@ def test_full_run_baseline_then_change_then_failed_push_is_retried(tmp_path):
     weeks = [80000] * 30 + [61000]
     import tests.helpers as H
     src = fake_sources(weeks, 2.1)
-    src["coinbase"] = lambda entries, ctx: Result(history={"BTCUSD": H.weekly_btc(weeks, last_sunday="2026-11-29")})
+    src["coinbase"] = lambda entries, ctx: Result(history={"BTCUSD": H.weekly_btc(weeks, last_sunday="2026-11-29")},
+                                                   live={"BTCUSD": (61000.0, ctx.now.isoformat())})
     fd = main(data, site, rt, now=t1, fetchers=src, sender=broken)
     st = json.loads((data / "state" / "hub.json").read_text())
     titles = [p["title"] for p in st["outbox"]]
@@ -266,3 +288,22 @@ def test_full_run_baseline_then_change_then_failed_push_is_retried(tmp_path):
     log = (data / "log" / "verdicts.csv").read_text()
     assert "RISK-OFF" in log and log.count("\n") == 3                     # one new row for the change (the digest shared it)
     assert "btc_weekly" in (data / "log" / "dial_changes.csv").read_text()
+
+
+def test_go_live_does_not_push_changes_that_are_only_the_warm_up_settling(tmp_path):
+    """The warm-up replay dates back-filled data later than a live run sees it (margin debt is the
+    real case: the replay ended on September's figure, the live run saw October's). The baseline
+    must be the settled live picture, so the runs after go-live stay silent."""
+    data, site, rt = tmp_path / "data", tmp_path / "site", tmp_path / "rt"
+    sent = []
+    sender = lambda title, message, priority, tags=None: (sent.append(title), (True, "sent"))[1]
+    months = pd.date_range(end="2026-10-31", periods=20, freq="ME")
+    debt = pd.Series([1000.0] * 12 + [1080.0, 1160.0, 1250.0, 1255.0, 1250.0, 1230.0, 1225.0, 1262.0], index=months)   # last month back above 0
+    src = fake_sources([80000] * 30, 2.1)
+    src["finra"] = lambda entries, ctx: Result(history={"MARGIN_DEBT": debt})
+    t0 = dt.datetime(2026, 11, 25, 9, 0, tzinfo=dt.timezone.utc)
+    fd = main(data, site, rt, now=t0, fetchers=src, sender=sender)
+    assert next(d for d in fd["dials"] if d["id"] == "margin_debt")["colour"] == "amber"      # already settled at the baseline
+    for i in (1, 2, 3):
+        main(data, site, rt, now=t0 + dt.timedelta(minutes=15 * i), fetchers=src, sender=sender)
+    assert sent == [] and not (data / "log" / "dial_changes.csv").exists()

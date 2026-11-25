@@ -27,7 +27,10 @@ def parse(xml_bytes):
 
 def fetch(entries, ctx):
     res = Result()
-    rates = parse(ctx.web.get(FULL if ctx.backfill else RECENT, timeout=120).content)
+    lasts = [pd.Timestamp(ctx.last[e["id"]]) for e in entries if e["id"] in ctx.last]
+    gap = (ctx.today - min(lasts)).days if len(lasts) == len(entries) and lasts else 9999
+    # the short file holds 90 days; after a longer pause (or a first run) take the full file
+    rates = parse(ctx.web.get(FULL if (ctx.backfill or gap > 80) else RECENT, timeout=120).content)
     for e in entries:
         if e["code"] in rates:
             s = rates[e["code"]]

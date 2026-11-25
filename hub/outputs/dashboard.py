@@ -54,7 +54,8 @@ def dial_card(d):
         n = d.get("data_age_days")
         age = f'data {esc(d["data_date"])}' + (f" ({n}d old)" if n else " (today)")
     cls = "dial stale" if d["stale"] else "dial"
-    stale = f'<p class="warn">Greyed out: {esc(d["stale_reason"])}.</p>' if d["stale"] else ""
+    stale = (f'<p class="warn">Greyed out: {esc(d["stale_reason"])}.</p>' if d["stale"]
+             else f'<p class="warn">{esc(d["stale_reason"])}.</p>' if d.get("stale_reason") else "")
     fresh = ' <span class="tag">fresh signal</span>' if d.get("fresh_turn_signal") else ""
     notes = "".join(f'<p class="warn">{esc(n)}</p>' for n in (d.get("extra") or {}).get("notes", []))
     return (f'<article class="{cls}" id="dial-{esc(d["id"])}"><h4>{esc(d["title"])}</h4>{gauge_svg(d)}'

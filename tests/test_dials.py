@@ -491,3 +491,35 @@ def test_dial_ids_are_unique_and_grouped():
     ids = [d["id"] for d in D.DIALS]
     assert len(ids) == len(set(ids)) == 39
     assert {d["group"] for d in D.DIALS} == {"A", "B", "C", "D"}
+
+
+# ------------------------------------------------------------------ review fixes (point 8)
+def test_margin_debt_with_a_missing_month_is_not_silently_stretched(tmp_path):
+    full = margin_series([1255.0, 1250.0, 1230.0])
+    gappy = full.drop(full.index[-3])                       # one month missing inside the 3-month window
+    r = D.margin_debt(view(tmp_path, {"MARGIN_DEBT": gappy}), C)
+    assert r.obs == full.index[-1] and r.colour == R        # computed from true month ends, 3 calendar months apart
+    assert len(D.margin_growth(view(tmp_path / "b", {"MARGIN_DEBT": gappy}))) < len(D.margin_growth(view(tmp_path / "c", {"MARGIN_DEBT": full})))
+
+
+def test_sp500_shows_an_unofficial_same_day_figure_without_changing_the_colour(tmp_path):
+    sp = sp_series([7000] * 14, [7050, 7060])                # FRED's last close: 3 Nov
+    spy = pd.Series([700.0, 706.0, 692.0], index=pd.to_datetime(["2026-11-02", "2026-11-03", "2026-11-04"]))   # one day ahead, sharply lower
+    plain = D.sp500(view(tmp_path / "a", {"SP500": sp}, now="2026-11-05 09:00"), C)
+    both = D.sp500(view(tmp_path / "b", {"SP500": sp, "SPY": spy}, now="2026-11-05 09:00"), C)
+    assert both.colour == plain.colour == G and both.value == 7060
+    assert round(both.extra["same_day_estimate"]) == round(7060 * 692 / 706)
+    assert "unofficial, same day (04 Nov)" in both.text and plain.extra["same_day_estimate"] is None
+
+
+def test_sp500_same_day_figure_is_hidden_when_it_is_not_newer(tmp_path):
+    sp = sp_series([7000] * 14, [7050, 7060])
+    spy = pd.Series([700.0, 706.0], index=pd.to_datetime(["2026-11-02", "2026-11-03"]))
+    assert D.sp500(view(tmp_path, {"SP500": sp, "SPY": spy}, now="2026-11-05 09:00"), C).extra["same_day_estimate"] is None
+
+
+def test_liquidity_date_is_the_older_of_the_two_weekly_balance_sheets(tmp_path):
+    n = 420
+    data = {"WALCL": ramp(6.0e6, 6.3e6, n), "ECBASSETSW": ramp(6.0e6, 6.3e6, n, end="2026-11-01"),
+            "JPNASSETS": flat(6.0e6, n), "M2SL": flat(22000, n), "ECB_USD": flat(1.10, n), "ECB_JPY": flat(165.0, n)}
+    assert D.liquidity(view(tmp_path, data), C).obs == pd.Timestamp("2026-11-01")

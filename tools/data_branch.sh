@@ -2,6 +2,7 @@
 # Check out, or save, the "data" branch into the ./data folder.
 #   tools/data_branch.sh open            fetch the branch (creates it empty the first time)
 #   tools/data_branch.sh save "message"  commit and push only if something changed
+# A save that cannot be pushed fails loudly (exit 1); it never reports success.
 set -euo pipefail
 case "$1" in
   open)
@@ -20,10 +21,20 @@ case "$1" in
     git add -A
     if git diff --cached --quiet; then
       echo "data: nothing changed, no commit"
-    else
-      git commit --quiet -m "${2:-Update data}"
-      for i in 1 2 3; do git push --quiet origin HEAD:data && break || sleep $((i * 5)); done
-      echo "data: committed and pushed"
+      exit 0
     fi
+    git commit --quiet -m "${2:-Update data}"
+    for i in 1 2 3; do
+      if git push --quiet origin HEAD:data; then
+        echo "data: committed and pushed"
+        exit 0
+      fi
+      echo "data: push attempt $i failed; fetching the branch and trying again"
+      sleep $((i * 5))
+      # someone else wrote the branch meanwhile: replay our commit on top of theirs
+      git fetch --quiet --depth=1 origin data && git rebase --quiet FETCH_HEAD || git rebase --abort || true
+    done
+    echo "data: could NOT be saved after 3 attempts" >&2
+    exit 1
     ;;
 esac

@@ -8,10 +8,15 @@ general:
   fresh_red_trading_days: 5  # a dial counts as "newly red" for this many trading days
   stale_minutes: 60          # dashboard "updated" time turns amber when older than this
   source_down_runs: 4        # a source failing this many runs in a row raises a "source down" push
+  enforce_max_age: true      # stale data cannot change a dial's colour (history replays switch this off: their data is dated by estimate)
   cross_check_gap: 0.05      # flag when two sources for the same metric differ by more than 5%
 
 max_age_days:                # a dial is greyed out as "stale" when its newest data is older than this
   default: 5                 # daily series: allows a long weekend plus a holiday
+  btc_price: 1               # live price; yesterday's close is tolerated for a short outage, never older
+  alt_watch: 2               # live prices
+  stable_30d: 3              # daily
+  stable_turn: 3             # daily
   btc_weekly: 9              # weekly close
   weekly_move: 9             # weekly close
   weekly_reclaim: 9          # weekly close
@@ -35,6 +40,7 @@ alerts:
   dial_change_priority: 3    # a dial turning amber from green
   improvement_priority: 2    # a dial turning green, or amber from red
   source_down_priority: 3    # a source failing 4 runs in a row
+  stale_priority: 3          # a dial's data becoming too old to trust
   max_outbox: 20             # unsent pushes kept for retry
 
 levels:                      # fixed levels; Coutts' posts may update these automatically (Phase 2), within 15%

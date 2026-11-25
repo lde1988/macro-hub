@@ -256,3 +256,48 @@ def test_config_families_refer_to_real_dials():
         for fam, members in group.items():
             assert set(members) <= ids, fam
     assert "fed_reserves" not in [m for ms in c["turn_families"].values() for m in ms]
+
+
+# ------------------------------------------------------------------ review fixes (point 8)
+def test_look_back_reaches_the_last_stored_date_after_a_long_pause():
+    e = {"id": "BTCUSD", "start": "2015-07-20"}
+    assert Ctx(now=NOW).since(e, 20) == pd.Timestamp("2026-11-05")                                  # normal short look-back
+    paused = Ctx(now=NOW, last={"BTCUSD": pd.Timestamp("2026-08-01")})
+    assert paused.since(e, 20) == pd.Timestamp("2026-07-29")                                        # hub paused since August: no hole
+    assert Ctx(now=NOW, last={"BTCUSD": pd.Timestamp("2026-11-24")}).since(e, 20) == pd.Timestamp("2026-11-05")
+    assert Ctx(now=NOW, backfill=True).since(e, 20) == pd.Timestamp("2015-07-20")
+
+
+def test_ecb_uses_the_full_file_after_a_long_pause():
+    asked = []
+
+    class W:
+        def get(self, url, **k):
+            asked.append(url)
+
+            class R:
+                content = b"<x/>"
+            return R()
+    entries = [{"id": "ECB_USD", "code": "USD", "start": "1999-01-04"}]
+    ecb.fetch(entries, Ctx(now=NOW, web=W(), last={"ECB_USD": pd.Timestamp("2026-11-24")}))
+    ecb.fetch(entries, Ctx(now=NOW, web=W(), last={"ECB_USD": pd.Timestamp("2026-07-01")}))
+    ecb.fetch(entries, Ctx(now=NOW, web=W()))
+    assert asked == [ecb.RECENT, ecb.FULL, ecb.FULL]
+
+
+def test_live_values_expire_so_an_old_price_is_never_used_as_now(tmp_path):
+    def with_live(entries, ctx):
+        return Result(history={"ECB_USD": pd.Series({pd.Timestamp("2026-11-24"): 1.1})}, live={"ECB_USD": (1.2, ctx.now.isoformat())})
+    _, live, _ = F.run_fetch(tmp_path, now=NOW, registry=MINI, fetchers={"ecb": with_live, "fred": fake()})
+    assert live["ECB_USD"]["value"] == 1.2
+    down = fake(fail="down")
+    _, live, _ = F.run_fetch(tmp_path, now=NOW + dt.timedelta(minutes=45), registry=MINI, fetchers={"ecb": down, "fred": fake()})
+    assert "ECB_USD" in live                                                # 45 minutes old: still within 2 x 30 + 15
+    _, live, _ = F.run_fetch(tmp_path, now=NOW + dt.timedelta(minutes=90), registry=MINI, fetchers={"ecb": down, "fred": fake()})
+    assert "ECB_USD" not in live                                            # too old: dropped, the dial falls back to stored history
+
+
+def test_bookkeeping_can_live_outside_the_data_folder(tmp_path):
+    rt = tmp_path / "rt"
+    F.run_fetch(tmp_path / "data", now=NOW, registry=MINI, fetchers={"ecb": fake(), "fred": fake()}, state_dir=rt)
+    assert (rt / "sources.json").exists() and not (tmp_path / "data" / "state" / "sources.json").exists()

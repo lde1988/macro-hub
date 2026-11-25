@@ -28,10 +28,15 @@ class Ctx:
     last: dict = dataclasses.field(default_factory=dict)  # sid -> last date already stored
 
     def since(self, entry, days):
-        """First date to ask for: the registry start on a back-fill, otherwise a short look-back."""
+        """First date to ask for: the registry start on a back-fill, otherwise a short look-back
+        that is stretched to reach the last stored date, so a pause never leaves a hole in history."""
         if self.backfill:
             return pd.Timestamp(entry["start"])
-        return pd.Timestamp(self.now.date()) - pd.Timedelta(days=days)
+        start = pd.Timestamp(self.now.date()) - pd.Timedelta(days=days)
+        have = self.last.get(entry.get("id"))
+        if have is not None and pd.Timestamp(have) - pd.Timedelta(days=3) < start:
+            start = pd.Timestamp(have) - pd.Timedelta(days=3)   # after a long pause, reach back to what is already stored
+        return max(start, pd.Timestamp(entry["start"])) if "start" in entry else start
 
     @property
     def today(self):

@@ -64,16 +64,18 @@ def fetch(entries, ctx):
         uni = load_yaml(uni_path)
         btc, alt = uni.get("btc", []), uni.get("alt", [])
         syms, hist = btc + alt, {}
-        t0 = int((ctx.today - pd.Timedelta(days=10)).timestamp())
+        reach = min((ctx.today - pd.Timestamp(have)).days + 3, 90) if have is not None else 10
+        t0 = int((ctx.today - pd.Timedelta(days=max(reach, 10))).timestamp())
         try:
             for i in range(0, len(syms), 20):
                 j = call(ctx, "/open-interest-history", key, symbols=",".join(syms[i:i + 20]), interval="daily",
                          convert_to_usd="true", **{"from": t0, "to": t1})
                 hist.update(parse_history(j, ctx.today))
             b, a = sum_universe(hist, btc, alt)
-            # only the last 3 finished days are written: older days came from the full back-fill
-            res.history[oi["oi:btc"]["id"]] = b.tail(3)
-            res.history[oi["oi:alt"]["id"]] = a.tail(3)
+            # only days after the last stored one (plus a 2-day overlap) are written: older days came from the full back-fill
+            cut = pd.Timestamp(have) - pd.Timedelta(days=2) if have is not None else ctx.today - pd.Timedelta(days=3)
+            res.history[oi["oi:btc"]["id"]] = b[b.index >= cut]
+            res.history[oi["oi:alt"]["id"]] = a[a.index >= cut]
         except Exception as ex:
             res.errors["OI_BTC"] = res.errors["OI_ALT"] = str(ex)
     return res

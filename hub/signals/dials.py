@@ -68,6 +68,8 @@ def dollar_state(v, c):
 
 def margin_growth(v):
     s = v.s("MARGIN_DEBT")
+    if len(s):
+        s = s.asfreq("ME")   # a missing month becomes a gap instead of silently stretching "3 months"
     return ((s / s.shift(3)) ** 4 - 1).dropna()
 
 
@@ -363,7 +365,7 @@ def liquidity(v, c, prev=None):
     col = band(x, [k["red_below"], k["green_at_or_above"]], [R, A, G], right=False)
     return Raw(x, col, f"{x:+.1f}% year on year · ${now_ / 1e6:,.1f}tn (proxy)",
                "Green at +5% a year or more; red when shrinking. A proxy: not Coutts' own index.",
-               max(v.s("WALCL").index[-1], v.s("ECBASSETSW").index[-1]),
+               min(v.s("WALCL").index[-1], v.s("ECBASSETSW").index[-1]),
                gauge(-10, 20, [k["red_below"], k["green_at_or_above"]], [R, A, G]), {"total_usd_millions": now_})
 
 
@@ -401,12 +403,19 @@ def sp500(v, c, prev=None):
     fall_col = band(fall, [k["amber_fall"], k["red_fall"]], [G, A, R], right=False)
     col = R if (month_break or fall_col == R) else (A if (last < avg or fall_col == A) else G)
     txt = f"{last:,.0f} · {fall:.1%} below 1-year high · 10-month average {avg:,.0f}"
+    same_day = None
+    spy = v.s("SPY")
+    if len(spy) and spy.index[-1] > s.index[-1] and s.index[-1] in spy.index:
+        # FRED posts the index a day late. Nasdaq does not carry the index itself, so the same-day
+        # figure is FRED's last close moved by the SPY fund's change since then. Display only.
+        same_day = last * float(spy.iloc[-1] / spy[s.index[-1]])
+        txt += f" · unofficial, same day ({spy.index[-1]:%d %b}): about {same_day:,.0f}, from the SPY fund"
     if month_break:
         txt += f" · {me.index[-1].strftime('%b')} closed below it"
     return Raw(last, col, txt, "Red on a finished month-end close below the 10-month average, or a 20% fall from the 1-year high.",
                s.index[-1], gauge(avg * 0.8, avg * 1.2, [avg], [A, G]),
                {"month_end_break": month_break, "ten_month_average": avg, "fall_from_high": fall,
-                "last_month_end": float(last_me), "last_month": str(me.index[-1])})
+                "last_month_end": float(last_me), "last_month": str(me.index[-1]), "same_day_estimate": same_day})
 
 
 def funding_daily(v):

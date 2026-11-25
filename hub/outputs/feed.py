@@ -57,16 +57,15 @@ def build(out, cfg, registry, now, status, since, record=None):
     for r in out["readings"].values():
         obs = r["obs_date"]
         age = (today - pd.Timestamp(obs)).days if obs else None
-        limit = cfg["max_age_days"].get(r["id"], cfg["max_age_days"]["default"])
-        too_old = age is not None and age > limit
+        too_old = bool(r.get("too_old"))
         stale = bool(r["colour"]) and (r["no_data"] or too_old)
         dials.append({
             "id": r["id"], "title": r["title"], "group": r["group"],
             "family": fam_of.get(r["id"], "valuation" if r["group"] == "A" else "turn"),
             "value": r["value"], "text": r["text"], "colour": r["colour"], "word": WORD[r["colour"]],
             "since": r["since"], "data_date": obs, "data_age_days": age, "stale": stale,
-            "stale_reason": ("source not answering; last colour kept" if r["no_data"] and r["colour"] else
-                             f"newest data is {age} days old" if too_old else ""),
+            "stale_reason": (f"newest data is {age} days old" + ("; last colour kept" if r["colour"] else "; no colour given") if too_old else
+                             "source not answering; last colour kept" if r["no_data"] and r["colour"] else ""),
             "fresh_turn_signal": bool(r.get("fresh_green")) if r["group"] == "D" else None,
             "moves": r["moves"], "gauge": r["gauge"], "extra": r["extra"]})
     by = lambda pred: [d for d in dials if pred(d)]

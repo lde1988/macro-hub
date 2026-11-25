@@ -109,6 +109,7 @@ series:
   - {id: APLD, source: nasdaq, code: "APLD:stocks", units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "Applied Digital share price"}
   - {id: IREN, source: nasdaq, code: "IREN:stocks", units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "IREN share price"}
   - {id: BIZD, source: nasdaq, code: "BIZD:etf",    units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "Business-development-company fund (private credit proxy)"}
+  - {id: SPY,  source: nasdaq, code: "SPY:etf",     units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "S&P 500 fund. Used only to show an unofficial same-day S&P 500 figure beside FRED's; never colours a dial"}
   - {id: KRE,  source: nasdaq, code: "KRE:etf",     units: USD, freq: D, lag_days: 1, start: "2016-12-01", meaning: "Regional bank fund"}
 
   # ---- Derivatives (Coinalyze)

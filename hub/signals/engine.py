@@ -57,6 +57,12 @@ def evaluate_dials(view, cfg, state):
             raw = d["fn"](view, cfg, prev.get("colour"))
         except Exception as ex:  # one broken dial must never stop the others
             raw = Raw(text=f"calculation error ({type(ex).__name__})")
+        # stale data must not move a dial: treat it as no data, so the last colour is kept (shown greyed out)
+        limit = cfg["max_age_days"].get(d["id"], cfg["max_age_days"]["default"])
+        age = (view.now.normalize() - pd.Timestamp(raw.obs).normalize()).days if raw.obs is not None else None
+        too_old = bool(cfg["general"].get("enforce_max_age", True)) and age is not None and age > limit
+        if too_old:
+            raw.colour = None
         st, changed_from = step(prev, raw.colour, view.now, runs, d["confirm"])
         new_state[d["id"]] = st
         fresh_red = (st["colour"] == R and not st["baseline"] and st["since"] is not None
@@ -68,6 +74,7 @@ def evaluate_dials(view, cfg, state):
             "colour": st["colour"], "word": WORD[st["colour"]], "raw_colour": raw.colour, "moves": raw.moves,
             "obs_date": str(raw.obs)[:10] if raw.obs is not None else None, "since": st["since"],
             "changed_from": changed_from, "fresh_red": fresh_red, "fresh_green": fresh_green, "no_data": raw.colour is None,
+            "too_old": too_old, "age_days": age,
             "gauge": raw.gauge, "extra": raw.extra,
         }
     return readings, new_state
