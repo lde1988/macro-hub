@@ -6,6 +6,13 @@
   "last_try": "2026-11-25T09:13:48+00:00",
   "series_errors": {}
  },
+ "coinalyze": {
+  "fails": 0,
+  "last_error": "",
+  "last_ok": "2026-11-25T09:53:38+00:00",
+  "last_try": "2026-11-25T09:53:38+00:00",
+  "series_errors": {}
+ },
  "coinbase": {
   "fails": 0,
   "last_error": "",
