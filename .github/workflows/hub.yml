@@ -44,14 +44,19 @@ jobs:
         run: python -m hub.run --data data --site site --runtime runtime
       - run: tools/data_branch.sh save "Hub run"
       - name: Keep the schedules alive
-        # GitHub switches scheduled workflows off after 60 days without activity. Re-enabling them
-        # resets that clock, and brings back any of the three that was switched off by mistake.
+        # Brings back any of the three scheduled workflows that has been switched off (by GitHub after
+        # 60 quiet days, or by mistake). The data this run saves is itself the activity that keeps the clock reset.
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Only a workflow that is NOT active is switched back on. Re-enabling an active one
+          # re-registers its timer, and GitHub can then take hours to fire it again.
           for w in hub.yml watchdog.yml oi-daily.yml; do
-            gh workflow enable "$w" --repo "${{ github.repository }}" >/dev/null 2>&1 || echo "could not enable $w"
+            state=$(gh api "repos/${{ github.repository }}/actions/workflows/$w" --jq .state 2>/dev/null || echo unknown)
+            if [ "$state" != "active" ] && [ "$state" != "unknown" ]; then
+              gh workflow enable "$w" --repo "${{ github.repository }}" && echo "switched $w back on (was $state)"
+            fi
           done
       - uses: actions/upload-pages-artifact@v4
         with:

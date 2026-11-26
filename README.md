@@ -29,7 +29,7 @@ There is no machine learning and there are no hidden weights. The rules are in
 
 | What | When | Where to see it |
 |---|---|---|
-| **Hub run**: fetch, dials, dashboard, feed, pushes | Every 15 minutes (at :07, :22, :37, :52). GitHub's timer is "best effort" and is often 5 to 20 minutes late | Actions tab → Hub run |
+| **Hub run**: fetch, dials, dashboard, feed, pushes | Every 15 minutes (at :07, :22, :37, :52). GitHub's timer is "best effort": runs are often 5 to 20 minutes late and, when GitHub is busy, some are skipped. After any change to a workflow file GitHub can take hours to pick the timer up again | Actions tab → Hub run |
 | **Open interest (daily)**: altcoin and Bitcoin open interest from about 1,060 markets | Once a day at 00:40 UTC; takes about half an hour | Actions tab → Open interest (daily) |
 | **Watchdog**: checks the dashboard is fresh and restarts the hub if not | Four times a day | Actions tab → Watchdog |
 | **Tests** | On every change to the code | Actions tab → Tests |
@@ -69,8 +69,10 @@ After a pause the hub fills in the history it missed, and tells you it is runnin
 
 GitHub switches scheduled jobs off after 60 days with no activity in a repository. Three things guard against that:
 
-- every run re-enables the three scheduled jobs, which resets GitHub's 60-day clock;
-- the hub saves data most days, which counts as activity;
+- the hub saves data on most runs, and each save counts as repository activity, which resets GitHub's 60-day clock;
+- every run checks the three scheduled jobs and switches back on any that has been switched off. (It
+  leaves running ones alone: switching on a job that is already on makes GitHub re-register its timer,
+  which can delay it by hours.);
 - the watchdog runs on its own timer and restarts the hub if the dashboard is more than 90 minutes old.
 
 If GitHub ever disables *all* scheduled jobs at once, none of them can switch the others back on.
