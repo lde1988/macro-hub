@@ -22,7 +22,7 @@ jobs:
       - name: Run people check
         env:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
-        run: mkdir -p out && python tools/sweep_people_check.py --x > out/people_check.md
+        run: mkdir -p out && python tools/sweep_people_check.py --profiles > out/people_check.md
       - name: Publish the result to a side branch
         if: always()
         run: |

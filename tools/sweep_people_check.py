@@ -241,7 +241,54 @@ def docs():
     return out
 
 
+def profile_check(model):
+    """Look closely at handles whose authenticity matters (owner's request, 26 Nov)."""
+    key = os.environ.get("XAI_API_KEY", "").strip()
+    if not key:
+        return "XAI_API_KEY not set.", 0.0
+    out, cost = [], 0.0
+    asks = [
+        (["standuquesne"], "Report everything you can find about the X account @standuquesne: display name, bio, "
+         "whether it shows a verification badge and of what kind (blue, gold, grey), when the account was created, "
+         "follower count, any website link in the profile, and its 5 most recent posts with dates and URLs."),
+        (None, "Search X for posts by OTHER accounts (journalists, news outlets, Duquesne, Morgan Stanley, Bloomberg, CNBC) "
+         "that mention or quote @standuquesne, or that say Stanley Druckenmiller posted on X, and which handle they cite. "
+         "Give up to 8 with author, date, URL and the handle cited. Say plainly if none are found."),
+        (["RosenvoldGeo"], "Report everything you can find about the X account @RosenvoldGeo: display name, bio, verification "
+         "badge, creation date, follower count, profile link, and its 5 most recent posts with dates and URLs."),
+        (["alive_eth", "0xMert_"], "For @alive_eth and @0xMert_: display name, bio, and the dates and URLs of their 3 most "
+         "recent posts, however old. Say plainly if an account cannot be found."),
+    ]
+    for handles, q in asks:
+        tool = {"type": "x_search", "enable_image_understanding": False}
+        if handles:
+            tool["allowed_x_handles"] = handles
+        body = {"model": model, "input": [{"role": "user", "content": q + " Never guess; write 'unknown' where not shown."}],
+                "tools": [tool], "max_turns": 4}
+        try:
+            r = requests.post("https://api.x.ai/v1/responses", json=body, timeout=180,
+                              headers={"Authorization": f"Bearer {key}"})
+        except Exception as e:  # noqa: BLE001
+            out.append(f"### {handles or 'citations'}: error {type(e).__name__}")
+            continue
+        if r.status_code != 200:
+            out.append(f"### {handles or 'citations'}: HTTP {r.status_code} {clean(r.text.replace(key, '***'), 300)}")
+            continue
+        j = r.json()
+        u = j.get("usage", {})
+        cost += (u.get("cost_in_usd_ticks") or 0) / 1e10
+        text = "".join(c.get("text", "") for o in j.get("output", []) for c in (o.get("content") or [])
+                       if c.get("type") == "output_text")
+        out.append(f"### {handles or 'posts by others citing @standuquesne'}\n"
+                   f"tools: {json.dumps(u.get('server_side_tool_usage_details') or {})[:200]}\n\n{text[:3000]}\n")
+    return "\n".join(out), cost
+
+
 def main():
+    if "--profiles" in sys.argv:
+        txt, cost = profile_check(os.environ.get("XAI_MODEL", "grok-4.3"))
+        print(f"# Profile check, {dt.datetime.now(dt.timezone.utc):%Y-%m-%d %H:%M} UTC\n\n{txt}\n\nCost reported by xAI: ${cost:.4f}")
+        return
     p = [f"# People check, {dt.datetime.now(dt.timezone.utc):%Y-%m-%d %H:%M} UTC, on {os.environ.get('RUNNER_NAME', 'local')}", ""]
     p += ["## Newsletter and blog feeds", "", "| who | url | works? | feed title | items | latest |", "|---|---|---|---|---|---|"]
     p += [check_feed(a, b) for a, b in FEEDS]
