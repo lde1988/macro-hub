@@ -20,8 +20,13 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           FEED: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/feed/latest.json
         run: |
-          for w in hub.yml oi-daily.yml watchdog.yml; do
-            gh workflow enable "$w" --repo "${{ github.repository }}" >/dev/null 2>&1 || echo "could not enable $w"
+          # Only a workflow that is NOT active is switched back on. Re-enabling an active one
+          # re-registers its timer, and GitHub can then take hours to fire it again.
+          for w in hub.yml watchdog.yml oi-daily.yml; do
+            state=$(gh api "repos/${{ github.repository }}/actions/workflows/$w" --jq .state 2>/dev/null || echo unknown)
+            if [ "$state" != "active" ] && [ "$state" != "unknown" ]; then
+              gh workflow enable "$w" --repo "${{ github.repository }}" && echo "switched $w back on (was $state)"
+            fi
           done
           stamp=$(curl -fsS -m 30 "$FEED" | python3 -c "import json,sys; print(json.load(sys.stdin)['generated_at'])" 2>/dev/null || true)
           if [ -n "$stamp" ]; then age=$(( ($(date -u +%s) - $(date -u -d "$stamp" +%s)) / 60 )); else age=99999; fi
