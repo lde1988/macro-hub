@@ -58,6 +58,17 @@ jobs:
               gh workflow enable "$w" --repo "${{ github.repository }}" && echo "switched $w back on (was $state)"
             fi
           done
+      - name: Start the weekly sweep if its own timer missed it
+        # Free backstop: GitHub's timer is unreliable. Only on Sunday evening or Monday, only if the last saved
+        # sweep is over 6 days old and the sweep is switched on, and never while one is already queued or running.
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(python -m hub.sweep.due --data data 2>/dev/null)" = "yes" ]; then
+            busy=$(gh run list --repo "${{ github.repository }}" --workflow sweep.yml --limit 5 --json status --jq '[.[]|select(.status!="completed")]|length' 2>/dev/null || echo 1)
+            if [ "$busy" = "0" ]; then gh workflow run sweep.yml --repo "${{ github.repository }}" --ref main && echo "weekly sweep was overdue: started it"; fi
+          fi
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site

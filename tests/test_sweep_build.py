@@ -598,3 +598,23 @@ def test_tiny_audio_pieces_are_not_sent(tmp_path, monkeypatch):
     monkeypatch.setattr(transcribe.requests, "post", lambda *a, **k: (posted.append(k["files"]["file"][0]), R())[1])
     segs, billed, cost = transcribe.transcribe(tmp_path / "in", tmp_path / "w", "m", 3600)
     assert posted == ["a.mp3"] and billed == 1200
+
+
+def test_weekly_sweep_backstop_only_when_overdue_on_sunday_evening_or_monday():
+    from hub.sweep import due
+    last = dt.datetime(2026, 11, 26, 11, 12, tzinfo=UTC)              # the first run
+    sun = dt.datetime(2026, 12, 6, 13, 31, tzinfo=UTC)                # Sunday 21:31 HKT, last run 10 days ago
+    assert due.overdue(last, sun) and due.overdue(None, sun)
+    assert not due.overdue(last, sun, enabled=False)
+    assert not due.overdue(last, sun.replace(hour=12, minute=20))      # the timer's own slot is not yet missed
+    assert not due.overdue(dt.datetime(2026, 12, 6, 12, 9, tzinfo=UTC), sun)   # it ran on time
+    assert due.overdue(last, dt.datetime(2026, 12, 7, 9, 0, tzinfo=UTC))       # Monday
+    assert not due.overdue(last, dt.datetime(2026, 12, 8, 9, 0, tzinfo=UTC))   # Tuesday: wait for next Sunday
+
+
+def test_backstop_reads_the_last_saved_sweep(tmp_path):
+    from hub.sweep import due
+    assert due.last_end(tmp_path) is None
+    (tmp_path / "sweep").mkdir()
+    (tmp_path / "sweep" / "last_run.json").write_text(json.dumps({"window": ["a", "2026-11-26T11:12:00+00:00"]}))
+    assert due.last_end(tmp_path) == dt.datetime(2026, 11, 26, 11, 12, tzinfo=UTC)
