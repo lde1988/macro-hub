@@ -1,9 +1,14 @@
-"""Log-regression channel, as used by Raoul Pal and Real Vision. Pure functions; no network.
+"""Coin valuations. Pure functions; no network. Context only: these readings never enter the
+buy / hold reading, the backdrop or any push.
 
-Fit a straight line to the natural log of the daily close against calendar days, over the coin's
-full available history. Fair value is the line's value today. The reading is
-(log price - log fair value) / standard deviation of the residuals (population form).
-Context only: these readings never enter the buy / hold reading, the backdrop or any push.
+Two price readings per coin, each in standard deviations:
+- Short term, every coin: the 1-year z-score. Over the last 365 daily closes, take the mean and the
+  standard deviation (sample form) of the natural log of the close. Reading = (log price today - mean)
+  / standard deviation. Fair value = exp(mean).
+- Long term, coins with at least 4 years of history: the 4-year trend channel. A straight line fitted
+  to the log of the daily close against time over the last 1,461 days only, refitted daily; the
+  standard deviation of the residuals over the same window (population form). Fair value = the line today.
+A third reading, price against revenue, is further down.
 """
 import math
 
@@ -12,10 +17,10 @@ import pandas as pd
 
 ZONES = ["-3 SD oversold", "-2 SD oversold", "-1 SD oversold", "below fair value", "above fair value",
          "+1 SD overbought", "+2 SD overbought", "+3 SD overbought"]
-METHODS = "Long-term trend: Pal's method. Recent trend: compared with its 200-day average."
-LABEL = "Trend-based estimate. Assumes past growth continues."
-DRIFT = "A constant-growth line drifts toward oversold as a coin's growth slows; read with care for older coins."
-NO_FIT = "the line does not fit this coin's history; reading not meaningful"
+METHODS = "Short term: compared with the last year. Long term: trend over the last 4 years."
+SHORT_LABEL = "Compared with its average price over the last year."
+LABEL = "Trend-based estimate. Assumes the last 4 years' growth continues."
+NO_FIT = "the line does not fit this coin's last 4 years; reading not meaningful"
 
 
 def zone(z):
@@ -28,76 +33,67 @@ def zone(z):
     return (f"-{k} SD oversold", "green") if z < 0 else (f"+{k} SD overbought", "red")
 
 
-def fit(history):
-    """history: daily closes (Series indexed by date, positive). Returns the line and its fit."""
-    s = history[history > 0].sort_index()
+def _bands(centre, sd):
+    return {f"{k:+d}": math.exp(centre + k * sd) for k in (-3, -2, -1, 1, 2, 3)}   # keys "+1", "-2"... (JSON-safe)
+
+
+def _price_now(s, price_now, cfg):
+    last = float(s.iloc[-1])
+    if price_now and abs(float(price_now) / last - 1) <= cfg["valuations"]["live_max_gap"]:
+        return float(price_now), True
+    return last, False
+
+
+def one_year(history, cfg, price_now=None):
+    """Short term: the 1-year z-score of the log price (sample standard deviation)."""
+    v = cfg["valuations"]
+    n = v["short_days"]
+    s = history[history > 0].sort_index() if len(history) else history
+    base = {"label": SHORT_LABEL, "days_available": len(s)}
+    if len(s) < n:
+        return {**base, "status": "too_little", "text": "too little history"}
+    w = np.log(s.iloc[-n:].values)
+    mean, sd = float(w.mean()), float(w.std(ddof=1))
+    p, live = _price_now(s, price_now, cfg)
+    z = (math.log(p) - mean) / sd if sd > 1e-12 else 0.0
+    name, colour = zone(z)
+    return {**base, "status": "ok", "z": round(z, 3), "zone": name, "colour": colour, "price": p, "price_is_live": live,
+            "last_close_date": str(s.index[-1])[:10], "fair_value": math.exp(mean), "bands": _bands(mean, sd),
+            "window_from": str(s.index[-n])[:10]}
+
+
+def fit(s):
+    """Straight line through the log of the closes s against calendar days, with its fit."""
     t = (s.index - s.index[0]).days.values.astype(float)
     y = np.log(s.values)
     slope, intercept = np.polyfit(t, y, 1)
     resid = y - (intercept + slope * t)
     sd = float(resid.std())
     r2 = float(1 - resid.var() / y.var()) if y.var() > 0 else 0.0
-    return {"start": s.index[0], "end": s.index[-1], "intercept": float(intercept), "slope": float(slope), "sd": sd, "r2": r2, "n": len(s)}
+    return {"start": s.index[0], "intercept": float(intercept), "slope": float(slope), "sd": sd, "r2": r2}
 
 
-def reading(history, cfg, price_now=None, today=None):
-    """Everything the card needs. price_now: live price (else the last close). today: date the fair value is for."""
+def channel(history, cfg, price_now=None, today=None):
+    """Long term: the 4-year trend channel, refitted on the last 1,461 days. None for a coin with under 4 years."""
     v = cfg["valuations"]
+    n = v["long_days"]
     s = history[history > 0].sort_index() if len(history) else history
-    if len(s) < 2:
-        return {"status": "none", "text": "no data"}
-    today = pd.Timestamp(today).normalize() if today is not None else s.index[-1]
-    years = (s.index[-1] - s.index[0]).days / 365.25
-    months = int(round(years * 12))
-    base = {"history_from": str(s.index[0])[:10], "years": round(years, 2), "months": months, "label": LABEL, "drift_note": DRIFT}
-    if years < v["min_years_dial"]:
-        return {**base, "status": "too_little", "text": f"too little history ({months} months)"}
-    f = fit(s)
-    last = float(s.iloc[-1])
-    p = float(price_now) if price_now and abs(float(price_now) / last - 1) <= v["live_max_gap"] else last
-    t = (today - f["start"]).days
-    fair = math.exp(f["intercept"] + f["slope"] * t)
-    z = (math.log(p) - math.log(fair)) / f["sd"] if f["sd"] > 0 else 0.0
+    if (len(s) and (s.index[-1] - s.index[0]).days + 1 < n) or len(s) < n * 0.9:
+        return None
+    w = s[s.index > s.index[-1] - pd.Timedelta(days=n)]
+    f = fit(w)
+    today = pd.Timestamp(today).normalize() if today is not None else w.index[-1]
+    centre = f["intercept"] + f["slope"] * (today - f["start"]).days
+    p, live = _price_now(s, price_now, cfg)
+    z = (math.log(p) - centre) / f["sd"] if f["sd"] > 1e-12 else 0.0
     name, colour = zone(z)
-    out = {**base, "status": "ok", "z": round(z, 3), "zone": name, "colour": colour, "price": p, "fair_value": fair,
-           "growth_per_year": math.exp(f["slope"] * 365) - 1, "r2": round(f["r2"], 3), "sd_log": f["sd"],
-           "bands": {f"{k:+d}": fair * math.exp(k * f["sd"]) for k in (-3, -2, -1, 1, 2, 3)},   # keys "+1", "-2"... (JSON-safe)
-           "price_is_live": p != last, "last_close_date": str(s.index[-1])[:10]}
-    notes = []
-    if years < v["min_years_confident"]:
-        out["status"] = "greyed"
-        notes.append(f"short history, low confidence ({months} months used)")
+    out = {"label": LABEL, "status": "ok", "z": round(z, 3), "zone": name, "colour": colour, "price": p, "price_is_live": live,
+           "fair_value": math.exp(centre), "growth_per_year": math.exp(f["slope"] * 365) - 1, "r2": round(f["r2"], 3),
+           "bands": _bands(centre, f["sd"]), "window_from": str(w.index[0])[:10], "warnings": []}
     if f["r2"] < v["min_r_squared"]:
         out["status"] = "greyed"
-        notes.append(NO_FIT)
-    out["warnings"] = notes
+        out["warnings"] = [NO_FIT]
     return out
-
-
-STRETCH_LABEL = "Compared with its own recent trend, not a fair value"
-
-
-def stretch(history, cfg, price_now=None):
-    """Stretch from trend: log(price / 200-day moving average), as a z-score against the coin's own
-    history of the same measure. Needs at least 365 days of the measure."""
-    v = cfg["valuations"]
-    s = history[history > 0].sort_index() if len(history) else history
-    n = v["stretch_ma_days"]
-    base = {"label": STRETCH_LABEL}
-    if len(s) < n + 1:
-        return {**base, "status": "too_little", "text": "too little history", "days": 0}
-    ma = s.rolling(n).mean()
-    m = np.log(s / ma).dropna()
-    if len(m) < v["stretch_min_days"]:
-        return {**base, "status": "too_little", "text": "too little history", "days": len(m)}
-    last = float(s.iloc[-1])
-    p = float(price_now) if price_now and abs(float(price_now) / last - 1) <= v["live_max_gap"] else last
-    now = math.log(p / float(ma.iloc[-1]))
-    sd = float(m.std())
-    z = (now - float(m.mean())) / sd if sd > 0 else 0.0
-    name, colour = zone(z)
-    return {**base, "status": "ok", "z": round(z, 3), "zone": name, "colour": colour, "ratio": p / float(ma.iloc[-1]),
-            "ma": float(ma.iloc[-1]), "days": len(m), "typical_ratio": math.exp(float(m.mean()))}
 
 
 REVENUE_LABEL = "Fully diluted value against the last year of fees, compared with its own history only"
@@ -153,18 +149,19 @@ def revenue(price, fees, cfg, rc, supply=None, circulating=None, total=None, pri
 
 
 def all_coins(view, cfg):
-    """One reading per coin, in the configured order. view: hub.signals.core.View."""
+    """All readings per coin, in the configured order. view: hub.signals.core.View."""
     out = []
     for c in cfg["valuations"]["coins"]:
-        r = reading(view.s(c["history"]), cfg, price_now=view.live(c["live"]), today=view.now.normalize())
-        st = stretch(view.s(c["history"]), cfg, price_now=view.live(c["live"]))
+        hist, live = view.s(c["history"]), view.live(c["live"])
         rv = None
         if c.get("revenue"):
             rc = c["revenue"]
             last = lambda sid: (float(view.s(sid).iloc[-1]) if len(view.s(sid)) else None)
-            rv = revenue(view.s(c["history"]), view.s(rc["fees"]), cfg, rc,
+            rv = revenue(hist, view.s(rc["fees"]), cfg, rc,
                          supply=view.s(rc["supply_series"]) if rc.get("supply_series") else None,
-                         circulating=last(f"SUP_CIRC_{c['sym']}"), total=last(f"SUP_TOTAL_{c['sym']}"),
-                         price_now=view.live(c["live"]))
-        out.append({"sym": c["sym"], "name": c["name"], **r, "stretch": st, "revenue": rv, "methods": METHODS})
+                         circulating=last(f"SUP_CIRC_{c['sym']}"), total=last(f"SUP_TOTAL_{c['sym']}"), price_now=live)
+        out.append({"sym": c["sym"], "name": c["name"], "methods": METHODS,
+                    "history_from": str(hist.index[0])[:10] if len(hist) else None,
+                    "years": round((hist.index[-1] - hist.index[0]).days / 365.25, 2) if len(hist) else 0,
+                    "short": one_year(hist, cfg, live), "long": channel(hist, cfg, live, view.now.normalize()), "revenue": rv})
     return out

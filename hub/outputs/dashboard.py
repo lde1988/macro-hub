@@ -135,33 +135,31 @@ def empty_block(title, big, small, label=""):
             f'<p class="cvsub">{esc(small)}</p>{f"<p class=cvlabel>{esc(label)}</p>" if label else ""}</section>')
 
 
-def long_term_block(v, lead):
-    title = "Long-term trend (log regression)"
-    if v["status"] in ("none", "too_little"):
-        msg = "too little history" + (f' ({v["months"]} months)' if v.get("months") is not None else "") if v["status"] == "too_little" else "no data yet"
-        return empty_block(title, msg, "No dial is drawn for under a year of history.", v.get("label", "")).replace(
-            "</section>", f'<p class="cvnote">{esc(v.get("drift_note", ""))}</p></section>')
-    bands = "".join(f'<tr><td>{lab}</td><td>{fmt_price(v["bands"][f"{k:+d}"]) if k else fmt_price(v["fair_value"])}</td></tr>'
-                    for k, lab in ((3, "+3 SD"), (2, "+2 SD"), (1, "+1 SD"), (0, "Fair value"), (-1, "−1 SD"), (-2, "−2 SD"), (-3, "−3 SD")))
-    when = "live" if v.get("price_is_live") else f'close {v["last_close_date"]}'
-    hist = f'{v["years"]:.1f} years' if v["years"] >= 1 else f'{v["months"]} months'
-    body = (f'<p class="cvsub">Fair value {fmt_price(v["fair_value"])} · assumes {minus(f"{v[chr(103) + chr(114) + "owth_per_year"] * 100:+.0f}")}% a year</p>'
-            f'<p class="cvprice">Price now <b>{fmt_price(v["price"])}</b> <span class="cvsub">({esc(when)})</span></p>'
-            f'<table class="cvbands">{bands}</table>'
-            f'<p class="cvsub">History used: {hist}, from {esc(v["history_from"])} · line fit R² {v["r2"]:.2f}</p>'
-            f'<p class="cvnote">{esc(v.get("drift_note", ""))}</p>')
-    return reading_block(title, v, v.get("label", ""), v["status"] == "greyed", v.get("warnings", []), body, lead, v["sym"])
+def _band_table(r):
+    return "".join(f'<tr><td>{lab}</td><td>{fmt_price(r["bands"][f"{k:+d}"]) if k else fmt_price(r["fair_value"])}</td></tr>'
+                   for k, lab in ((3, "+3 SD"), (2, "+2 SD"), (1, "+1 SD"), (0, "Fair value"), (-1, "−1 SD"), (-2, "−2 SD"), (-3, "−3 SD")))
 
 
-def recent_block(st, lead):
-    title = "Recent trend (stretch from its 200-day average)"
-    if not st:
-        return ""
-    if st.get("status") != "ok":
-        return empty_block(title, "too little history", f'Needs 365 days of the measure; {st.get("days") or 0} available.', st.get("label", ""))
-    body = (f'<p class="cvsub">Price is {st["ratio"]:.2f} times its 200-day average ({fmt_price(st["ma"])}); usually {st["typical_ratio"]:.2f} times. '
-            f'Scored against {st["days"]:,} days.</p>')
-    return reading_block(title, st, st.get("label", ""), False, (), body, lead)
+def short_block(r, sym):
+    title = "Short term: against the last year"
+    if not r or r.get("status") != "ok":
+        n = (r or {}).get("days_available", 0)
+        return empty_block(title, "too little history", f"Needs 365 days of prices; {n} available.", (r or {}).get("label", ""))
+    when = "live" if r.get("price_is_live") else f'close {r["last_close_date"]}'
+    body = (f'<p class="cvsub">Fair value {fmt_price(r["fair_value"])}: the average (in log terms) of the last 365 closes, from {esc(r["window_from"])}</p>'
+            f'<p class="cvprice">Price now <b>{fmt_price(r["price"])}</b> <span class="cvsub">({esc(when)})</span></p>'
+            f'<table class="cvbands">{_band_table(r)}</table>')
+    return reading_block(title, r, r.get("label", ""), False, (), body, True, sym)
+
+
+def long_block(r, sym, years):
+    title = "Long term: trend over the last 4 years"
+    if not r:
+        return empty_block(title, "not shown", f"Needs 4 years of prices; {years:.1f} years available.")
+    body = (f'<p class="cvsub">Fair value {fmt_price(r["fair_value"])} · trend {minus(f"{r[chr(103) + chr(114) + "owth_per_year"] * 100:+.0f}")}% a year</p>'
+            f'<table class="cvbands">{_band_table(r)}</table>'
+            f'<p class="cvsub">Line fitted to the closes since {esc(r["window_from"])}, refitted daily · line fit R² {r["r2"]:.2f}</p>')
+    return reading_block(title, r, r.get("label", ""), r["status"] == "greyed", r.get("warnings", []), body, False, sym)
 
 
 def revenue_block(rv):
@@ -190,21 +188,19 @@ plain_approx = "approximate: past supply estimated"
 
 def valuation_card(v):
     head = f'<h4>{esc(v["sym"])} <span class="cvname">{esc(v["name"])}</span></h4><p class="cvmethods">{esc(v.get("methods", ""))}</p>'
-    st = v.get("stretch") or {}
-    lead_recent = v["status"] in ("greyed", "too_little") and st.get("status") == "ok"
-    first, second = (recent_block(st, True), long_term_block(v, False)) if lead_recent else (long_term_block(v, True), recent_block(st, False))
-    return f'<article class="cvcard" id="cv-{esc(v["sym"].lower())}">{head}{first}{second}{revenue_block(v.get("revenue"))}</article>'
+    return (f'<article class="cvcard" id="cv-{esc(v["sym"].lower())}">{head}{short_block(v.get("short"), v["sym"])}'
+            f'{long_block(v.get("long"), v["sym"], v.get("years") or 0)}{revenue_block(v.get("revenue"))}</article>')
 
 
 def valuations_pane(vals):
     if not vals:
         return '<section class="card"><p class="disc">No coin data yet.</p></section>'
     strip = "".join(f'<a href="#cv-{esc(v["sym"].lower())}" data-i="{i}"><span class="dot" style="background:'
-                    f'{COL[v.get("colour")] if v.get("status") == "ok" else "#6b6b6b"}"></span>{esc(v["sym"])}</a>' for i, v in enumerate(vals))
+                    f'{COL[(v.get("short") or {}).get("colour")] if (v.get("short") or {}).get("status") == "ok" else "#6b6b6b"}"></span>{esc(v["sym"])}</a>' for i, v in enumerate(vals))
     cards = "".join(valuation_card(v) for v in vals)
-    return (f'<p class="disc cvintro">Up to three readings per coin, each in standard deviations from that coin\'s own norm: the long-term trend '
-            f'(a straight line through the log of its whole price history), the recent trend (price against its 200-day average) and, where '
-            f'fee data allows, price against revenue. Context only: these do not enter the reading or any alert.</p>'
+    return (f'<p class="disc cvintro">Up to three readings per coin, each in standard deviations: price against its average over the '
+            f'last year; price against its trend over the last 4 years; and, where fee data allows, price against revenue. '
+            f'Context only: these do not enter the reading or any alert.</p>'
             f'<nav class="cvstrip" aria-label="Coins">{strip}</nav><div class="cvtrack" id="cvtrack">{cards}</div>')
 
 
@@ -316,7 +312,7 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 .cvstrip{{display:flex;gap:6px;overflow-x:auto;padding:10px 0 6px;scrollbar-width:none}} .cvstrip::-webkit-scrollbar{{display:none}}
 .cvstrip a{{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:16px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:600}}
 .cvstrip a.on{{background:var(--card);border-color:#9ecbff}}
-.cvtrack{{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:10px;scrollbar-width:thin}}
+.cvtrack{{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:10px;scrollbar-width:thin}}
 .cvcard{{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}}
 .cvcard h4{{font-size:18px}} .cvname{{color:var(--mute);font-weight:400;font-size:15px}}
 .cvbig{{font-size:40px;font-weight:800;line-height:1.1;margin-top:8px;font-variant-numeric:tabular-nums}} .cvbig.muted{{font-size:22px;color:var(--mute)}}

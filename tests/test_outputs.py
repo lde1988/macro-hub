@@ -31,7 +31,7 @@ def small_feed(tmp_path, extra=None, state=None, now=NOW, status=None):
 # ------------------------------------------------------------------ feed
 def test_feed_has_version_reading_regime_and_every_dial(tmp_path):
     fd, _ = small_feed(tmp_path)
-    assert fd["version"] == "1.0" and fd["generated_at"] == "2026-11-25T09:00:00Z" and "HKT" in fd["generated_at_hkt"]
+    assert fd["version"] == "2.0" and fd["generated_at"] == "2026-11-25T09:00:00Z" and "HKT" in fd["generated_at_hkt"]
     assert fd["reading"]["label"] == "HOLD" and fd["reading"]["days_in_force"] == 9
     assert fd["trend_exit"]["state"] == "RISK-OFF" and fd["regime"]["name"] == "BREAK"
     assert len(fd["dials"]) == 40

@@ -1,4 +1,4 @@
-"""Log-regression channel, with made-up price histories. Nothing is fetched."""
+"""Coin valuations, with made-up price histories. Nothing is fetched."""
 import math
 
 import numpy as np
@@ -7,7 +7,7 @@ import pytest
 
 from hub import alerts
 from hub.outputs import dashboard
-from hub.signals.valuation import APPROX, DRIFT, LABEL, NO_FIT, all_coins, fit, reading, revenue, zone
+from hub.signals.valuation import APPROX, LABEL, METHODS, NO_FIT, SHORT_LABEL, all_coins, channel, one_year, revenue, zone
 from hub.util import load_config
 from tests.helpers import view
 
@@ -28,43 +28,7 @@ def wave(amp, period_days=1461):
     return lambda t: amp * np.sin(2 * math.pi * t / period_days)
 
 
-# ------------------------------------------------------------------ the arithmetic
-def test_a_clean_exponential_is_recovered_exactly():
-    s = exp_series(8, growth=1.0)
-    f = fit(s)
-    assert abs((math.exp(f["slope"] * 365) - 1) - 1.0) < 1e-6 and f["r2"] > 0.999999 and f["sd"] < 1e-9
-
-
-def test_reading_is_log_distance_over_residual_sd():
-    s = exp_series(8, growth=0.6, noise=wave(0.5))
-    f = fit(s)
-    t = np.array((s.index - s.index[0]).days, dtype=float)
-    resid = np.log(s.values) - (f["intercept"] + f["slope"] * t)
-    assert abs(f["sd"] - resid.std(ddof=0)) < 1e-12                        # population standard deviation
-    r = reading(s, C)
-    fair = math.exp(f["intercept"] + f["slope"] * t[-1])
-    assert abs(r["fair_value"] - fair) < 1e-6 * fair
-    assert abs(r["z"] - round((math.log(s.iloc[-1]) - math.log(fair)) / f["sd"], 3)) < 1e-9
-    for k in (-3, -2, -1, 1, 2, 3):                                         # price at each band
-        assert abs(r["bands"][f"{k:+d}"] - fair * math.exp(k * f["sd"])) < 1e-6 * fair
-    assert abs(r["growth_per_year"] - (math.exp(f["slope"] * 365) - 1)) < 1e-12 and 0.4 < r["growth_per_year"] < 0.8 and r["r2"] > 0.8
-
-
-def test_log_base_and_price_units_do_not_change_the_reading():
-    s = exp_series(6, growth=0.8, noise=wave(0.4))
-    a, b = reading(s, C), reading(s * 1000, C)
-    assert a["z"] == b["z"] and abs(b["fair_value"] / a["fair_value"] - 1000) < 1e-6
-
-
-def test_a_price_below_the_line_reads_oversold_and_above_reads_overbought():
-    base = exp_series(6, growth=0.8, noise=wave(0.3))
-    low, high = base.copy(), base.copy()
-    low.iloc[-1] *= math.exp(-0.9)
-    high.iloc[-1] *= math.exp(0.9)
-    assert reading(low, C)["z"] < -1 and reading(low, C)["colour"] == "green"
-    assert reading(high, C)["z"] > 1 and reading(high, C)["colour"] == "red"
-
-
+# ------------------------------------------------------------------ zones
 @pytest.mark.parametrize("z,name,colour", [
     (-3.4, "-3 SD oversold", "green"), (-3.0, "-2 SD oversold", "green"), (-2.5, "-2 SD oversold", "green"),
     (-2.0, "-1 SD oversold", "green"), (-1.01, "-1 SD oversold", "green"), (-1.0, "below fair value", "amber"),
@@ -75,64 +39,104 @@ def test_eight_zones_with_the_fair_band_split_at_zero(z, name, colour):
     assert zone(z) == (name, colour)
 
 
-def test_live_price_is_used_for_now_but_a_wild_print_is_ignored():
-    s = exp_series(6, growth=0.8, noise=wave(0.3))
+# ------------------------------------------------------------------ short term: 1-year z-score
+def test_one_year_z_is_log_price_against_the_last_365_closes_sample_sd():
+    s = exp_series(3, growth=0.5, noise=wave(0.3, 200))
+    r = one_year(s, C)
+    w = np.log(s.iloc[-365:].values)
+    assert r["status"] == "ok"
+    assert abs(r["z"] - round((math.log(s.iloc[-1]) - w.mean()) / w.std(ddof=1), 3)) < 1e-9
+    assert abs(r["fair_value"] - math.exp(w.mean())) < 1e-9 * r["fair_value"]
+    for k in (-3, -2, -1, 1, 2, 3):
+        assert abs(r["bands"][f"{k:+d}"] - math.exp(w.mean() + k * w.std(ddof=1))) < 1e-9 * r["fair_value"]
+    assert r["window_from"] == str(s.index[-365])[:10] and r["label"] == SHORT_LABEL
+
+
+def test_one_year_uses_only_the_last_365_days():
+    s = exp_series(3, growth=0.5, noise=wave(0.3, 200))
+    t = s.copy()
+    t.iloc[:-365] = t.iloc[:-365] * 50                       # anything older than a year makes no difference
+    assert one_year(s, C)["z"] == one_year(t, C)["z"]
+
+
+def test_one_year_needs_365_days():
+    assert one_year(exp_series(0.99, growth=0.5), C)["status"] == "too_little"
+    assert one_year(exp_series(1.0, growth=0.5), C)["status"] == "ok"            # 366 closes
+    assert one_year(pd.Series(dtype=float), C)["text"] == "too little history"
+
+
+def test_one_year_uses_a_live_price_but_ignores_a_wild_print():
+    s = exp_series(2, growth=0.5, noise=wave(0.2, 100))
     last = s.iloc[-1]
-    r = reading(s, C, price_now=last * 1.05, today=s.index[-1] + pd.Timedelta(days=1))
-    assert r["price"] == last * 1.05 and r["price_is_live"] is True
-    bad = reading(s, C, price_now=last * 3, today=s.index[-1])
+    assert one_year(s, C, price_now=last * 1.05)["price_is_live"] is True
+    bad = one_year(s, C, price_now=last * 3)
     assert bad["price"] == last and bad["price_is_live"] is False
 
 
-def test_fair_value_is_for_today_not_the_last_close():
-    s = exp_series(6, growth=1.0)
-    a = reading(s, C, today=s.index[-1])
-    b = reading(s, C, today=s.index[-1] + pd.Timedelta(days=365))
-    assert abs(b["fair_value"] / a["fair_value"] - 2.0) < 1e-6              # one year of +100% growth
+def test_a_spike_reads_overbought_and_a_crash_oversold():
+    base = exp_series(2, growth=0.0, noise=wave(0.2, 90))
+    up, down = base.copy(), base.copy()
+    up.iloc[-1] *= math.exp(0.6)
+    down.iloc[-1] *= math.exp(-0.6)
+    assert one_year(up, C)["colour"] == "red" and one_year(down, C)["colour"] == "green"
 
 
-# ------------------------------------------------------------------ honesty rules
-def test_under_one_year_gives_no_dial():
-    r = reading(exp_series(0.8, growth=1.0, noise=wave(0.2, 90)), C)
-    assert r["status"] == "too_little" and "too little history" in r["text"] and "z" not in r
+# ------------------------------------------------------------------ long term: 4-year trend channel
+def test_channel_fits_only_the_last_1461_days():
+    s = exp_series(8, growth=0.44, noise=wave(0.3, 500))
+    r = channel(s, C)
+    w = s.iloc[-1461:]
+    t = (w.index - w.index[0]).days.values.astype(float)
+    b, a = np.polyfit(t, np.log(w.values), 1)
+    resid = np.log(w.values) - (a + b * t)
+    assert r["window_from"] == str(w.index[0])[:10]
+    assert abs(r["growth_per_year"] - (math.exp(b * 365) - 1)) < 1e-9
+    assert abs(r["z"] - round((math.log(w.iloc[-1]) - (a + b * t[-1])) / resid.std(), 3)) < 1e-9
+    older = s.copy()
+    older.iloc[:-1461] = older.iloc[:-1461] * 10              # history older than 4 years makes no difference
+    assert channel(older, C)["z"] == r["z"]
 
 
-def test_under_three_years_is_greyed_with_months_used():
-    r = reading(exp_series(1.9, growth=1.0, noise=wave(0.2, 200)), C)
-    assert r["status"] == "greyed" and r["warnings"] == ["short history, low confidence (23 months used)"] and "z" in r
+def test_channel_recovers_a_clean_trend():
+    r = channel(exp_series(5, growth=0.44), C)
+    assert abs(r["growth_per_year"] - 0.44) < 1e-6 and r["r2"] > 0.999
+    assert r["label"] == LABEL
 
 
-def test_a_poor_fit_is_greyed_with_the_agreed_wording():
-    flat = exp_series(6, growth=0.0, noise=wave(1.0))                       # no trend at all: R squared near 0
-    r = reading(flat, C)
+def test_channel_only_for_coins_with_four_years():
+    assert channel(exp_series(3.9, growth=0.5), C) is None
+    assert channel(exp_series(4.0, growth=0.5, noise=wave(0.2, 300)), C) is not None
+
+
+def test_channel_r_squared_rule():
+    flat = exp_series(5, growth=0.0, noise=wave(1.0, 700))
+    r = channel(flat, C)
     assert r["r2"] < 0.3 and r["status"] == "greyed" and r["warnings"] == [NO_FIT]
-    assert NO_FIT == "the line does not fit this coin's history; reading not meaningful"
 
 
-def test_short_and_poor_fit_both_say_so():
-    r = reading(exp_series(2, growth=0.0, noise=wave(1.0, 200)), C)
-    assert r["status"] == "greyed" and len(r["warnings"]) == 2
+def test_channel_fair_value_is_for_today():
+    s = exp_series(5, growth=1.0)
+    a = channel(s, C, today=s.index[-1])
+    b = channel(s, C, today=s.index[-1] + pd.Timedelta(days=365))
+    assert abs(b["fair_value"] / a["fair_value"] - 2.0) < 1e-6
 
 
-def test_a_good_long_fit_is_not_greyed():
-    r = reading(exp_series(8, growth=0.8, noise=wave(0.3)), C)
-    assert r["status"] == "ok" and r["warnings"] == [] and r["label"] == LABEL and r["drift_note"] == DRIFT
-    assert LABEL == "Trend-based estimate. Assumes past growth continues."
-
-
-# ------------------------------------------------------------------ all coins, page, digest, and staying out of the rules
+# ------------------------------------------------------------------ all coins, page, digest, staying out of the rules
 def ten_coin_view(tmp_path):
-    data, live = {}, {}
+    data = {}
     for i, c in enumerate(C["valuations"]["coins"]):
-        yrs = [16, 11, 6.6, 3.3, 9, 6, 10, 1.9, 1.5, 0.5][i]
-        data[c["history"]] = exp_series(yrs, growth=0.7, noise=wave(0.4), end="2026-11-25")
-    return view(tmp_path, data, now="2026-11-26 03:00", live=live)
+        yrs = [16, 11, 6.6, 3.3, 9, 6, 10, 1.9, 0.6, 2]
+        data[c["history"]] = exp_series(yrs[i], growth=0.7, noise=wave(0.4, 400), end="2026-11-25")
+    return view(tmp_path, data, now="2026-11-26 03:00")
 
 
 def test_all_ten_coins_in_order(tmp_path):
     vals = all_coins(ten_coin_view(tmp_path), C)
     assert [v["sym"] for v in vals] == ["BTC", "ETH", "SOL", "SUI", "LINK", "NEAR", "ZEC", "HYPE", "WAL", "DEEP"]
-    assert [v["status"] for v in vals][-3:] == ["greyed", "greyed", "too_little"]
+    assert [v["short"]["status"] for v in vals] == ["ok"] * 8 + ["too_little", "ok"]
+    assert [v["long"] is not None for v in vals] == [True, True, True, False, True, True, True, False, False, False]
+    assert all(v["methods"] == METHODS for v in vals)
+    assert METHODS == "Short term: compared with the last year. Long term: trend over the last 4 years."
 
 
 def test_the_tab_has_one_card_per_coin_and_no_outside_scripts(tmp_path):
@@ -140,92 +144,51 @@ def test_the_tab_has_one_card_per_coin_and_no_outside_scripts(tmp_path):
     fd, _ = small_feed(tmp_path / "f")
     fd["valuations"] = all_coins(ten_coin_view(tmp_path), C)
     page = dashboard.render(fd)
-    assert page.count('class="cvcard') == 10 and page.count('class="cvstrip"') == 1 and page.count('data-i=') == 10
-    assert "scroll-snap-type:x mandatory" in page and "<script src" not in page
-    assert page.count(LABEL) == 10 and page.count(DRIFT.replace("'", "&#x27;")) == 10
-    assert page.count("Long-term trend: Pal&#x27;s method. Recent trend: compared with its 200-day average.") == 10
-    assert page.count("Short history, low confidence") == 2 and "too little history" in page
-    for lab in ("−3 SD", "−2 SD", "−1 SD", "below fair", "above fair", "+1 SD", "+2 SD", "+3 SD"):
+    assert page.count('class="cvcard') == 10 and page.count('data-i=') == 10 and "<script src" not in page
+    assert page.count("Short term: compared with the last year. Long term: trend over the last 4 years.") == 10
+    assert page.count(">Short term: against the last year<") == 10 and page.count(">Long term: trend over the last 4 years<") == 10
+    assert "Needs 4 years of prices" in page and "Needs 365 days of prices" in page
+    assert "Pal" not in page and "200-day average" not in page.split('class="pane p2"')[1]
+    for lab in ("−3 SD", "−2 SD", "−1 SD", "below", "above", "+1 SD", "+2 SD", "+3 SD"):
         assert lab in page
-    assert "assumes +" in page and "% a year" in page and "Coin Metrics</a> community data, CC BY-NC 4.0" in page
-    assert page.index('class="tabs"') < page.index('class="pane p1"') < page.index('class="pane p2"')
+    assert "trend +" in page and "% a year" in page
 
 
 def test_every_dial_shows_its_sd_number_large_and_a_word(tmp_path):
-    vals = all_coins(ten_coin_view(tmp_path), C)
-    for v in vals:
+    for v in all_coins(ten_coin_view(tmp_path), C):
         card = dashboard.valuation_card(v)
-        for r in (v, v["stretch"]):
-            if r.get("status") in ("ok", "greyed") and "z" in r:
-                num = f'{r["z"]:+.2f}'.replace("-", "\u2212")
-                assert f'font-size="36" font-weight="800"' in card and f'>{num}</text>' in card
+        for r in (v["short"], v["long"]):
+            if r and r.get("status") in ("ok", "greyed"):
+                assert f'>{f"{r[chr(122)]:+.2f}".replace("-", chr(8722))}</text>' in card
                 assert r["zone"][3:] in card and any(sym in card for sym in "▲●▼")
 
 
-def test_cards_lead_with_the_recent_trend_when_the_long_term_dial_is_greyed(tmp_path):
-    vals = all_coins(ten_coin_view(tmp_path), C)
-    for v in vals:
+def test_short_term_always_leads_and_revenue_comes_last(tmp_path):
+    for v in all_coins(ten_coin_view(tmp_path), C):
         card = dashboard.valuation_card(v)
-        lt, rt = card.index("Long-term trend (log regression)"), card.index("Recent trend (stretch")
-        if v["status"] in ("greyed", "too_little") and v["stretch"]["status"] == "ok":
-            assert rt < lt
-        else:
-            assert lt < rt
-        assert card.index("cvmethods") < min(lt, rt)
+        st, lt = card.index("Short term: against the last year"), card.index("Long term: trend over the last 4 years<")
+        assert card.index("cvmethods") < st < lt
+        if "Price against revenue" in card:
+            assert lt < card.index("Price against revenue")
 
 
 def test_valuations_are_one_digest_line_and_never_a_push_or_part_of_the_reading(tmp_path):
     from tests.test_outputs import small_feed
-    fd, out = small_feed(tmp_path / "f")
+    fd, _ = small_feed(tmp_path / "f")
     before = (fd["reading"]["label"], fd["regime"]["name"], alerts.summary(fd))
     fd["valuations"] = all_coins(ten_coin_view(tmp_path), C)
     assert (fd["reading"]["label"], fd["regime"]["name"], alerts.summary(fd)) == before
-    changed = [dict(v) for v in fd["valuations"]]
-    for v in changed:
-        if "z" in v:
-            v.update(z=-v["z"], colour="red" if v["colour"] == "green" else "green")
-    fd2 = dict(fd, valuations=changed)
-    assert alerts.plan(alerts.summary(fd), fd2, C) == []                     # a valuation change pushes nothing
-    d = alerts.digest(fd, C)["message"]
-    lines = [l for l in d.split("\n") if l.startswith("Coin valuations")]
-    assert len(lines) == 1 and "BTC " in lines[0] and "DEEP" in lines[0] and "(* greyed: short history or the line does not fit)" in lines[0]
+    flipped = [dict(v, short=dict(v["short"], z=-v["short"].get("z", 0), colour="red")) for v in fd["valuations"]]
+    assert alerts.plan(alerts.summary(fd), dict(fd, valuations=flipped), C) == []
+    lines = [l for l in alerts.digest(fd, C)["message"].split("\n") if l.startswith("Coins against their last year")]
+    assert len(lines) == 1 and "BTC " in lines[0] and "too little history: WAL" in lines[0]
 
 
 def test_the_card_renders_from_the_published_json_too(tmp_path):
     import json
-    v = {"sym": "BTC", "name": "Bitcoin", **reading(exp_series(8, growth=0.8, noise=wave(0.3)), C)}
+    v = all_coins(ten_coin_view(tmp_path), C)[0]
     back = json.loads(json.dumps(v, default=str))
     assert dashboard.valuation_card(back) == dashboard.valuation_card(v)
-
-
-# ------------------------------------------------------------------ stretch from trend
-from hub.signals.valuation import STRETCH_LABEL, stretch  # noqa: E402
-
-
-def test_stretch_is_log_price_over_200_day_average_scored_against_its_own_history():
-    s = exp_series(4, growth=0.5, noise=wave(0.3, 400))
-    st = stretch(s, C)
-    ma = s.rolling(200).mean()
-    m = np.log(s / ma).dropna()
-    now = math.log(s.iloc[-1] / ma.iloc[-1])
-    assert st["status"] == "ok" and st["days"] == len(m)
-    assert abs(st["z"] - round((now - m.mean()) / m.std(ddof=0), 3)) < 1e-9
-    assert abs(st["ratio"] - s.iloc[-1] / ma.iloc[-1]) < 1e-12 and st["label"] == STRETCH_LABEL
-    assert STRETCH_LABEL == "Compared with its own recent trend, not a fair value"
-
-
-def test_stretch_needs_365_days_of_the_measure():
-    assert stretch(exp_series(1.5, growth=0.5), C)["status"] == "too_little"           # 548 days: 349 of the measure
-    assert stretch(exp_series(1.55, growth=0.5), C)["status"] == "ok"                  # 567 days: 368 of the measure
-    assert stretch(exp_series(0.3, growth=0.5), C)["text"] == "too little history"
-
-
-def test_stretch_reads_high_after_a_spike_and_low_after_a_crash():
-    base = exp_series(4, growth=0.5, noise=wave(0.2, 300))
-    up, down = base.copy(), base.copy()
-    up.iloc[-30:] *= np.exp(np.linspace(0, 0.8, 30))
-    down.iloc[-30:] *= np.exp(np.linspace(0, -0.8, 30))
-    assert stretch(up, C)["colour"] == "red" and stretch(down, C)["colour"] == "green"
 
 
 # ------------------------------------------------------------------ Bitcoin moving averages (context only)
@@ -319,11 +282,12 @@ def test_revenue_block_wording(tmp_path):
 
 def test_revenue_is_never_the_lead_reading(tmp_path):
     price = exp_series(4, growth=0.0, start_price=10.0, noise=wave(0.1, 200))
-    v = {"sym": "SOL", "name": "Solana", **reading(exp_series(1.5, growth=0.5, noise=wave(0.2, 100)), C),
-         "stretch": {"status": "too_little", "days": 100}, "methods": "m",
+    v = {"sym": "SOL", "name": "Solana", "methods": METHODS, "years": 4.0,
+         "short": one_year(price, C), "long": channel(price, C),
          "revenue": revenue(price, flat_fees(1000, 100.0), C, {"supply": "current", "approximate": True}, total=200.0)}
     card = dashboard.valuation_card(v)
-    assert card.index("Long-term trend (log regression)") < card.index("Price against revenue")
+    assert card.index(">Short term: against the last year<") < card.index(">Long term: trend over the last 4 years<") < card.index("Price against revenue")
+
 
 
 def test_link_revenue_is_labelled_short_fee_history_and_greyed():

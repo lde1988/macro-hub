@@ -154,7 +154,7 @@ band edge, and data older than its limit cannot change a colour (the dial greys 
 Read [FEED.md](FEED.md) for the full layout. In short:
 
 - Fetch `feed/latest.json` no more than once every few minutes.
-- Check `version` starts with `1.`; ignore fields you do not know. Within version 1 fields are only added.
+- Check `version` starts with `2.`; ignore fields you do not know. Within a major version fields are only added.
 - Check `generated_at`: if it is more than an hour old, treat everything as stale.
 - `reading.label` is `BUY`, `HOLD` or `FROTH WARNING`; `reading.level` is `STAGED` or `CONFIRMED` for a buy.
 - `trend_exit.state` is `RISK-ON` or `RISK-OFF`. It is separate from the reading.

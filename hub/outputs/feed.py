@@ -6,7 +6,7 @@ from hub.outputs import plain
 from hub.signals.core import A, G, R, WORD
 from hub.signals.engine import FAMILY_NAMES
 
-FEED_VERSION = "1.0"
+FEED_VERSION = "2.0"   # 2.0 (26 Nov 2026): the "valuations" entries were restructured; see FEED.md
 HKT = "Asia/Hong_Kong"
 DISCLAIMER = "Framework reading, not financial advice"
 EXIT_NOTE = "Built to spot buy zones. Its exit signals have a weak record."
@@ -109,7 +109,7 @@ def build(out, cfg, registry, now, status, since, record=None, valuations=None):
                         "problem": v.get("last_error", "") or "; ".join(f"{a}: {b}" for a, b in (v.get("series_errors") or {}).items())}
                     for k, v in sorted(status.items())},
         "watching": {"enabled": False, "note": "Weekly sweep (Phase 2) is switched off."},
-        "valuations": valuations or [],   # coin log-regression channels: context only, never part of the reading
+        "valuations": valuations or [],   # coin valuations: context only, never part of the reading
     }
     fd["plain"] = plain.build(fd)      # plain-English wording for people; the fields above stay as they are for bots
     return fd

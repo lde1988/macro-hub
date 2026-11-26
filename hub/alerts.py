@@ -125,13 +125,10 @@ def digest(feed, cfg):
 
 
 def valuation_line(vals):
-    """The coin valuations in one digest line (context only)."""
-    ok = [f'{v["sym"]} {v["z"]:+.1f}' for v in vals if v.get("status") == "ok"]
-    grey = [f'{v["sym"]} {v["z"]:+.1f}*' for v in vals if v.get("status") == "greyed"]
-    none = [v["sym"] for v in vals if v.get("status") not in ("ok", "greyed")]
-    line = "Coin valuations (SD from trend): " + ", ".join(ok + grey)
-    if grey:
-        line += " (* greyed: short history or the line does not fit)"
+    """The coin valuations in one digest line (context only): the 1-year reading for each coin."""
+    ok = [f'{v["sym"]} {v["short"]["z"]:+.1f}' for v in vals if (v.get("short") or {}).get("status") == "ok"]
+    none = [v["sym"] for v in vals if (v.get("short") or {}).get("status") != "ok"]
+    line = "Coins against their last year (SD): " + ", ".join(ok)
     if none:
-        line += "; no reading: " + ", ".join(none)
+        line += "; too little history: " + ", ".join(none)
     return line + "."
