@@ -1,0 +1,359 @@
+{
+ "window": [
+  "2026-11-19T10:48:08+00:00",
+  "2026-11-26T10:48:08+00:00"
+ ],
+ "counts": {
+  "x_posts": 150,
+  "audio_s": 60801.86319500001,
+  "video_s": 0,
+  "episodes": 20,
+  "videos": 0,
+  "newsletter_posts": 2
+ },
+ "costs": {
+  "xai": 1.6627,
+  "groq": 0.6756,
+  "gemini": 0.0,
+  "total": 2.3383
+ },
+ "month_before": 0.0,
+ "budget_refused": [],
+ "waiting_for_gemini": [
+  {
+   "person": "Mikkel Rosenvold",
+   "title": "The AI Boom Hasn't Even Started? | Macro Mondays with Andreas Steno & Mikkel Rosenvold",
+   "url": "https://www.youtube.com/watch?v=9l2mf4qmvIk",
+   "how": "name search"
+  },
+  {
+   "person": "Mikkel Rosenvold",
+   "title": "\ud83d\udd34 Drinks with the Danes: \"Jensen The White\" | Andreas Steno & Mikkel Rosenvold",
+   "url": "https://www.youtube.com/watch?v=iJxw3YIozxQ",
+   "how": "name search"
+  },
+  {
+   "person": "Mikkel Rosenvold",
+   "title": "\ud83d\udd34 Drinks with the Danes LIVE @ 3pm ET | Andreas Steno & Mikkel Rosenvold",
+   "url": "https://www.youtube.com/watch?v=tI3rtr2JSfY",
+   "how": "name search"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "Bitcoin Has Fallen 8 Weeks Straight - What's Next? Trading the Market w/ Kris Bullock & Bijan Maleki",
+   "url": "https://www.youtube.com/watch?v=TOYlOgQBKfM",
+   "how": "own channel"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "Why Solana's Next Chapter Is Bigger Than Blockchain",
+   "url": "https://www.youtube.com/watch?v=rrUDF6Qyaec",
+   "how": "own channel"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "Matt Hougan: Solana Could Be Dramatically Undervalued | CIO of Bitwise at Breakpoint 2026 in London",
+   "url": "https://www.youtube.com/watch?v=k-2uPMm_tL0",
+   "how": "own channel"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "The AI Stock Bottom Is In?",
+   "url": "https://www.youtube.com/watch?v=L4sywE_hTUs",
+   "how": "own channel"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "Solana\u2019s President on the Next Era of Crypto | with Lily Liu at Breakpoint 2026 in London",
+   "url": "https://www.youtube.com/watch?v=JZbuLchDbbw",
+   "how": "own channel"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "Anthropic IPO: Don't FOMO in!",
+   "url": "https://www.youtube.com/watch?v=GYd8BILHxMo",
+   "how": "own channel"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "The Next Global Power Shift Has Begun with Dr. Pippa Malmgren",
+   "url": "https://www.youtube.com/watch?v=4eI8XHIjZCA",
+   "how": "own channel"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "Why a Veteran Bitcoin Trader Is Sitting in Cash",
+   "url": "https://www.youtube.com/watch?v=E-QcHKNR1rE",
+   "how": "own channel"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "Wall Street Could Be Wrong About AI | Macro Mondays with Andreas Steno",
+   "url": "https://www.youtube.com/watch?v=ctyvkyTw1Z4",
+   "how": "own channel"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "The Market is Getting AI Wrong | Raoul Pal The Journey Man",
+   "url": "https://www.youtube.com/watch?v=2URb8k_luUc",
+   "how": "name search"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "\ud83d\udd34  Drinks With Raoul Pal LIVE November 25, 2026 @5p ET",
+   "url": "https://www.youtube.com/watch?v=M-mb2BvbH9Y",
+   "how": "name search"
+  },
+  {
+   "person": "Raoul Pal",
+   "title": "The Everything Code: The One Framework That Explains Every Market (Raoul Pal)",
+   "url": "https://www.youtube.com/watch?v=I5svZVu32Uo",
+   "how": "name search"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Candlestick Pattern 4",
+   "url": "https://www.youtube.com/watch?v=kRPf5Fka-L4",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Weekly Market Preview Clip 1",
+   "url": "https://www.youtube.com/watch?v=pgW2pKppFbA",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Candlestick Pattern Clip",
+   "url": "https://www.youtube.com/watch?v=H5DUPXYpwk8",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Clip 2 from weekly preview",
+   "url": "https://www.youtube.com/watch?v=ZcRRhMymAPw",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Candlestick Reversal Patterns with RSI below 30",
+   "url": "https://www.youtube.com/watch?v=5gjGlSPAm9I",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Pattern Reversals 1",
+   "url": "https://www.youtube.com/watch?v=weaOqmbfOgw",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Washout scores",
+   "url": "https://www.youtube.com/watch?v=pGBJ4pE5cKU",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Wall Street Panic Spreads: Market Crash, Planes Grounded, Bank Runs & Costco Chaos",
+   "url": "https://www.youtube.com/watch?v=nMoiy-Mba_4",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Why Bitcoin \"Still\" Matters Clip 5",
+   "url": "https://www.youtube.com/watch?v=FVBhCLqcwnE",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "What needs to happen for a bottom in stocks",
+   "url": "https://www.youtube.com/watch?v=NZ_cwMufasg",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Why Bitcoin \"Still\" Matters Clip 4",
+   "url": "https://www.youtube.com/watch?v=3gK048wT3kg",
+   "how": "own channel"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Jordi Visser Is WAITING To Buy Bitcoin",
+   "url": "https://www.youtube.com/watch?v=xrGskR6MCnU",
+   "how": "name search"
+  },
+  {
+   "person": "Jordi Visser",
+   "title": "Jordi Visser: AI Will KILL Capitalism",
+   "url": "https://www.youtube.com/watch?v=tjhyfo1pA_U",
+   "how": "name search"
+  },
+  {
+   "person": "Gavin Baker",
+   "title": "Gavin Baker on Jensen Huang, Nvidia, and Bull Case for Semis After Autumn Crash",
+   "url": "https://www.youtube.com/watch?v=2XhpxKX3d0M",
+   "how": "name search"
+  },
+  {
+   "person": "Gavin Baker",
+   "title": "Gavin Baker: Why Nvidia Needs Jensen Huang Back as CEO",
+   "url": "https://www.youtube.com/watch?v=drpASO63CJc",
+   "how": "name search"
+  },
+  {
+   "person": "Gavin Baker",
+   "title": "TomorrowX: Brian Armstrong, Gavin Baker, Andrew Feldman & More",
+   "url": "https://www.youtube.com/watch?v=cTFNOTt-jGs",
+   "how": "name search"
+  },
+  {
+   "person": "Lyn Alden",
+   "title": "This Will Change How You See Bitcoin Forever | Lyn Alden",
+   "url": "https://www.youtube.com/watch?v=b78zG_kAdaU",
+   "how": "name search"
+  },
+  {
+   "person": "Lyn Alden",
+   "title": "Bitcoin, Stocks and Gold: Best Opportunities in 2027 | Lyn Alden",
+   "url": "https://www.youtube.com/watch?v=YIK0rTBJOjM",
+   "how": "name search"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "An AI Ran A Business For A Year And Didn't Cheat | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=bGZ3WQMP4XY",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "DB2 Compares Altman's IPO Delay To Shrek | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=8QEtvux_p7w",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "The Hugging Face Story That Wasn't A Conspiracy (But Is Scarier) | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=QLqd0s3vjrY",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "Anthropic's Bio-Weapons Admission | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=QDqLmGW0Hd0",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "Paul Christiano's Warning: \"Most People Could Die\" | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=C0tG6-Aj86o",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "Will AI Regulation Even Work? | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=7nfCe2Qs_Ho",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "Salim Calls BS \u2014 And So Does Everyone Else | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=gYIt04hcAH4",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "Dario's Essay Was A \"Clumsy Decapitation Attempt\" | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=qv-Fo0cWV6A",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "My Quadriplegic Friend Would Be 100% Functional Today With AI | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=qUZiPVBpLqM",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "The Risk Is Over-Regulation, Not Under-Regulation | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=daTQbqTfJZg",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "20 Gutenberg Moments Are Hitting Society at the Same Time | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=WV9DM7VIdRI",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "The Education System Is About to Break | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=6BU38h_1GA0",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "AI Labs Are Offering $15 Million for Proprietary Data | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=i8_K053bvUk",
+   "how": "own channel"
+  },
+  {
+   "person": "Peter Diamandis",
+   "title": "AI Playbook for Mid-Career Professionals | MOONSHOTS",
+   "url": "https://www.youtube.com/watch?v=SaZpXbUcdjY",
+   "how": "own channel"
+  },
+  {
+   "person": "Stan Druckenmiller",
+   "title": "TomorrowX Summit | Stan Druckenmiller & Iliana Bouzali",
+   "url": "https://www.youtube.com/watch?v=N9DjSYMTZ5Q",
+   "how": "name search"
+  },
+  {
+   "person": "Paul Kedrosky",
+   "title": "278: Paul Kedrosky, Managing Partner, SK Ventures",
+   "url": "https://www.youtube.com/watch?v=UFhgGdoEwIo",
+   "how": "name search"
+  }
+ ],
+ "gemini_on": false,
+ "log": [
+  "X @AndreasSteno, @RosenvoldGeo, @RaoulGMI, @Jamie1Coutts, @BittelJulien: 10 records, 0 dropped, 50 posts, $0.288",
+  "X @jvisserlabs, @alive_, @mert, @GavinSBaker, @pmarca: 4 records, 0 dropped, 26 posts, $0.170",
+  "X @LynAldenContact, @crossbordercap, @avichal, @KevinWSHPod, @PeterDiamandis: 0 records, 0 dropped, 43 posts, $0.235",
+  "X @standuquesne, @EMostaque, @tracyalloway, @TheStalwart, @pkedrosky: 0 records, 0 dropped, 31 posts, $0.173",
+  "Andreas Steno Larsen: https://andreassteno.substack.com/feed: blocked (403); read through xAI web search, 0 posts this week",
+  "Raoul Pal: https://raoulpal.substack.com/feed: blocked (403); read through xAI web search, 2 posts this week",
+  "Jordi Visser: https://visserlabs.substack.com/feed: blocked (403); read through xAI web search, 0 posts this week",
+  "Marc Andreessen: https://pmarca.substack.com/feed: blocked (403); read through xAI web search, 0 posts this week",
+  "Lyn Alden: https://www.lynalden.com/feed/: blocked (error ConnectionError: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without); read through xAI web search, 0 posts this week",
+  "Michael Howell: https://capitalwars.substack.com/feed: blocked (403); read through xAI web search, 4 posts this week",
+  "Kevin Follonier: https://theshiftwithkevin.substack.com/feed: blocked (403); read through xAI web search, 0 posts this week",
+  "Peter Diamandis: https://www.diamandis.com/blog/rss.xml: feed, 0 posts this week",
+  "Emad Mostaque: https://intelligentinternet.substack.com/feed: blocked (403); read through xAI web search, 0 posts this week",
+  "Paul Kedrosky: https://pkedrosky.substack.com/feed: blocked (403); read through xAI web search, 0 posts this week",
+  "Dan Rasmussen: https://verdadcap.com/archive?format=rss: feed, 0 posts this week",
+  "Odd Lots (Tracy Alloway and Joe Weisenthal): podcast 'Marc Levinson on How UPS Created Modern Logistics' (own show): 50 min, 0 records, 0 dropped",
+  "Peter Diamandis: podcast 'Jensen Huang Is Back: Inside NVIDIA\u2019s $1 Trillion Comeback A' (own show): 78 min, 1 records, 1 dropped",
+  "Odd Lots (Tracy Alloway and Joe Weisenthal): podcast 'What Jensen Huang's Stunning Return Means for the AI Trade' (own show): 36 min, 0 records, 3 dropped",
+  "Odd Lots (Tracy Alloway and Joe Weisenthal): podcast 'What a Town Full of Vibecoders Says About the Chinese Econom' (own show): 59 min, 0 records, 1 dropped",
+  "Peter Diamandis: podcast 'AI Market Shocks, Anthropic\u2019s Stock Slide, Gemini Releases, ' failed: TranscribeError: HTTP 400: {\"error\":{\"message\":\"Audio file is too short. Minimum audio length is 0.01 seconds.\",\"type\":\"invalid_request_error\",\"code\":\"audio_too_short\"}}\n",
+  "Raoul Pal: podcast 'The Market is Getting AI Wrong with Andreas Steno | Raoul Pa' (own show): 48 min, 1 records, 1 dropped",
+  "Peter Diamandis: podcast 'Anthropic\u2019s $1.4T IPO: The Biggest Wealth Event in Human His' (own show): 119 min, 0 records, 0 dropped",
+  "Kevin Follonier: podcast 'E195: CryptoBanter Founder: This Crypto Bull Run Could Make ' (own show): 60 min, 3 records, 0 dropped",
+  "Stan Druckenmiller: podcast 'Robin Hood NYC 2023 Fireside Chat Stan Druckenmiller and Pau' (name search): 40 min, 0 records, 0 dropped",
+  "Raoul Pal: podcast 'Raoul Pal: \"Economic History Is Over.\" The Exponential Age H' (name search): 62 min, 6 records, 0 dropped",
+  "Lyn Alden: podcast '#814: Bitcoin's Mildest Bear Market Yet with Lyn Alden' (name search): 66 min, 5 records, 0 dropped",
+  "Lyn Alden: podcast 'Lyn Alden: Structural \u2018Run It Hot\u2019 Environment, Gold & The D' (name search): 52 min, 3 records, 0 dropped",
+  "Peter Diamandis: podcast 'Episode 163: Hidden Opportunities in Turbulent Times' (name search): 28 min, 0 records, 0 dropped",
+  "Gavin Baker: podcast 'Gavin Baker: The AI Capex Cycle Will Be Longer Than the Mark' (name search): 15 min, 4 records, 0 dropped",
+  "Mikkel Rosenvold: podcast 'Why This AI Selloff Looks Like 1998 | Macro Mondays with And' (name search): 28 min, 3 records, 0 dropped",
+  "Gavin Baker: podcast 'What the Biggest Investors in AI Are Doing Right Now: Gavin ' (name search): 25 min, 0 records, 0 dropped",
+  "Avichal Garg: podcast 'Live Office Hours with Adora Cheung and Avichal Garg - Stanf' (name search): 59 min, 0 records, 0 dropped",
+  "Mert Mumtaz: podcast '\"I'm No Longer Bullish on Bitcoin!\" | Mert Mumtaz' (name search): 28 min, 1 records, 0 dropped",
+  "Jordi Visser: podcast 'Why Is Everything Crashing? | Jordi Visser' (name search): 55 min, 6 records, 0 dropped",
+  "Gavin Baker: podcast 'Latest: Elon Musk's full interview with Gavin Baker and Anto' (name search): 54 min, 0 records, 0 dropped",
+  "Paul Kedrosky: podcast 'Paul Kedrosky, Managing Partner, SK Ventures' (name search): 51 min, 2 records, 0 dropped"
+ ],
+ "records": 53,
+ "seconds": 1429
+}

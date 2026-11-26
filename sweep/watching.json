@@ -1,0 +1,606 @@
+{
+ "enabled": true,
+ "version": 1,
+ "generated_at": "2026-11-26T11:12:16Z",
+ "week_end": "2026-11-26",
+ "note": "Context only: what these people said this week. It never changes the buy / hold reading, a dial or a rule, except Coutts' stated levels under the owner's 15% rule.",
+ "topics": {
+  "liquidity": "Liquidity",
+  "crypto": "Crypto",
+  "ai_spending": "AI spending",
+  "credit_risk": "Credit risk"
+ },
+ "people": [
+  {
+   "id": "steno",
+   "name": "Andreas Steno Larsen",
+   "balancing": false,
+   "latest": {},
+   "records_this_week": 4,
+   "uncertain_this_week": 3,
+   "last_seen": "2026-11-25",
+   "changed": []
+  },
+  {
+   "id": "rosenvold",
+   "name": "Mikkel Rosenvold",
+   "balancing": false,
+   "latest": {},
+   "records_this_week": 2,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-26",
+   "changed": []
+  },
+  {
+   "id": "pal",
+   "name": "Raoul Pal",
+   "balancing": false,
+   "latest": {
+    "liquidity": {
+     "stance": "negative",
+     "week_end": "2026-11-26",
+     "date": "2026-11-19",
+     "quote": "if the dollar keeps going up from here then we do actually have bigger problems",
+     "url": "https://www.podtrac.com/pts/redirect.mp3/chrt.fm/track/1B146C/pscrb.fm/rss/p/traffic.megaphone.fm/ADV9896127687.mp3",
+     "at": "24:54"
+    },
+    "crypto": {
+     "stance": "positive",
+     "week_end": "2026-11-26",
+     "date": "2026-11-26",
+     "quote": "what beats the debasement? Well there only two assets in the entire world that do on a consistent basis Again over time one is crypto and one is technology",
+     "url": "https://podcasts.apple.com/us/podcast/raoul-pal-economic-history-is-over-the-exponential/id1454112457?i=1000804148419&uo=4",
+     "at": "9:50"
+    }
+   },
+   "records_this_week": 7,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-26",
+   "changed": []
+  },
+  {
+   "id": "coutts",
+   "name": "Jamie Coutts",
+   "balancing": false,
+   "latest": {},
+   "records_this_week": 3,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-26",
+   "changed": []
+  },
+  {
+   "id": "bittel",
+   "name": "Julien Bittel",
+   "balancing": false,
+   "latest": {},
+   "records_this_week": 4,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-25",
+   "changed": []
+  },
+  {
+   "id": "visser",
+   "name": "Jordi Visser",
+   "balancing": false,
+   "latest": {
+    "liquidity": {
+     "stance": "negative",
+     "week_end": "2026-11-26",
+     "date": "2026-11-21",
+     "quote": "I believe we're in the unwind phase.",
+     "url": "https://podcasts.apple.com/us/podcast/why-is-everything-crashing-jordi-visser/id1434060078?i=1000803282672&uo=4",
+     "at": "50:13"
+    },
+    "crypto": {
+     "stance": "positive",
+     "week_end": "2026-11-26",
+     "date": "2026-11-21",
+     "quote": "I called Bitcoin the purest AI trade",
+     "url": "https://podcasts.apple.com/us/podcast/why-is-everything-crashing-jordi-visser/id1434060078?i=1000803282672&uo=4",
+     "at": "34:47"
+    },
+    "ai_spending": {
+     "stance": "negative",
+     "week_end": "2026-11-26",
+     "date": "2026-11-22",
+     "quote": "growing uncertainty around AI",
+     "url": "https://x.com/jvisserlabs/status/2124495614658392411",
+     "at": null
+    }
+   },
+   "records_this_week": 8,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-22",
+   "changed": []
+  },
+  {
+   "id": "yahya",
+   "name": "Ali Yahya",
+   "balancing": false,
+   "latest": {},
+   "records_this_week": 0,
+   "uncertain_this_week": 0,
+   "last_seen": null,
+   "changed": []
+  },
+  {
+   "id": "mumtaz",
+   "name": "Mert Mumtaz",
+   "balancing": false,
+   "latest": {
+    "crypto": {
+     "stance": "mixed",
+     "week_end": "2026-11-26",
+     "date": "2026-11-25",
+     "quote": "I do not think panic is warranted",
+     "url": "https://x.com/mert/status/2125641863948546231",
+     "at": null
+    }
+   },
+   "records_this_week": 2,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-25",
+   "changed": []
+  },
+  {
+   "id": "baker",
+   "name": "Gavin Baker",
+   "balancing": false,
+   "latest": {
+    "ai_spending": {
+     "stance": "positive",
+     "week_end": "2026-11-26",
+     "date": "2026-11-24",
+     "quote": "the new policy is super risky",
+     "url": "https://x.com/GavinSBaker/status/2125263349969486195",
+     "at": null
+    }
+   },
+   "records_this_week": 5,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-24",
+   "changed": []
+  },
+  {
+   "id": "andreessen",
+   "name": "Marc Andreessen",
+   "balancing": false,
+   "latest": {},
+   "records_this_week": 0,
+   "uncertain_this_week": 0,
+   "last_seen": null,
+   "changed": []
+  },
+  {
+   "id": "alden",
+   "name": "Lyn Alden",
+   "balancing": false,
+   "latest": {
+    "crypto": {
+     "stance": "positive",
+     "week_end": "2026-11-26",
+     "date": "2026-11-25",
+     "quote": "I believe that in a world where central bankers are tripping over themselves to devalue their currency, Bitcoin wins. In the world of fiat currencies, Bitcoin is the victor.",
+     "url": "https://podcasts.apple.com/us/podcast/814-bitcoins-mildest-bear-market-yet-with-lyn-alden/id1292381204?i=1000804010521&uo=4",
+     "at": "0:18"
+    },
+    "ai_spending": {
+     "stance": "mixed",
+     "week_end": "2026-11-26",
+     "date": "2026-11-25",
+     "quote": "They are crowding out other parts of the market.",
+     "url": "https://podcasts.apple.com/us/podcast/814-bitcoins-mildest-bear-market-yet-with-lyn-alden/id1292381204?i=1000804010521&uo=4",
+     "at": "4:24"
+    },
+    "credit_risk": {
+     "stance": "negative",
+     "week_end": "2026-11-26",
+     "date": "2026-11-25",
+     "quote": "Whereas in Europe, if certain member states don't get buy-in from the broader ones, and if they run into a fiscal crisis or a banking crisis, they can run into an issue where they can't even laterally print the euro.",
+     "url": "https://podcasts.apple.com/us/podcast/814-bitcoins-mildest-bear-market-yet-with-lyn-alden/id1292381204?i=1000804010521&uo=4",
+     "at": "15:57"
+    }
+   },
+   "records_this_week": 8,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-25",
+   "changed": []
+  },
+  {
+   "id": "howell",
+   "name": "Michael Howell",
+   "balancing": false,
+   "latest": {
+    "liquidity": {
+     "stance": "mixed",
+     "week_end": "2026-11-26",
+     "date": "2026-11-24",
+     "quote": "Benign funding conditions continue to support liquidity",
+     "url": "https://capitalwars.substack.com/p/global-liquidity-watch-weekly-update-54c",
+     "at": null
+    },
+    "ai_spending": {
+     "stance": "negative",
+     "week_end": "2026-11-26",
+     "date": "2026-11-21",
+     "quote": "Equity market enthusiasm towards AI investment is being challenged by growing credit market concern about cash flows, collateral and refinancing.",
+     "url": "https://capitalwars.substack.com/p/when-good-news-is-bad-and-bad-news",
+     "at": null
+    },
+    "credit_risk": {
+     "stance": "negative",
+     "week_end": "2026-11-26",
+     "date": "2026-11-21",
+     "quote": "Equity market enthusiasm towards AI investment is being challenged by growing credit market concern about cash flows, collateral and refinancing.",
+     "url": "https://capitalwars.substack.com/p/when-good-news-is-bad-and-bad-news",
+     "at": null
+    }
+   },
+   "records_this_week": 4,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-24",
+   "changed": []
+  },
+  {
+   "id": "garg",
+   "name": "Avichal Garg",
+   "balancing": false,
+   "latest": {},
+   "records_this_week": 0,
+   "uncertain_this_week": 0,
+   "last_seen": null,
+   "changed": []
+  },
+  {
+   "id": "follonier",
+   "name": "Kevin Follonier",
+   "balancing": false,
+   "latest": {
+    "crypto": {
+     "stance": "positive",
+     "week_end": "2026-11-26",
+     "date": "2026-11-19",
+     "quote": "I think altcoins are going to outperform Bitcoin by 5.7x. 5.7 times 3, 17.1x.",
+     "url": "https://podcasters.spotify.com/pod/show/when-shift-happens/episodes/E195-CryptoBanter-Founder-This-Crypto-Bull-Run-Could-Make-You-Rich--But-Only-If-You-Do-This-e3sll2f",
+     "at": "1:21"
+    }
+   },
+   "records_this_week": 3,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-19",
+   "changed": []
+  },
+  {
+   "id": "diamandis",
+   "name": "Peter Diamandis",
+   "balancing": false,
+   "latest": {},
+   "records_this_week": 1,
+   "uncertain_this_week": 1,
+   "last_seen": "2026-11-24",
+   "changed": []
+  },
+  {
+   "id": "druckenmiller",
+   "name": "Stan Druckenmiller",
+   "balancing": false,
+   "latest": {},
+   "records_this_week": 0,
+   "uncertain_this_week": 0,
+   "last_seen": null,
+   "changed": []
+  },
+  {
+   "id": "mostaque",
+   "name": "Emad Mostaque",
+   "balancing": false,
+   "latest": {},
+   "records_this_week": 0,
+   "uncertain_this_week": 0,
+   "last_seen": null,
+   "changed": []
+  },
+  {
+   "id": "oddlots",
+   "name": "Odd Lots (Tracy Alloway and Joe Weisenthal)",
+   "balancing": true,
+   "latest": {},
+   "records_this_week": 0,
+   "uncertain_this_week": 0,
+   "last_seen": null,
+   "changed": []
+  },
+  {
+   "id": "kedrosky",
+   "name": "Paul Kedrosky",
+   "balancing": true,
+   "latest": {
+    "ai_spending": {
+     "stance": "negative",
+     "week_end": "2026-11-26",
+     "date": "2026-11-20",
+     "quote": "the AI bubble, the AI moment",
+     "url": "https://podcasts.apple.com/us/podcast/paul-kedrosky-managing-partner-sk-ventures/id1785037770?i=1000803190039&uo=4",
+     "at": "0:00"
+    },
+    "credit_risk": {
+     "stance": "negative",
+     "week_end": "2026-11-26",
+     "date": "2026-11-20",
+     "quote": "there's also a loose credit story",
+     "url": "https://podcasts.apple.com/us/podcast/paul-kedrosky-managing-partner-sk-ventures/id1785037770?i=1000803190039&uo=4",
+     "at": "0:00"
+    }
+   },
+   "records_this_week": 2,
+   "uncertain_this_week": 0,
+   "last_seen": "2026-11-20",
+   "changed": []
+  },
+  {
+   "id": "rasmussen",
+   "name": "Dan Rasmussen",
+   "balancing": true,
+   "latest": {},
+   "records_this_week": 0,
+   "uncertain_this_week": 0,
+   "last_seen": null,
+   "changed": []
+  }
+ ],
+ "tally": {
+  "liquidity": {
+   "positive": 0,
+   "neutral": 0,
+   "negative": 2,
+   "mixed": 1
+  },
+  "crypto": {
+   "positive": 4,
+   "neutral": 0,
+   "negative": 0,
+   "mixed": 1
+  },
+  "ai_spending": {
+   "positive": 1,
+   "neutral": 0,
+   "negative": 3,
+   "mixed": 1
+  },
+  "credit_risk": {
+   "positive": 0,
+   "neutral": 0,
+   "negative": 3,
+   "mixed": 0
+  }
+ },
+ "changes": [],
+ "cited": [
+  {
+   "key": "btc_price",
+   "label": "Bitcoin price",
+   "people": [
+    "bittel",
+    "follonier",
+    "pal",
+    "visser"
+   ],
+   "count": 4,
+   "tracked_by_hub": true,
+   "example": {
+    "quote": "Bitcoin was lower a year later every single time, with the median low coming about nine months in.",
+    "url": "https://x.com/BittelJulien/status/2125540210989580794",
+    "person_id": "bittel"
+   }
+  },
+  {
+   "key": "global_liquidity",
+   "label": "Global liquidity",
+   "people": [
+    "coutts",
+    "howell",
+    "rosenvold",
+    "visser"
+   ],
+   "count": 4,
+   "tracked_by_hub": true,
+   "example": {
+    "quote": "The liquidity event few are watching: the US debt limit. Republicans have no votes to raise it before January 3. That hands it to a Democratic Congress, with an X-date that could bind as early as February. Treasury runs down its cash, which adds liquidity. A deal follows and it rebuilds, which drains it.",
+    "url": "https://x.com/RosenvoldGeo/status/2125862710952788472",
+    "person_id": "rosenvold"
+   }
+  },
+  {
+   "key": "ai_capex",
+   "label": "AI capital spending",
+   "people": [
+    "alden",
+    "baker",
+    "bittel"
+   ],
+   "count": 3,
+   "tracked_by_hub": false,
+   "example": {
+    "quote": "The AI capex build-out sent 12-month forward earnings up 39%. But higher bond yields and tightening financial conditions crushed the multiple, from 23.3x a year ago to 17.3x today.",
+    "url": "https://x.com/BittelJulien/status/2125192486582682112",
+    "person_id": "bittel"
+   }
+  },
+  {
+   "key": "earnings",
+   "label": "Corporate earnings",
+   "people": [
+    "baker",
+    "bittel"
+   ],
+   "count": 2,
+   "tracked_by_hub": false,
+   "example": {
+    "quote": "Forward earnings are now further above their long-run trend than in 99% of months since December 1967, and my models say we're at peak earnings. 2027 flips the script.",
+    "url": "https://x.com/BittelJulien/status/2125192486582682112",
+    "person_id": "bittel"
+   }
+  },
+  {
+   "key": "oil",
+   "label": "Oil price",
+   "people": [
+    "rosenvold",
+    "steno"
+   ],
+   "count": 2,
+   "tracked_by_hub": false,
+   "example": {
+    "quote": "The all-in price of a barrel of oil is now down 61 usds since October. I repeat. 61 usds in a month. And yet you want to hike?",
+    "url": "https://x.com/AndreasSteno/status/2125723923274711265",
+    "person_id": "steno"
+   }
+  },
+  {
+   "key": "sp500",
+   "label": "S&P 500",
+   "people": [
+    "bittel",
+    "pal"
+   ],
+   "count": 2,
+   "tracked_by_hub": true,
+   "example": {
+    "quote": "Cross-asset sentiment peaked on April 30th. From there, the S&P 500 rallied another 8.5% to its October record... and has since given all of it back. It's now slightly below where it was on the day of the peak.",
+    "url": "https://x.com/BittelJulien/status/2125540210989580794",
+    "person_id": "bittel"
+   }
+  },
+  {
+   "key": "equity_valuation",
+   "label": "Stock valuation multiples",
+   "people": [
+    "baker",
+    "kedrosky"
+   ],
+   "count": 2,
+   "tracked_by_hub": false,
+   "example": {
+    "quote": "Valuations are certainly really, really attractive right now.",
+    "url": "https://podcasts.apple.com/us/podcast/gavin-baker-the-ai-capex-cycle-will-be-longer-than/id1769093906?i=1000803638716&uo=4",
+    "person_id": "baker"
+   }
+  }
+ ],
+ "calibration": [
+  {
+   "person_id": "pal",
+   "date": "2026-11-26",
+   "metric": "S&P 500",
+   "their_text": "13%",
+   "theirs": null,
+   "hub": 7201.09,
+   "hub_date": "2026-11-24",
+   "gap_pct": null,
+   "note": "units not comparable",
+   "url": "https://podcasts.apple.com/us/podcast/raoul-pal-economic-history-is-over-the-exponential/id1454112457?i=1000804148419&uo=4",
+   "from_chart_only": false
+  },
+  {
+   "person_id": "pal",
+   "date": "2026-11-26",
+   "metric": "Bitcoin price",
+   "their_text": "140%",
+   "theirs": 140.0,
+   "hub": 60383.51,
+   "hub_date": "2026-11-25",
+   "gap_pct": -99.8,
+   "note": null,
+   "url": "https://podcasts.apple.com/us/podcast/raoul-pal-economic-history-is-over-the-exponential/id1454112457?i=1000804148419&uo=4",
+   "from_chart_only": false
+  }
+ ],
+ "scorecard": [
+  {
+   "person_id": "howell",
+   "made": "2026-11-21",
+   "by": "2027-12-31",
+   "text": "liquidity pressures may constrain further Fed tightening, while approaching debt maturities and weaker global growth could encourage a policy reversal in early 2027",
+   "url": "https://capitalwars.substack.com/p/when-good-news-is-bad-and-bad-news",
+   "status": "open",
+   "outcome": null,
+   "speaker_certain": true
+  },
+  {
+   "person_id": "steno",
+   "made": "2026-11-23",
+   "by": "2027-12-31",
+   "text": "we'll see interest rate cuts next year",
+   "url": "https://podcasts.apple.com/us/podcast/why-this-ai-selloff-looks-like-1998-macro-mondays-with/id1210383304?i=1000803639813&uo=4",
+   "status": "open",
+   "outcome": null,
+   "speaker_certain": false
+  },
+  {
+   "person_id": "pal",
+   "made": "2026-11-26",
+   "by": "2030-12-31",
+   "text": "by 2030 that's where we're going to be",
+   "url": "https://podcasts.apple.com/us/podcast/raoul-pal-economic-history-is-over-the-exponential/id1454112457?i=1000804148419&uo=4",
+   "status": "open",
+   "outcome": null,
+   "speaker_certain": true
+  },
+  {
+   "person_id": "alden",
+   "made": "2026-11-25",
+   "by": "2030-12-31",
+   "text": "debasement trade persists into the 2030s",
+   "url": "https://podcasts.apple.com/us/podcast/lyn-alden-structural-run-it-hot-environment-gold-the/id1439485214?i=1000803966850&uo=4",
+   "status": "open",
+   "outcome": null,
+   "speaker_certain": true
+  }
+ ],
+ "proposals": [],
+ "levels": {
+  "values": {},
+  "log": [],
+  "pending": []
+ },
+ "run": {
+  "time_utc": "2026-11-26T11:12Z",
+  "cost_usd": 2.3383,
+  "month_to_date_usd": 2.34,
+  "budget_usd": 20.0,
+  "counts": {
+   "x_posts": 150,
+   "audio_s": 60801.86319500001,
+   "video_s": 0,
+   "episodes": 20,
+   "videos": 0,
+   "newsletter_posts": 2
+  },
+  "records": 53,
+  "gemini_on": false,
+  "waiting_for_gemini": 49,
+  "left_out_for_budget": 0
+ },
+ "names": {
+  "steno": "Andreas Steno Larsen",
+  "rosenvold": "Mikkel Rosenvold",
+  "pal": "Raoul Pal",
+  "coutts": "Jamie Coutts",
+  "bittel": "Julien Bittel",
+  "visser": "Jordi Visser",
+  "yahya": "Ali Yahya",
+  "mumtaz": "Mert Mumtaz",
+  "baker": "Gavin Baker",
+  "andreessen": "Marc Andreessen",
+  "alden": "Lyn Alden",
+  "howell": "Michael Howell",
+  "garg": "Avichal Garg",
+  "follonier": "Kevin Follonier",
+  "diamandis": "Peter Diamandis",
+  "druckenmiller": "Stan Druckenmiller",
+  "mostaque": "Emad Mostaque",
+  "oddlots": "Odd Lots (Tracy Alloway and Joe Weisenthal)",
+  "kedrosky": "Paul Kedrosky",
+  "rasmussen": "Dan Rasmussen"
+ }
+}
