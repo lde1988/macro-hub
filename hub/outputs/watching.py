@@ -3,13 +3,14 @@
 Everything shown comes from data/sweep/watching.json, written by the weekly sweep. All text in it was said by
 other people and is untrusted: it is always escaped here and never treated as markup or instructions.
 """
+import datetime as dt
 import html
 import json
 from pathlib import Path
 
 OFF = {"enabled": False, "note": "Weekly sweep (Phase 2) is switched off."}
-STANCE_COL = {"positive": "#0aac23", "neutral": "#fbb315", "negative": "#dc3c3d", "mixed": "#8a8f96", None: "#3a3f44"}
-STANCE_SYM = {"positive": "▲", "neutral": "●", "negative": "▼", "mixed": "◆", None: "·"}
+STANCE_COL = {"positive": "#0aac23", "neutral": "#fbb315", "negative": "#dc3c3d", "mixed": "#8a8f96", None: "#5b6168"}
+STANCE_SYM = {"positive": "▲", "neutral": "●", "negative": "▼", "mixed": "◆", None: "–"}
 STANCE_WORD = {"positive": "positive", "neutral": "neutral", "negative": "negative", "mixed": "mixed", None: "nothing said"}
 TOPIC_HELP = {"credit_risk": "positive = credit looks healthy; negative = credit risk rising"}
 STATUS_COL = {"right": "#0aac23", "wrong": "#dc3c3d", "open": "#a4abb3", "needs your judgement": "#fbb315"}
@@ -27,6 +28,23 @@ def safe_url(u):
 def link(u, text):
     u = safe_url(u)
     return f'<a href="{esc(u)}" rel="noopener nofollow">{esc(text)}</a>' if u else esc(text)
+
+
+def day(d):
+    """'2026-11-25' -> '25 Nov'."""
+    try:
+        return dt.date.fromisoformat(str(d)[:10]).strftime("%-d %b")
+    except ValueError:
+        return str(d or "")
+
+
+def hkt(t):
+    """'2026-11-29T12:07Z' -> '29 Nov 20:07 HKT'."""
+    try:
+        x = dt.datetime.fromisoformat(str(t).replace("Z", "+00:00"))
+        return (x + dt.timedelta(hours=8)).strftime("%-d %b %H:%M HKT")
+    except ValueError:
+        return str(t or "")
 
 
 def load(data):
@@ -56,7 +74,7 @@ def render(w):
         return f'<section class="card"><p class="disc">{esc(w.get("note", ""))}</p></section>'
     topics = w["topics"]
     names = w.get("names", {})
-    out = [f'<section class="card wpanel"><p class="disc">Week to {esc(w["week_end"])}. {esc(w["note"])}</p>']
+    out = [f'<section class="card wpanel"><p class="disc">Week to {esc(day(w["week_end"]))}. {esc(w["note"])}</p>']
 
     # 1. tally across the group
     rows = []
@@ -71,7 +89,7 @@ def render(w):
     if w["changes"]:
         items = "".join(
             f'<li><b>{esc(c["person"])}</b> on {esc(topics[c["topic"]].lower())}: {_chip(c["from"])} {esc(c["from"])} '
-            f'({esc(c.get("from_date"))}) → {_chip(c["to"])} {esc(c["to"])} ({esc(c.get("to_date"))}). '
+            f'({esc(day(c.get("from_date")))}) → {_chip(c["to"])} {esc(c["to"])} ({esc(day(c.get("to_date")))}). '
             f'“{esc(c["to_quote"][:220])}” {link(c.get("url"), "source")}</li>' for c in w["changes"])
         out.append(f'<h4 class="wh">⚑ Changed their mind this week</h4><ul class="wl">{items}</ul>')
     else:
@@ -92,18 +110,24 @@ def render(w):
                         for t in topics)
         detail = "".join(
             f'<li>{esc(topics[t])}: <b style="color:{STANCE_COL[v["stance"]]}">{esc(v["stance"])}</b> '
-            f'({esc(v.get("date"))}) “{esc(v["quote"][:260])}” '
+            f'({esc(day(v.get("date")))}) “{esc(v["quote"][:260])}” '
             f'{link(v.get("url"), "at " + v["at"] if v.get("at") else "source")}</li>'
             for t, v in lat.items() if t in topics)
         flags = (" ⚑" if p.get("changed") else "") + (' <span class="tag">sceptic</span>' if p.get("balancing") else "")
         unc = (f'<p class="note">{p["uncertain_this_week"]} of this week\'s records come from shared shows, where who said what '
                f'is not certain; they are not counted.</p>') if p.get("uncertain_this_week") else ""
+        n = p.get("records_this_week", 0)
+        seen = (f'last heard {day(p["last_seen"])} · {n} record{"s" if n != 1 else ""} this week' if p.get("last_seen")
+                else "nothing found yet")
+        none = ("<li>Nothing they said gave a clear stance on these four topics.</li>" if p.get("last_seen")
+                else "<li>Nothing found for them yet.</li>")
         people.append(f'<details class="wp"><summary><span class="wn">{esc(p["name"])}{flags}</span><span class="wc">{chips}</span>'
-                      f'<span class="wd">{esc(p.get("last_seen") or "no records yet")}</span></summary>'
-                      f'<ul class="wl">{detail or "<li>No stance stated yet.</li>"}</ul>{unc}</details>')
+                      f'<span class="wd">{esc(seen)}</span></summary>'
+                      f'<ul class="wl">{detail or none}</ul>{unc}</details>')
     legend = " ".join(f'{_chip(k)} {k}' for k in ("positive", "neutral", "negative", "mixed"))
-    out.append(f'<h4 class="wh">Each person</h4><p class="disc">Order of symbols: '
-               f'{esc(", ".join(topics.values()))}. {legend}</p>' + "".join(people))
+    out.append(f'<h4 class="wh">Each person</h4><p class="disc">Symbols in order: '
+               f'{esc(", ".join(topics.values()))}. {legend} {_chip(None)} nothing said. Tap a name for the sentences.</p>'
+               f'<div class="wpeople">{"".join(people)}</div>')
 
     # 5. calibration
     if w["calibration"]:
@@ -123,13 +147,14 @@ def render(w):
     if w["scorecard"]:
         trs = "".join(
             f'<tr><td>{esc(names.get(s["person_id"], s["person_id"]))}</td><td>{link(s.get("url"), s["text"][:140])}'
-            f'{"" if s.get("speaker_certain") else " (speaker not certain)"}</td><td>{esc(s.get("made"))} → {esc(s["by"])}</td>'
+            f'{"" if s.get("speaker_certain") else " (speaker not certain)"}</td><td>{esc(day(s.get("made")))} → {esc(s["by"])}</td>'
             f'<td style="color:{STATUS_COL.get(s["status"], "#a4abb3")}">{esc(s["status"])}'
             f'{"<br>" + esc(s["outcome"]) if s.get("outcome") else ""}</td></tr>' for s in w["scorecard"][:25])
         right = sum(1 for s in w["scorecard"] if s["status"] == "right")
         wrong = sum(1 for s in w["scorecard"] if s["status"] == "wrong")
         out.append(f'<h4 class="wh">Scorecard of dated calls</h4><p class="disc">Judged so far: {right} right, {wrong} wrong. '
-                   f'Open calls are judged when their date passes.</p><table class="wtab">{trs}</table>')
+                   f'Open calls are judged when their date passes.</p><table class="wtab"><tr><td>Who</td><td>Call</td>'
+                   f'<td>Made → by</td><td>Status</td></tr>{trs}</table>')
 
     # 7. proposals
     if w["proposals"]:
@@ -152,7 +177,7 @@ def render(w):
 
     r = w["run"]
     c = r["counts"]
-    out.append(f'<p class="disc">Last sweep {esc(r["time_utc"])}: {r["records"]} records from {c["x_posts"]} X posts, '
+    out.append(f'<p class="disc">Last sweep {esc(hkt(r["time_utc"]))}: {r["records"]} records from {c["x_posts"]} X posts, '
                f'{c["episodes"]} podcast episodes, {c["videos"]} videos and {c["newsletter_posts"]} newsletter posts. '
                f'Cost ${r["cost_usd"]:.2f}; this month ${r["month_to_date_usd"]:.2f} of ${r["budget_usd"]:.0f}.'
                + (f' {r["waiting_for_gemini"]} YouTube-only videos wait for the Gemini key.' if not r.get("gemini_on") and r.get("waiting_for_gemini") else "")
@@ -166,5 +191,7 @@ CSS = """
 .wchip{font-size:15px;margin-right:3px} .wp{border-top:1px solid var(--line)}
 .wp summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 0;align-items:center}
 .wn{font-weight:600;font-size:15px} .wc{white-space:nowrap} .wd{grid-column:1 / -1;font-size:12px;color:var(--mute)}
+.wpeople{display:grid;grid-template-columns:1fr;column-gap:28px}
+@media(min-width:700px){.wpeople{grid-template-columns:1fr 1fr}}
 .wtab{font-size:12px} .wtab tr:first-child td{color:var(--mute);text-transform:uppercase;font-size:11px;letter-spacing:.04em}
 """
