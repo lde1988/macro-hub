@@ -7,7 +7,7 @@ import pytest
 
 from hub import alerts
 from hub.outputs import dashboard
-from hub.signals.valuation import DRIFT, LABEL, NO_FIT, all_coins, fit, reading, zone
+from hub.signals.valuation import APPROX, DRIFT, LABEL, NO_FIT, all_coins, fit, reading, revenue, zone
 from hub.util import load_config
 from tests.helpers import view
 
@@ -67,10 +67,11 @@ def test_a_price_below_the_line_reads_oversold_and_above_reads_overbought():
 
 @pytest.mark.parametrize("z,name,colour", [
     (-3.4, "-3 SD oversold", "green"), (-3.0, "-2 SD oversold", "green"), (-2.5, "-2 SD oversold", "green"),
-    (-2.0, "-1 SD oversold", "green"), (-1.01, "-1 SD oversold", "green"), (-1.0, "fair value", "amber"),
-    (0.0, "fair value", "amber"), (1.0, "fair value", "amber"), (1.5, "+1 SD overbought", "red"),
-    (2.2, "+2 SD overbought", "red"), (3.0, "+2 SD overbought", "red"), (3.01, "+3 SD overbought", "red"), (9.0, "+3 SD overbought", "red")])
-def test_seven_zones_with_edges_belonging_to_the_zone_nearer_fair_value(z, name, colour):
+    (-2.0, "-1 SD oversold", "green"), (-1.01, "-1 SD oversold", "green"), (-1.0, "below fair value", "amber"),
+    (-0.01, "below fair value", "amber"), (0.0, "above fair value", "amber"), (1.0, "above fair value", "amber"),
+    (1.5, "+1 SD overbought", "red"), (2.2, "+2 SD overbought", "red"), (3.0, "+2 SD overbought", "red"),
+    (3.01, "+3 SD overbought", "red"), (9.0, "+3 SD overbought", "red")])
+def test_eight_zones_with_the_fair_band_split_at_zero(z, name, colour):
     assert zone(z) == (name, colour)
 
 
@@ -142,21 +143,35 @@ def test_the_tab_has_one_card_per_coin_and_no_outside_scripts(tmp_path):
     assert page.count('class="cvcard') == 10 and page.count('class="cvstrip"') == 1 and page.count('data-i=') == 10
     assert "scroll-snap-type:x mandatory" in page and "<script src" not in page
     assert page.count(LABEL) == 10 and page.count(DRIFT.replace("'", "&#x27;")) == 10
+    assert page.count("Long-term trend: Pal&#x27;s method. Recent trend: compared with its 200-day average.") == 10
     assert page.count("Short history, low confidence") == 2 and "too little history" in page
-    for lab in ("−3 SD", "−2 SD", "−1 SD", "fair", "+1 SD", "+2 SD", "+3 SD"):
+    for lab in ("−3 SD", "−2 SD", "−1 SD", "below fair", "above fair", "+1 SD", "+2 SD", "+3 SD"):
         assert lab in page
     assert "assumes +" in page and "% a year" in page and "Coin Metrics</a> community data, CC BY-NC 4.0" in page
     assert page.index('class="tabs"') < page.index('class="pane p1"') < page.index('class="pane p2"')
 
 
-def test_cards_always_carry_a_word_and_symbol_not_just_colour(tmp_path):
+def test_every_dial_shows_its_sd_number_large_and_a_word(tmp_path):
     vals = all_coins(ten_coin_view(tmp_path), C)
     for v in vals:
-        if v["status"] in ("ok", "greyed"):
-            card = dashboard.valuation_card(v)
-            assert v["zone"][3:] in card and any(sym in card for sym in "▲●▼")
-            assert f'{v["z"]:+.2f} SD'.replace("-", "\u2212") in card
-            assert card.index("Trend-based estimate") < card.index('<div class="cvdial"><svg', card.index("Log-regression channel") if "Log-regression channel" in card else 0)
+        card = dashboard.valuation_card(v)
+        for r in (v, v["stretch"]):
+            if r.get("status") in ("ok", "greyed") and "z" in r:
+                num = f'{r["z"]:+.2f}'.replace("-", "\u2212")
+                assert f'font-size="36" font-weight="800"' in card and f'>{num}</text>' in card
+                assert r["zone"][3:] in card and any(sym in card for sym in "▲●▼")
+
+
+def test_cards_lead_with_the_recent_trend_when_the_long_term_dial_is_greyed(tmp_path):
+    vals = all_coins(ten_coin_view(tmp_path), C)
+    for v in vals:
+        card = dashboard.valuation_card(v)
+        lt, rt = card.index("Long-term trend (log regression)"), card.index("Recent trend (stretch")
+        if v["status"] in ("greyed", "too_little") and v["stretch"]["status"] == "ok":
+            assert rt < lt
+        else:
+            assert lt < rt
+        assert card.index("cvmethods") < min(lt, rt)
 
 
 def test_valuations_are_one_digest_line_and_never_a_push_or_part_of_the_reading(tmp_path):
@@ -213,17 +228,6 @@ def test_stretch_reads_high_after_a_spike_and_low_after_a_crash():
     assert stretch(up, C)["colour"] == "red" and stretch(down, C)["colour"] == "green"
 
 
-def test_greyed_cards_lead_with_the_stretch_reading(tmp_path):
-    vals = all_coins(ten_coin_view(tmp_path), C)
-    for v in vals:
-        card = dashboard.valuation_card(v)
-        if v["status"] == "greyed" and v["stretch"]["status"] == "ok":
-            assert card.index("Stretch from trend") < card.index("Log-regression channel")
-        elif v["status"] == "ok":
-            assert card.index("<svg") < card.index("Stretch from trend")            # under the log-regression dial
-        assert "Stretch from trend" in card and "not a fair value" in card
-
-
 # ------------------------------------------------------------------ Bitcoin moving averages (context only)
 def test_btc_moving_average_dial_bands_and_200_week_marker(tmp_path):
     from hub.signals import dials as D
@@ -254,3 +258,69 @@ def test_btc_moving_average_dial_is_context_only(tmp_path):
     before = reading(r, C)["headline"]
     r["btc_ma"].update(colour="red")
     assert reading(r, C)["headline"] == before                                       # ... and never moves the reading
+
+
+# ------------------------------------------------------------------ price against revenue
+def flat_fees(days, per_day, end="2026-11-25"):
+    return pd.Series(per_day, index=pd.date_range(end=end, periods=days, freq="D"))
+
+
+RC_MAX = {"fees": "F", "supply": "max", "max_supply": 1_000_000.0}
+
+
+def test_multiple_is_fully_diluted_value_over_365_days_of_fees():
+    price = exp_series(4, growth=0.0, start_price=10.0)                   # flat $10
+    fees = flat_fees(1000, 100.0)                                        # $100 a day: $36,500 a year
+    r = revenue(price, fees, C, RC_MAX, circulating=250_000.0)
+    assert r["status"] == "ok" and abs(r["multiple"] - 10.0 * 1_000_000 / 36_500) < 1e-9
+    assert abs(r["z"]) < 1e-9 and r["zone"] == "above fair value" and abs(r["unlock"] - 0.75) < 1e-12
+
+
+def test_a_jump_in_value_without_more_fees_reads_expensive():
+    price = exp_series(4, growth=0.0, start_price=10.0, noise=wave(0.1, 200))
+    price.iloc[-1] = price.iloc[-1] * 3
+    r = revenue(price, flat_fees(1000, 100.0), C, RC_MAX)
+    assert r["z"] > 2 and r["colour"] == "red"
+    cheap = exp_series(4, growth=0.0, start_price=10.0, noise=wave(0.1, 200))
+    fees = flat_fees(1000, 100.0)
+    fees.iloc[-200:] = 400.0                                             # fees quadruple, price does not
+    assert revenue(cheap, fees, C, RC_MAX)["colour"] == "green"
+
+
+def test_needs_a_year_of_fees_plus_a_year_of_the_multiple():
+    price = exp_series(4, growth=0.0)
+    r = revenue(price, flat_fees(703, 100.0), C, RC_MAX)
+    assert r["status"] == "waiting" and r["available_in"] == 26             # HYPE today: 703 days of fees
+    assert revenue(price, flat_fees(729, 100.0), C, RC_MAX)["status"] == "ok"
+    assert revenue(price, flat_fees(191, 100.0), C, RC_MAX)["available_in"] == 538
+
+
+def test_supply_kinds():
+    price = exp_series(4, growth=0.0, start_price=10.0)
+    fees = flat_fees(1000, 100.0)
+    sup = pd.Series(np.linspace(100.0, 200.0, len(price)), index=price.index)       # supply doubles over the period
+    hist = revenue(price, fees, C, {"supply": "history"}, supply=sup)
+    assert abs(hist["fdv"] - 10.0 * 200.0) < 1e-6 and hist["z"] > 1                # value rose with supply, fees did not
+    cur = revenue(price, fees, C, {"supply": "current", "approximate": True}, total=200.0, circulating=150.0)
+    assert cur["approximate"] is True and abs(cur["unlock"] - 0.25) < 1e-12 and abs(cur["z"]) < 1e-9
+    assert APPROX == "approximate: past supply estimated"
+
+
+def test_revenue_block_wording(tmp_path):
+    price = exp_series(4, growth=0.0, start_price=10.0, noise=wave(0.1, 200))
+    ok = revenue(price, flat_fees(1000, 100.0), C, {"supply": "current", "approximate": True}, total=200.0, circulating=150.0)
+    html = dashboard.revenue_block(ok)
+    assert "Approximate: past supply estimated." in html and "Still to unlock: 25% of supply." in html and "grey" in html
+    eth = revenue(price, flat_fees(1000, 100.0), C, {"supply": "max", "max_supply": 100.0, "note": "Its fee history spans the move to rollups, which cut fees on Ethereum itself."})
+    assert "spans the move to rollups" in dashboard.revenue_block(eth)
+    wait = revenue(price, flat_fees(703, 100.0), C, RC_MAX)
+    assert "available in 26 days" in dashboard.revenue_block(wait)
+
+
+def test_revenue_is_never_the_lead_reading(tmp_path):
+    price = exp_series(4, growth=0.0, start_price=10.0, noise=wave(0.1, 200))
+    v = {"sym": "SOL", "name": "Solana", **reading(exp_series(1.5, growth=0.5, noise=wave(0.2, 100)), C),
+         "stretch": {"status": "too_little", "days": 100}, "methods": "m",
+         "revenue": revenue(price, flat_fees(1000, 100.0), C, {"supply": "current", "approximate": True}, total=200.0)}
+    card = dashboard.valuation_card(v)
+    assert card.index("Long-term trend (log regression)") < card.index("Price against revenue")

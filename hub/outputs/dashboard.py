@@ -79,80 +79,113 @@ def fmt_price(x):
     return f"${x:.6f}"
 
 
-VZ = [(-4, -3, "green", "−3 SD"), (-3, -2, "green", "−2 SD"), (-2, -1, "green", "−1 SD"), (-1, 1, "amber", "fair"),
-      (1, 2, "red", "+1 SD"), (2, 3, "red", "+2 SD"), (3, 4, "red", "+3 SD")]
-
-
-def valuation_svg(v):
-    """Seven-zone gauge from -4 to +4 SD with a needle at the reading."""
-    cx, cy, r = 150, 132, 100
-    frac = lambda z: (min(max(z, -4), 4) + 4) / 8
-    parts = [f'<svg viewBox="0 0 300 150" role="img" aria-label="{esc(v["sym"])}: {v["z"]:+.2f} standard deviations, {esc(v["zone"])}">']
-    for lo, hi, colour, lab in VZ:
-        f0, f1 = frac(lo) + 0.004, frac(hi) - 0.004
-        on = lo < v["z"] <= hi or (lo == -4 and v["z"] <= -4) or (hi == 4 and v["z"] > 3)
-        parts.append(f'<path d="{_arc(cx, cy, r, f0, f1)}" fill="none" stroke="{COL[colour]}" stroke-width="16" opacity="{0.95 if on else 0.35}"/>')
-        x, y = _pt(cx, cy, r + 22, (frac(lo) + frac(hi)) / 2)
-        parts.append(f'<text x="{x:.1f}" y="{y + 4:.1f}" text-anchor="middle" font-size="11" fill="#c9ced4"{" font-weight=\"700\"" if on else ""}>{lab}</text>')
-    x, y = _pt(cx, cy, r - 18, frac(v["z"]))
-    parts.append(f'<line x1="{cx}" y1="{cy}" x2="{x:.1f}" y2="{y:.1f}" stroke="#f2f2f2" stroke-width="3.5" stroke-linecap="round"/>'
-                 f'<circle cx="{cx}" cy="{cy}" r="6" fill="#f2f2f2"/></svg>')
-    return "".join(parts)
+VZ = [(-4, -3, "green", "−3 SD"), (-3, -2, "green", "−2 SD"), (-2, -1, "green", "−1 SD"), (-1, 0, "amber", "below fair"),
+      (0, 1, "amber", "above fair"), (1, 2, "red", "+1 SD"), (2, 3, "red", "+2 SD"), (3, 4, "red", "+3 SD")]
+ZONE_INDEX = {"-3 SD oversold": 0, "-2 SD oversold": 1, "-1 SD oversold": 2, "below fair value": 3, "above fair value": 4,
+              "+1 SD overbought": 5, "+2 SD overbought": 6, "+3 SD overbought": 7}
 
 
 def minus(text):
     """Typographic minus sign, so "-1.71" does not read as a dash."""
-    return text.replace("-", "\u2212")
+    return text.replace("-", "−")
 
 
-def valuation_card(v):
-    head = f'<h4>{esc(v["sym"])} <span class="cvname">{esc(v["name"])}</span></h4>'
-    foot = f'<p class="cvnote">{esc(v.get("drift_note", ""))}</p>'
+def valuation_svg(z, zone_name, colour, grey=False, title=""):
+    """Eight-zone gauge from -4 to +4 SD, a needle at the reading, and the SD number large under the pivot."""
+    cx, cy, r = 150, 128, 100
+    frac = lambda x: (min(max(x, -4), 4) + 4) / 8
+    on_i = ZONE_INDEX.get(zone_name, -1)
+    num_col = "#9aa1a8" if grey else COL[colour]
+    parts = [f'<svg viewBox="0 0 300 178" role="img" aria-label="{esc(title)}: {z:+.2f} standard deviations, {esc(zone_name)}">']
+    for i, (lo, hi, col, lab) in enumerate(VZ):
+        f0, f1 = frac(lo) + 0.004, frac(hi) - 0.004
+        on = i == on_i
+        parts.append(f'<path d="{_arc(cx, cy, r, f0, f1)}" fill="none" stroke="{COL[col]}" stroke-width="16" opacity="{0.95 if on else 0.32}"/>')
+        x, y = _pt(cx, cy, r + 20, (frac(lo) + frac(hi)) / 2)
+        parts.append(f'<text x="{x:.1f}" y="{y + 4:.1f}" text-anchor="middle" font-size="{10 if "fair" in lab else 11}" fill="#c9ced4"'
+                     f'{" font-weight=\"700\"" if on else ""}>{lab}</text>')
+    x, y = _pt(cx, cy, r - 18, frac(z))
+    parts.append(f'<line x1="{cx}" y1="{cy}" x2="{x:.1f}" y2="{y:.1f}" stroke="#f2f2f2" stroke-width="3.5" stroke-linecap="round"/>'
+                 f'<circle cx="{cx}" cy="{cy}" r="6" fill="#f2f2f2"/>'
+                 f'<text x="{cx}" y="{cy + 42}" text-anchor="middle" font-size="36" font-weight="800" fill="{num_col}">{minus(f"{z:+.2f}")}</text></svg>')
+    return "".join(parts)
+
+
+def reading_block(title, r, label, grey=False, warnings=(), body="", lead=False, sym=""):
+    """One reading on a coin card: heading, zone in words with a symbol, label, the dial (SD number large), detail."""
+    c = r["colour"]
+    shade = "#9aa1a8" if grey else COL[c]
+    warn = "".join(f'<p class="cvwarn">{esc(w[:1].upper() + w[1:])}.</p>' for w in warnings)
+    zone_text = minus(r["zone"][:1].upper() + r["zone"][1:])
+    return (f'<section class="cvblock{" lead" if lead else ""}{" grey" if grey else ""}"><p class="cvh">{esc(title)}</p>'
+            f'<p class="cvzone" style="color:{shade}"><span aria-hidden="true">{SYM[c]}</span> {esc(zone_text)}</p>'
+            f'<p class="cvlabel">{esc(label)}</p>{warn}'
+            f'<div class="cvdial">{valuation_svg(r["z"], r["zone"], c, grey, f"{sym} {title}")}</div>{body}</section>')
+
+
+def empty_block(title, big, small, label=""):
+    return (f'<section class="cvblock grey"><p class="cvh">{esc(title)}</p><p class="cvmid muted">{esc(big)}</p>'
+            f'<p class="cvsub">{esc(small)}</p>{f"<p class=cvlabel>{esc(label)}</p>" if label else ""}</section>')
+
+
+def long_term_block(v, lead):
+    title = "Long-term trend (log regression)"
     if v["status"] in ("none", "too_little"):
-        foot = f'<p class="cvnote">{esc(v.get("label", ""))}</p>' + foot
         msg = "too little history" + (f' ({v["months"]} months)' if v.get("months") is not None else "") if v["status"] == "too_little" else "no data yet"
-        return (f'<article class="cvcard" id="cv-{esc(v["sym"].lower())}">{head}<p class="cvh">Log-regression channel</p><p class="cvbig muted">{esc(msg)}</p>'
-                f'<p class="cvsub">No dial is drawn for under a year of history.</p>{stretch_block(v.get("stretch"))}{foot}</article>')
-    grey = v["status"] == "greyed"
-    c = v["colour"]
-    warn = "".join(f'<p class="cvwarn">{esc(w[:1].upper() + w[1:])}.</p>' for w in v.get("warnings", []))
+        return empty_block(title, msg, "No dial is drawn for under a year of history.", v.get("label", "")).replace(
+            "</section>", f'<p class="cvnote">{esc(v.get("drift_note", ""))}</p></section>')
     bands = "".join(f'<tr><td>{lab}</td><td>{fmt_price(v["bands"][f"{k:+d}"]) if k else fmt_price(v["fair_value"])}</td></tr>'
                     for k, lab in ((3, "+3 SD"), (2, "+2 SD"), (1, "+1 SD"), (0, "Fair value"), (-1, "−1 SD"), (-2, "−2 SD"), (-3, "−3 SD")))
     when = "live" if v.get("price_is_live") else f'close {v["last_close_date"]}'
-    yrs = v["years"]
-    hist = f'{yrs:.1f} years' if yrs >= 1 else f'{v["months"]} months'
-    lead = grey and (v.get("stretch") or {}).get("status") == "ok"
-    first = stretch_block(v.get("stretch"), lead=True) + '<p class="cvh">Log-regression channel</p>' if lead else ""
-    after = "" if lead else stretch_block(v.get("stretch"))
-    return (f'<article class="cvcard{" grey" if grey else ""}" id="cv-{esc(v["sym"].lower())}">{head}{first}'
-            f'<p class="cvbig" style="color:{COL[c] if not grey else "#8a9097"}">{minus(f"{v[chr(122)]:+.2f}")} SD</p>'
-            f'<p class="cvzone" style="color:{COL[c] if not grey else "#8a9097"}"><span aria-hidden="true">{SYM[c]}</span> {esc(minus(v["zone"][:1].upper() + v["zone"][1:]))}</p>'
-            f'<p class="cvlabel">{esc(v.get("label", ""))}</p>'
-            f'{warn}<div class="cvdial">{valuation_svg(v)}</div>'
-            f'<p class="cvsub">Fair value {fmt_price(v["fair_value"])} · assumes {minus(f"{v[chr(103) + 'rowth_per_year'] * 100:+.0f}")}% a year</p>'
+    hist = f'{v["years"]:.1f} years' if v["years"] >= 1 else f'{v["months"]} months'
+    body = (f'<p class="cvsub">Fair value {fmt_price(v["fair_value"])} · assumes {minus(f"{v[chr(103) + chr(114) + "owth_per_year"] * 100:+.0f}")}% a year</p>'
             f'<p class="cvprice">Price now <b>{fmt_price(v["price"])}</b> <span class="cvsub">({esc(when)})</span></p>'
             f'<table class="cvbands">{bands}</table>'
-            f'<p class="cvsub">History used: {hist}, from {esc(v["history_from"])} · line fit R² {v["r2"]:.2f}</p>{after}{foot}</article>')
+            f'<p class="cvsub">History used: {hist}, from {esc(v["history_from"])} · line fit R² {v["r2"]:.2f}</p>'
+            f'<p class="cvnote">{esc(v.get("drift_note", ""))}</p>')
+    return reading_block(title, v, v.get("label", ""), v["status"] == "greyed", v.get("warnings", []), body, lead, v["sym"])
 
 
-def stretch_block(st, lead=False):
-    """The second reading: stretch from the 200-day trend, same seven zones."""
+def recent_block(st, lead):
+    title = "Recent trend (stretch from its 200-day average)"
     if not st:
         return ""
-    title = '<p class="cvh">Stretch from trend</p>'
-    lab = f'<p class="cvlabel">{esc(st.get("label", ""))}</p>'
     if st.get("status") != "ok":
-        days = st.get("days") or 0
-        return (f'<div class="cvstretch{" lead" if lead else ""} grey">{title}<p class="cvmid muted">too little history</p>'
-                f'<p class="cvsub">Needs 365 days of the measure; {days} available.</p>{lab}</div>')
-    c = st["colour"]
-    v = {"sym": "stretch", "z": st["z"], "zone": st["zone"]}
-    return (f'<div class="cvstretch{" lead" if lead else ""}">{title}'
-            f'<p class="{"cvbig" if lead else "cvmid"}" style="color:{COL[c]}">{minus(f"{st[chr(122)]:+.2f}")} SD</p>'
-            f'<p class="cvzone" style="color:{COL[c]}"><span aria-hidden="true">{SYM[c]}</span> {esc(minus(st["zone"][:1].upper() + st["zone"][1:]))}</p>'
-            f'{lab}<div class="cvdial">{valuation_svg(v)}</div>'
-            f'<p class="cvsub">Price is {st["ratio"]:.2f} times its 200-day average ({fmt_price(st["ma"])}); usually {st["typical_ratio"]:.2f} times. '
-            f'Scored against {st["days"]:,} days.</p></div>')
+        return empty_block(title, "too little history", f'Needs 365 days of the measure; {st.get("days") or 0} available.', st.get("label", ""))
+    body = (f'<p class="cvsub">Price is {st["ratio"]:.2f} times its 200-day average ({fmt_price(st["ma"])}); usually {st["typical_ratio"]:.2f} times. '
+            f'Scored against {st["days"]:,} days.</p>')
+    return reading_block(title, st, st.get("label", ""), False, (), body, lead)
+
+
+def revenue_block(rv):
+    title = "Price against revenue"
+    if not rv:
+        return ""
+    unlock = f'Still to unlock: {rv["unlock"]:.0%} of supply.' if rv.get("unlock") is not None else ""
+    if rv["status"] == "waiting":
+        n = rv["available_in"]
+        return empty_block(title, f'available in {n} day{"s" if n != 1 else ""}',
+                           f'Needs a year of fees plus a year of history of the multiple. {unlock}'.strip(), rv.get("label", ""))
+    if rv["status"] != "ok":
+        return empty_block(title, "no data yet", unlock, rv.get("label", ""))
+    warn = [plain_approx] if rv.get("approximate") else []
+    body = (f'<p class="cvsub">Fully diluted value {fmt_price(rv["fdv"])} is {rv["multiple"]:,.0f} times the last year\'s fees '
+            f'({fmt_price(rv["fees_365"])}); usually {rv["typical_multiple"]:,.0f} times. Scored against {rv["days"]:,} days.</p>'
+            f'<p class="cvsub">{esc(unlock)}</p>'
+            + (f'<p class="cvnote">{esc(rv["note"])}</p>' if rv.get("note") else "")
+            + '<p class="cvnote">Fees mean different things for different coins (trading fees, gas, oracle payments). Compare each coin only with its own history.</p>')
+    return reading_block(title, rv, rv.get("label", ""), bool(rv.get("approximate")), warn, body, False)
+
+
+plain_approx = "approximate: past supply estimated"
+
+
+def valuation_card(v):
+    head = f'<h4>{esc(v["sym"])} <span class="cvname">{esc(v["name"])}</span></h4><p class="cvmethods">{esc(v.get("methods", ""))}</p>'
+    st = v.get("stretch") or {}
+    lead_recent = v["status"] in ("greyed", "too_little") and st.get("status") == "ok"
+    first, second = (recent_block(st, True), long_term_block(v, False)) if lead_recent else (long_term_block(v, True), recent_block(st, False))
+    return f'<article class="cvcard" id="cv-{esc(v["sym"].lower())}">{head}{first}{second}{revenue_block(v.get("revenue"))}</article>'
 
 
 def valuations_pane(vals):
@@ -281,9 +314,8 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 .cvzone{{font-size:18px;font-weight:700;margin-top:2px}} .cvlabel{{font-size:13px;color:#c9ced4;margin-top:6px}}
 .cvwarn{{font-size:14px;color:var(--amber);margin-top:6px}}
 .cvdial svg{{display:block;width:100%;max-width:340px;margin:8px auto 0}}
-.cvcard.grey > .cvdial{{filter:grayscale(1);opacity:.45}} .cvstretch.grey .cvmid{{color:var(--mute)}}
-.cvstretch{{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}} .cvstretch.lead{{border-top:0;margin-top:6px;padding-top:0}}
-.cvstretch.lead + .cvh{{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}}
+.cvblock{{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}} .cvblock.lead{{border-top:0;margin-top:4px;padding-top:0}}
+.cvblock.grey .cvdial{{filter:grayscale(1);opacity:.5}} .cvmethods{{font-size:13px;color:#c9ced4;margin-top:4px}}
 .cvh{{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin-top:10px}} .cvmid{{font-size:26px;font-weight:800;margin-top:4px}} .cvmid.muted{{font-size:18px}}
 .cvsub{{font-size:13px;color:var(--mute);margin-top:4px}} .cvprice{{margin-top:8px}}
 .cvbands{{margin-top:8px;font-size:14px;color:var(--ink)}} .cvbands td{{padding:3px 0}} .cvbands td:last-child{{text-align:right;font-variant-numeric:tabular-nums}}

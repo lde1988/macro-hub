@@ -21,6 +21,7 @@ sources:
   bitview:     {every: 60,   credit: "Bitview (bitview.space), CC BY 4.0"}
   coinmetrics: {every: 360,  credit: "Coin Metrics community data (coinmetrics.io), CC BY-NC 4.0"}
   defillama:   {every: 60,   credit: "DefiLlama"}
+  defillama_fees: {every: 360, credit: "DefiLlama fees (defillama.com)"}
   ecb:         {every: 30,   credit: "European Central Bank reference rates"}
   fred:        {every: 60,   credit: "FRED, Federal Reserve Bank of St. Louis"}
   finra:       {every: 720,  credit: "FINRA margin statistics"}
@@ -66,6 +67,29 @@ series:
   - {id: CMP_HYPE, source: coinmetrics, code: "price:hype", units: USD, freq: D, lag_days: 1, start: "2024-12-13", meaning: "Hyperliquid daily price, full history"}
   - {id: CMP_WAL, source: coinmetrics, code: "price:wal", units: USD, freq: D, lag_days: 1, start: "2025-05-14", meaning: "Walrus daily price, full history"}
   - {id: CMP_DEEP, source: coinmetrics, code: "price:deep", units: USD, freq: D, lag_days: 1, start: "2024-11-08", meaning: "DeepBook daily price, full history"}
+  # ---- Fees (DefiLlama) and supply, for the coin tab's "price against revenue" reading. Context only.
+  - {id: FEES_SUI, source: defillama_fees, code: "sui", units: USD, freq: D, lag_days: 1, start: "2024-07-01", meaning: "SUI: fees paid by users per day, as counted by DefiLlama"}
+  - {id: FEES_ETH, source: defillama_fees, code: "ethereum", units: USD, freq: D, lag_days: 1, start: "2015-08-07", meaning: "ETH: fees paid by users per day, as counted by DefiLlama"}
+  - {id: FEES_LINK, source: defillama_fees, code: "chainlink", units: USD, freq: D, lag_days: 1, start: "2023-08-07", meaning: "LINK: fees paid by users per day, as counted by DefiLlama"}
+  - {id: FEES_SOL, source: defillama_fees, code: "solana", units: USD, freq: D, lag_days: 1, start: "2021-01-17", meaning: "SOL: fees paid by users per day, as counted by DefiLlama"}
+  - {id: FEES_NEAR, source: defillama_fees, code: "near", units: USD, freq: D, lag_days: 1, start: "2020-10-14", meaning: "NEAR: fees paid by users per day, as counted by DefiLlama"}
+  - {id: FEES_HYPE, source: defillama_fees, code: "hyperliquid", units: USD, freq: D, lag_days: 1, start: "2024-12-23", meaning: "HYPE: fees paid by users per day, as counted by DefiLlama"}
+  - {id: FEES_WAL, source: defillama_fees, code: "walrus-protocol", units: USD, freq: D, lag_days: 1, start: "2025-03-25", meaning: "WAL: fees paid by users per day, as counted by DefiLlama"}
+  - {id: CMS_ETH, source: coinmetrics, code: "supply:eth", units: ETH, freq: D, lag_days: 1, start: "2015-08-07", meaning: "Ether supply"}
+  - {id: SUP_CIRC_SUI, source: coingecko, code: "markets:sui:circulating_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "SUI circulating supply (CoinGecko, recorded daily)"}
+  - {id: SUP_TOTAL_SUI, source: coingecko, code: "markets:sui:total_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "SUI total supply (CoinGecko, recorded daily)"}
+  - {id: SUP_CIRC_ETH, source: coingecko, code: "markets:ethereum:circulating_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "ETH circulating supply (CoinGecko, recorded daily)"}
+  - {id: SUP_TOTAL_ETH, source: coingecko, code: "markets:ethereum:total_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "ETH total supply (CoinGecko, recorded daily)"}
+  - {id: SUP_CIRC_LINK, source: coingecko, code: "markets:chainlink:circulating_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "LINK circulating supply (CoinGecko, recorded daily)"}
+  - {id: SUP_TOTAL_LINK, source: coingecko, code: "markets:chainlink:total_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "LINK total supply (CoinGecko, recorded daily)"}
+  - {id: SUP_CIRC_SOL, source: coingecko, code: "markets:solana:circulating_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "SOL circulating supply (CoinGecko, recorded daily)"}
+  - {id: SUP_TOTAL_SOL, source: coingecko, code: "markets:solana:total_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "SOL total supply (CoinGecko, recorded daily)"}
+  - {id: SUP_CIRC_NEAR, source: coingecko, code: "markets:near:circulating_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "NEAR circulating supply (CoinGecko, recorded daily)"}
+  - {id: SUP_TOTAL_NEAR, source: coingecko, code: "markets:near:total_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "NEAR total supply (CoinGecko, recorded daily)"}
+  - {id: SUP_CIRC_HYPE, source: coingecko, code: "markets:hyperliquid:circulating_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "HYPE circulating supply (CoinGecko, recorded daily)"}
+  - {id: SUP_TOTAL_HYPE, source: coingecko, code: "markets:hyperliquid:total_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "HYPE total supply (CoinGecko, recorded daily)"}
+  - {id: SUP_CIRC_WAL, source: coingecko, code: "markets:walrus-2:circulating_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "WAL circulating supply (CoinGecko, recorded daily)"}
+  - {id: SUP_TOTAL_WAL, source: coingecko, code: "markets:walrus-2:total_supply", units: coins, freq: D, lag_days: 0, start: "2026-11-26", meaning: "WAL total supply (CoinGecko, recorded daily)"}
   - {id: CM_REALIZED_PRICE,     source: coinmetrics, code: "PriceUSD/CapMVRVCur", units: USD, freq: D, lag_days: 1, start: "2011-01-01", meaning: "Realised price from Coin Metrics, used as a cross-check"}
 
   # ---- Stablecoins (DefiLlama)

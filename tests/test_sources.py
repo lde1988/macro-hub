@@ -383,3 +383,28 @@ def test_a_source_with_a_never_loaded_series_is_asked_at_once(tmp_path):
                 fetchers={"ecb": lambda e, c: calls.append(2) or Result(history={"ECB_USD": one, "ECB_JPY": one})})
     F.run_fetch(tmp_path, now=NOW + dt.timedelta(minutes=30), registry=reg, fetchers={"ecb": lambda e, c: calls.append(3) or Result()})
     assert calls == [1, 2]                                    # asked at once for the new series, then back to every 6 hours
+
+
+def test_defillama_fees_drop_todays_moving_figure():
+    from hub.sources import defillama_fees
+    j = {"totalDataChart": [[ts("2026-11-24"), 100.0], [ts("2026-11-25"), 50.0], [ts("2026-11-23"), None]]}
+    s = defillama_fees.parse(j, TODAY)
+    assert list(s.index) == [pd.Timestamp("2026-11-24")] and s.iloc[0] == 100.0
+
+
+def test_coingecko_supply_figures_in_one_call():
+    asked = []
+
+    class W:
+        def get(self, url, params=None, **k):
+            asked.append(url)
+
+            class R:
+                def json(self):
+                    return [{"id": "sui", "circulating_supply": 4.1e9, "total_supply": 1e10}, {"id": "near", "circulating_supply": 1.3e9, "total_supply": None}]
+            return R()
+    entries = [{"id": "SUP_CIRC_SUI", "code": "markets:sui:circulating_supply"}, {"id": "SUP_TOTAL_SUI", "code": "markets:sui:total_supply"},
+               {"id": "SUP_TOTAL_NEAR", "code": "markets:near:total_supply"}]
+    res = coingecko.fetch(entries, Ctx(now=NOW, web=W()))
+    assert len(asked) == 1 and res.history["SUP_TOTAL_SUI"].iloc[0] == 1e10 and "SUP_TOTAL_NEAR" in res.errors
+    assert res.once == {"SUP_CIRC_SUI", "SUP_TOTAL_SUI"}

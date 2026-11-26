@@ -15,7 +15,7 @@ import pandas as pd
 from hub.util import Web
 
 NAMES = ["coinbase", "bitview", "coinmetrics", "defillama", "ecb", "fred", "finra", "treasury",
-         "nasdaq", "coingecko", "coinalyze", "coinalyze_oi", "dxycheck"]
+         "nasdaq", "coingecko", "coinalyze", "coinalyze_oi", "dxycheck", "defillama_fees"]
 
 
 @dataclasses.dataclass

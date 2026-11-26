@@ -226,14 +226,14 @@ turn_families:
 valuations:
   coins:                     # card order; each: name, history series (Coin Metrics), live-price series (Coinbase)
     - {sym: BTC,  name: Bitcoin,     history: CMP_BTC,  live: BTCUSD}  # card 1
-    - {sym: ETH,  name: Ether,       history: CMP_ETH,  live: ETHUSD}  # card 2
-    - {sym: SOL,  name: Solana,      history: CMP_SOL,  live: SOLUSD}  # card 3
-    - {sym: SUI,  name: Sui,         history: CMP_SUI,  live: SUIUSD}  # card 4
-    - {sym: LINK, name: Chainlink,   history: CMP_LINK, live: LINKUSD}  # card 5
-    - {sym: NEAR, name: NEAR,        history: CMP_NEAR, live: NEARUSD}  # card 6
+    - {sym: ETH,  name: Ether,       history: CMP_ETH,  live: ETHUSD, revenue: {fees: FEES_ETH, supply: history, supply_series: CMS_ETH, note: "Its fee history spans the move to rollups, which cut fees on Ethereum itself."}}  # card 2
+    - {sym: SOL,  name: Solana,      history: CMP_SOL,  live: SOLUSD, revenue: {fees: FEES_SOL, supply: current, approximate: true}}  # card 3
+    - {sym: SUI,  name: Sui,         history: CMP_SUI,  live: SUIUSD, revenue: {fees: FEES_SUI, supply: max, max_supply: 10000000000}}  # card 4
+    - {sym: LINK, name: Chainlink,   history: CMP_LINK, live: LINKUSD, revenue: {fees: FEES_LINK, supply: max, max_supply: 1000000000}}  # card 5
+    - {sym: NEAR, name: NEAR,        history: CMP_NEAR, live: NEARUSD, revenue: {fees: FEES_NEAR, supply: current, approximate: true}}  # card 6
     - {sym: ZEC,  name: Zcash,       history: CMP_ZEC,  live: ZECUSD}  # card 7
-    - {sym: HYPE, name: Hyperliquid, history: CMP_HYPE, live: HYPEUSD}  # card 8
-    - {sym: WAL,  name: Walrus,      history: CMP_WAL,  live: WALUSD}  # card 9
+    - {sym: HYPE, name: Hyperliquid, history: CMP_HYPE, live: HYPEUSD, revenue: {fees: FEES_HYPE, supply: max, max_supply: 1000000000}}  # card 8
+    - {sym: WAL,  name: Walrus,      history: CMP_WAL,  live: WALUSD, revenue: {fees: FEES_WAL, supply: max, max_supply: 5000000000}}  # card 9
     - {sym: DEEP, name: DeepBook,    history: CMP_DEEP, live: DEEPUSD}  # card 10
   min_years_dial: 1.0        # under this: no dial, only "too little history"
   min_years_confident: 3.0   # under this: dial greyed, "short history, low confidence"
@@ -241,3 +241,5 @@ valuations:
   live_max_gap: 0.25         # ignore a live price more than 25% away from the last daily close (bad print)
   stretch_ma_days: 200       # "stretch from trend": log of price over its 200-day moving average ...
   stretch_min_days: 365      # ... scored against at least 365 days of its own history of that measure
+  revenue_days: 365          # "price against revenue": fully diluted value / the last 365 days of fees ...
+  revenue_min_days: 365      # ... scored against at least 365 days of its own history of that multiple

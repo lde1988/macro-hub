@@ -23,11 +23,11 @@ def parse(rows):
     return pd.Series(out, dtype=float)
 
 
-def parse_price(rows):
+def parse_price(rows, metric="PriceUSD"):
     out = {}
     for x in rows:
         try:
-            v = float(x["PriceUSD"])
+            v = float(x[metric])
         except (KeyError, TypeError, ValueError):
             continue
         if v > 0:
@@ -52,6 +52,8 @@ def fetch(entries, ctx):
             start = ctx.since(e, 15)
             if e["code"].startswith("price:"):
                 s = parse_price(_get(ctx, e["code"].split(":", 1)[1], "PriceUSD", start))
+            elif e["code"].startswith("supply:"):
+                s = parse_price(_get(ctx, e["code"].split(":", 1)[1], "SplyCur", start), "SplyCur")
             else:
                 s = parse(_get(ctx, "btc", "PriceUSD,CapMVRVCur", start))
             res.history[e["id"]] = s[s.index < ctx.today]
