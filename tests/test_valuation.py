@@ -324,3 +324,18 @@ def test_revenue_is_never_the_lead_reading(tmp_path):
          "revenue": revenue(price, flat_fees(1000, 100.0), C, {"supply": "current", "approximate": True}, total=200.0)}
     card = dashboard.valuation_card(v)
     assert card.index("Long-term trend (log regression)") < card.index("Price against revenue")
+
+
+def test_link_revenue_is_labelled_short_fee_history_and_greyed():
+    link = next(c for c in C["valuations"]["coins"] if c["sym"] == "LINK")
+    price = exp_series(4, growth=0.0, start_price=10.0, noise=wave(0.1, 200))
+    r = revenue(price, flat_fees(1000, 100.0), C, link["revenue"])
+    assert r["caveat"] == "short fee history" and r["approximate"] is False
+    html = dashboard.revenue_block(r)
+    assert "Short fee history." in html and 'cvblock grey' in html
+    for sym in ("SOL", "NEAR"):
+        rc = next(c for c in C["valuations"]["coins"] if c["sym"] == sym)["revenue"]
+        assert revenue(price, flat_fees(1000, 100.0), C, rc, total=100.0)["caveat"] == APPROX
+    for sym in ("SUI", "ETH"):
+        rc = next(c for c in C["valuations"]["coins"] if c["sym"] == sym)["revenue"]
+        assert not rc.get("caveat") and not rc.get("approximate")

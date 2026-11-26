@@ -110,7 +110,9 @@ def revenue(price, fees, cfg, rc, supply=None, circulating=None, total=None, pri
     rc: the coin's revenue settings. supply: Ether's supply history when rc["supply"] == "history"."""
     v = cfg["valuations"]
     n, need = v["revenue_days"], v["revenue_min_days"]
-    out = {"label": REVENUE_LABEL, "approximate": bool(rc.get("approximate")), "note": rc.get("note", "")}
+    out = {"label": REVENUE_LABEL, "approximate": bool(rc.get("approximate")), "note": rc.get("note", ""),
+           # a caveat greys the reading and is shown beside it: estimated past supply, or a short fee history
+           "caveat": rc.get("caveat") or (APPROX if rc.get("approximate") else "")}
     if rc.get("supply") == "max":
         out["unlock"] = 1 - circulating / rc["max_supply"] if circulating else None
     elif circulating and total:

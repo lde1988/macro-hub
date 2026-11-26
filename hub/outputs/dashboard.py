@@ -175,13 +175,14 @@ def revenue_block(rv):
                            f'Needs a year of fees plus a year of history of the multiple. {unlock}'.strip(), rv.get("label", ""))
     if rv["status"] != "ok":
         return empty_block(title, "no data yet", unlock, rv.get("label", ""))
-    warn = [plain_approx] if rv.get("approximate") else []
+    caveat = rv.get("caveat") or (plain_approx if rv.get("approximate") else "")
+    warn = [caveat] if caveat else []
     body = (f'<p class="cvsub">Fully diluted value {fmt_price(rv["fdv"])} is {rv["multiple"]:,.0f} times the last year\'s fees '
             f'({fmt_price(rv["fees_365"])}); usually {rv["typical_multiple"]:,.0f} times. Scored against {rv["days"]:,} days.</p>'
             f'<p class="cvsub">{esc(unlock)}</p>'
             + (f'<p class="cvnote">{esc(rv["note"])}</p>' if rv.get("note") else "")
             + '<p class="cvnote">Fees mean different things for different coins (trading fees, gas, oracle payments). Compare each coin only with its own history.</p>')
-    return reading_block(title, rv, rv.get("label", ""), bool(rv.get("approximate")), warn, body, False)
+    return reading_block(title, rv, rv.get("label", ""), bool(caveat), warn, body, False)
 
 
 plain_approx = "approximate: past supply estimated"
