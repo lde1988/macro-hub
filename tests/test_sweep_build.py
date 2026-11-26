@@ -508,3 +508,8 @@ def test_new_keys_are_scrubbed(monkeypatch):
     monkeypatch.setenv("GEMINI_API_KEY", "AIzaSyFAKEKEY123")
     monkeypatch.setenv("GROQ_API_KEY", "gsk_FAKEKEY456")
     assert "FAKEKEY" not in scrub("error with AIzaSyFAKEKEY123 and gsk_FAKEKEY456")
+
+
+def test_the_window_is_the_seven_days_before_the_run():
+    run = collect.Run(small_cfg(), "/nonexistent", NOW, fetch=FakeFetch({}), browser=FakeFetch({}))
+    assert run.end == NOW and run.start == NOW - dt.timedelta(days=7) and run.start < run.end <= NOW
