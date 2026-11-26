@@ -126,11 +126,13 @@ history (Coin Metrics community data, CC BY-NC 4.0: credit Coin Metrics if you r
 | `sym`, `name` | Coin |
 | `status` | `ok`; `greyed` (under 3 years of history, or the line fits poorly: R² below 0.3); `too_little` (under 1 year: no reading); `none` (no data) |
 | `z` | Standard deviations from the line: (log price − log fair value) ÷ SD of the residuals |
-| `zone`, `colour` | One of seven zones from `-3 SD oversold` to `+3 SD overbought`; oversold green, fair value amber, overbought red |
+| `zone`, `colour` | One of eight zones: `-3 SD oversold`, `-2 SD oversold`, `-1 SD oversold`, `below fair value` (−1 to 0), `above fair value` (0 to +1), `+1 SD overbought`, `+2 SD overbought`, `+3 SD overbought`; oversold green, the two fair-value zones amber, overbought red |
 | `price`, `price_is_live`, `last_close_date` | Price used (live Coinbase price when available) |
 | `fair_value`, `growth_per_year` | The line's value today, and the growth it assumes (0.5 = +50% a year) |
 | `bands` | Price at each band, keys `"-3"` … `"+3"` |
 | `r2`, `years`, `months`, `history_from` | How well the line fits and how much history was used |
 | `warnings` | Plain reasons a card is greyed |
+| `stretch` | Recent trend: `status`, `z`, `zone`, `colour`, `ratio` (price ÷ 200-day average), `ma`, `typical_ratio`, `days` |
+| `revenue` | Price against revenue (SUI, ETH, LINK, SOL, NEAR; HYPE and WAL once they have enough history; otherwise null): `status` (`ok`, `waiting` with `available_in` days, or `none`), `z`, `zone`, `colour`, `multiple` (fully diluted value ÷ last 365 days of DefiLlama fees), `typical_multiple`, `fdv`, `fees_365`, `unlock` (share of supply still to unlock), `approximate` (true where past supply is estimated: SOL, NEAR), `note` |
 
 A constant-growth line drifts toward "oversold" as a coin's growth slows. Treat these as context.

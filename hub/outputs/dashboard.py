@@ -68,6 +68,8 @@ def dial_card(d):
 def fmt_price(x):
     if x is None:
         return "n/a"
+    if x >= 1e9:
+        return f"${x / 1e9:,.1f}bn"
     if x >= 1_000_000:
         return f"${x / 1e6:,.2f}m"
     if x >= 100:
@@ -102,8 +104,13 @@ def valuation_svg(z, zone_name, colour, grey=False, title=""):
         on = i == on_i
         parts.append(f'<path d="{_arc(cx, cy, r, f0, f1)}" fill="none" stroke="{COL[col]}" stroke-width="16" opacity="{0.95 if on else 0.32}"/>')
         x, y = _pt(cx, cy, r + 20, (frac(lo) + frac(hi)) / 2)
-        parts.append(f'<text x="{x:.1f}" y="{y + 4:.1f}" text-anchor="middle" font-size="{10 if "fair" in lab else 11}" fill="#c9ced4"'
-                     f'{" font-weight=\"700\"" if on else ""}>{lab}</text>')
+        weight = ' font-weight="700"' if on else ""
+        if "fair" in lab:      # two short lines, so "below fair" and "above fair" do not run into each other
+            word = lab.split()[0]
+            parts.append(f'<text x="{x:.1f}" y="{y - 4:.1f}" text-anchor="middle" font-size="10" fill="#c9ced4"{weight}>'
+                         f'<tspan x="{x:.1f}">{word}</tspan><tspan x="{x:.1f}" dy="11">fair</tspan></text>')
+        else:
+            parts.append(f'<text x="{x:.1f}" y="{y + 4:.1f}" text-anchor="middle" font-size="11" fill="#c9ced4"{weight}>{lab}</text>')
     x, y = _pt(cx, cy, r - 18, frac(z))
     parts.append(f'<line x1="{cx}" y1="{cy}" x2="{x:.1f}" y2="{y:.1f}" stroke="#f2f2f2" stroke-width="3.5" stroke-linecap="round"/>'
                  f'<circle cx="{cx}" cy="{cy}" r="6" fill="#f2f2f2"/>'
@@ -194,8 +201,9 @@ def valuations_pane(vals):
     strip = "".join(f'<a href="#cv-{esc(v["sym"].lower())}" data-i="{i}"><span class="dot" style="background:'
                     f'{COL[v.get("colour")] if v.get("status") == "ok" else "#6b6b6b"}"></span>{esc(v["sym"])}</a>' for i, v in enumerate(vals))
     cards = "".join(valuation_card(v) for v in vals)
-    return (f'<p class="disc cvintro">Log-regression channels: how far each coin\'s price sits from a straight line fitted to the log of its whole price history. '
-            f'Context only: these do not enter the reading above or any alert.</p>'
+    return (f'<p class="disc cvintro">Up to three readings per coin, each in standard deviations from that coin\'s own norm: the long-term trend '
+            f'(a straight line through the log of its whole price history), the recent trend (price against its 200-day average) and, where '
+            f'fee data allows, price against revenue. Context only: these do not enter the reading or any alert.</p>'
             f'<nav class="cvstrip" aria-label="Coins">{strip}</nav><div class="cvtrack" id="cvtrack">{cards}</div>')
 
 
@@ -361,7 +369,8 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 <footer>
 <h3>Sources: last successful fetch</h3>
 <table>{srcs}</table>
-<p>Coin price histories: <a href="https://coinmetrics.io">Coin Metrics</a> community data, CC BY-NC 4.0, used for non-commercial purposes.</p>
+<p>Coin price histories: <a href="https://coinmetrics.io">Coin Metrics</a> community data, CC BY-NC 4.0, used for non-commercial purposes.
+Fees and stablecoin supply: <a href="https://defillama.com">DefiLlama</a>. Coin supply figures: CoinGecko.</p>
 <p>On-chain data: Bitview (bitview.space), CC BY 4.0. The dollar index is computed from ECB reference rates and is not the official ICE index. The liquidity figure is a proxy.</p>
 <p>Green = supports buying crypto, amber = neutral, red = argues against. A dial changes colour only after two runs in a row beyond a band edge.</p>
 <p>Feed for bots: <a href="feed/latest.json">feed/latest.json</a> (version {esc(feed["version"])}) · <a href="feed/FEED.md">layout</a> · <a href="feed/verdicts.csv">verdict log</a></p>
