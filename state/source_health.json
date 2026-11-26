@@ -2,22 +2,22 @@
  "bitview": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-25"
+  "last_ok": "2026-11-26"
  },
  "coinalyze": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-25"
+  "last_ok": "2026-11-26"
  },
  "coinbase": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-25"
+  "last_ok": "2026-11-26"
  },
  "coingecko": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-25"
+  "last_ok": "2026-11-26"
  },
  "coinmetrics": {
   "fails": 0,
@@ -27,17 +27,17 @@
  "defillama": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-25"
+  "last_ok": "2026-11-26"
  },
  "dxycheck": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-25"
+  "last_ok": "2026-11-26"
  },
  "ecb": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-25"
+  "last_ok": "2026-11-26"
  },
  "finra": {
   "fails": 0,
@@ -47,16 +47,16 @@
  "fred": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-25"
+  "last_ok": "2026-11-26"
  },
  "nasdaq": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-25"
+  "last_ok": "2026-11-26"
  },
  "treasury": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-25"
+  "last_ok": "2026-11-26"
  }
 }

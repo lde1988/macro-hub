@@ -77,7 +77,7 @@
    "colour": "amber",
    "count": 0,
    "extra": {
-    "ratio_to_realised": 1.1303277422659832
+    "ratio_to_realised": 1.1488675183536097
    },
    "pending": null,
    "since": "2026-02-27 23:59:00"
@@ -104,11 +104,11 @@
   },
   "ccc_bb": {
    "baseline": false,
-   "colour": "amber",
-   "count": 1,
+   "colour": "red",
+   "count": 0,
    "extra": {},
-   "pending": "red",
-   "since": "2026-10-30 23:59:00"
+   "pending": null,
+   "since": "2026-11-26 02:50:30"
   },
   "cpi_mom": {
    "baseline": false,
@@ -332,8 +332,8 @@
   }
  },
  "down": [],
- "last_digest": "2026-11-25",
- "last_run": "2026-11-25T22:27:36Z",
+ "last_digest": "2026-11-26",
+ "last_run": "2026-11-26T02:50:30Z",
  "outbox": [],
  "since": {
   "reading": "2026-11-16",
@@ -353,7 +353,7 @@
    "btc_price": "amber",
    "btc_weekly": "red",
    "buybacks": "amber",
-   "ccc_bb": "amber",
+   "ccc_bb": "red",
    "cpi_mom": "red",
    "discount_window": "green",
    "dollar": "red",
