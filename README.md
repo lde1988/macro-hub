@@ -29,7 +29,7 @@ There is no machine learning and there are no hidden weights. The rules are in
 
 | What | When | Where to see it |
 |---|---|---|
-| **Hub run**: fetch, dials, dashboard, feed, pushes | Every 15 minutes (at :07, :22, :37, :52). GitHub's timer is "best effort": runs are often 5 to 20 minutes late and, when GitHub is busy, some are skipped. After any change to a workflow file GitHub can take hours to pick the timer up again | Actions tab → Hub run |
+| **Hub run**: fetch, dials, dashboard, feed, pushes | Every 15 minutes, started by an outside scheduler (see "Outside scheduler"), with GitHub's own timer (at :07, :22, :37, :52) as a backup. GitHub's timer is "best effort": runs are often 5 to 20 minutes late and, when GitHub is busy, some are skipped. After any change to a workflow file GitHub can take hours to pick the timer up again | Actions tab → Hub run |
 | **Open interest (daily)**: altcoin and Bitcoin open interest from about 1,060 markets | Once a day at 00:40 UTC; takes about half an hour | Actions tab → Open interest (daily) |
 | **Watchdog**: checks the dashboard is fresh and restarts the hub if not | Four times a day | Actions tab → Watchdog |
 | **Tests** | On every change to the code | Actions tab → Tests |
@@ -64,6 +64,41 @@ The first run after a reset records a silent baseline. A push that cannot be del
 
 To start again, repeat the steps and choose **Enable workflow**, then click **Run workflow** on Hub run.
 After a pause the hub fills in the history it missed, and tells you it is running again.
+
+## Outside scheduler (the main timer since 26 November 2026)
+
+GitHub's own 15-minute timer proved unreliable: on 25–26 November it fired only twice in 20 hours. An outside
+service (cron-job.org) now starts the hub run every 15 minutes through GitHub's API. GitHub's timer stays on as
+a backup; two runs close together simply queue one behind the other.
+
+It uses a fine-grained GitHub token that can do one thing only: manage Actions on this repository.
+
+**Making the token** (GitHub → your picture → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token):
+
+1. Token name: `macro-hub outside scheduler`. Expiration: the longest offered; put a reminder in your calendar a week before.
+2. Resource owner: `lde1988`. Repository access: **Only select repositories** → `lde1988/macro-hub`.
+3. Repository permissions: **Actions → Read and write**. Metadata → Read-only is added by GitHub automatically and is required. Leave everything else at "No access", and add no account permissions.
+4. Generate, and copy the token once. It is shown only once. Do not save it anywhere else.
+
+**Setting up cron-job.org** (free account; Console → Cronjobs → Create cronjob):
+
+1. Title: `macro-hub hub run`.
+2. URL: `https://api.github.com/repos/lde1988/macro-hub/actions/workflows/hub.yml/dispatches`
+3. Execution schedule: Custom → minutes `0,15,30,45`, every hour, every day.
+4. Advanced tab:
+   - Request method: **POST**.
+   - Headers, one per line:
+     - `Accept: application/vnd.github+json`
+     - `Authorization: Bearer <the token>`
+     - `X-GitHub-Api-Version: 2022-11-28`
+     - `Content-Type: application/json`
+   - Request body: `{"ref":"main"}`
+5. Notifications: tick "execution fails" and "cronjob is disabled because of too many failures".
+6. Save, then press **Test run**. The answer should be **204** (no content). Within a minute the Actions tab shows a new Hub run started by "workflow_dispatch".
+
+**What the token can and cannot do:** it can start, cancel, re-run and delete workflow runs, read their logs, and switch workflows on or off, on this repository only. It cannot read secrets, change code or touch any other repository. If it leaks, delete it under Fine-grained tokens and make a new one.
+
+**If the token expires**, cron-job.org starts failing with 401, its failure e-mail arrives, and GitHub's own timer and the watchdog carry on as before. Make a new token and paste it into the Authorization header.
 
 ## If it stops on its own
 
