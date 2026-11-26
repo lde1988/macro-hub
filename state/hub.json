@@ -77,7 +77,7 @@
    "colour": "amber",
    "count": 0,
    "extra": {
-    "ratio_to_realised": 1.1488675183536097
+    "ratio_to_realised": 1.143341446912377
    },
    "pending": null,
    "since": "2026-02-27 23:59:00"
@@ -333,7 +333,7 @@
  },
  "down": [],
  "last_digest": "2026-11-26",
- "last_run": "2026-11-26T02:50:30Z",
+ "last_run": "2026-11-26T03:08:02Z",
  "outbox": [],
  "since": {
   "reading": "2026-11-16",
@@ -341,6 +341,7 @@
   "trend_exit": "2026-11-16"
  },
  "summary": {
+  "backdrop": "Downtrend: Bitcoin is below its weekly trend line",
   "dials": {
    "ai_basket": "red",
    "alt_oi": "amber",
@@ -383,6 +384,7 @@
    "y2_chg": "amber"
   },
   "label": "HOLD",
+  "light": "HOLD",
   "reading": "Hold: fairly cheap, but the turn is not confirmed",
   "regime": "BREAK",
   "stale": [],
