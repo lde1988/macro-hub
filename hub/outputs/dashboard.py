@@ -312,7 +312,7 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 .cvstrip{{display:flex;gap:6px;overflow-x:auto;padding:10px 0 6px;scrollbar-width:none}} .cvstrip::-webkit-scrollbar{{display:none}}
 .cvstrip a{{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:16px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:600}}
 .cvstrip a.on{{background:var(--card);border-color:#9ecbff}}
-.cvtrack{{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:10px;scrollbar-width:thin}}
+.cvtrack{{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:10px;scrollbar-width:thin}}
 .cvcard{{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}}
 .cvcard h4{{font-size:18px}} .cvname{{color:var(--mute);font-weight:400;font-size:15px}}
 .cvbig{{font-size:40px;font-weight:800;line-height:1.1;margin-top:8px;font-variant-numeric:tabular-nums}} .cvbig.muted{{font-size:22px;color:var(--mute)}}
