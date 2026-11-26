@@ -52,10 +52,10 @@ people:
     newsletters: ["https://visserlabs.substack.com/feed"]
   - id: yahya
     name: Ali Yahya
-    x: null                    # @alive_eth not found on 26 Nov; being resolved in the source test
+    x: alive_                  # confirmed 26 Nov: bio "Before: GP @a16z, Google Brain, @Stanford CS"
   - id: mumtaz
     name: Mert Mumtaz
-    x: null                    # @0xMert_ not found on 26 Nov; @mert is a lead, being resolved
+    x: mert                    # confirmed 26 Nov: bio "ceo @helius @heliusprivacy"
   - id: baker
     name: Gavin Baker
     x: GavinSBaker
