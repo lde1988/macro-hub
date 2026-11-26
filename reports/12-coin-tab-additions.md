@@ -88,11 +88,11 @@ Read plainly:
 
 | Coin | Price against revenue now | Multiple (usual) | Still to unlock |
 |---|---|---|---|
-| SUI | +1.85, +1 SD overbought | 2,973x (median history lower) | 59% |
+| SUI | +1.85, +1 SD overbought | 2,973x (usually 1,570x) | 59% |
 | ETH | +0.90, above fair value | 1,219x (usually 286x) | 0% |
 | LINK | −1.26, −1 SD oversold | 148x (usually 1,614x) | 23% |
 | SOL | −0.66, below fair value (approximate) | 198x (usually 380x) | 7% |
-| NEAR | +0.69, above fair value (approximate) | 3,447x | 0% |
+| NEAR | +0.69, above fair value (approximate) | 3,447x (usually 1,660x) | 0% |
 | HYPE | available in 26 days | 68x | 76% |
 | WAL | available in 118 days | 970x | 47% |
 
