@@ -76,3 +76,24 @@ Read plainly:
 - **Highs:** red at the 2013 and 2017 highs, but **not since**: the 2021, 2024 and 2025 highs peaked at 1.2 to 2.0 times the 200-day average, short of the 2.4 red line. Each cycle's peak has been less stretched than the one before.
 - **False greens:** green also fired on days that were not lows. Since 2015 it was green on 16% of days, including spells in mid-2021, early 2022 and November to December 2025 (around $85,000 to $90,000, seven months before the 2026 low). Green says "cheap against the recent trend", not "the low is in".
 - These figures use today's bands with hindsight; no band was tuned to them.
+
+## Update, 26 Nov: published and built
+
+- **Published:** stretch from trend, and the Bitcoin moving-average dial (context only).
+- **How rare is price below the 200-week average?** Since 1 January 2015, price closed below it on **388 of 4,347 days (8.9%)**: 27 days in 2015, 6 in 2020, 174 in 2022, 144 in 2023, and 37 so far in 2026 (including every day since 14 November). Never in 2016–2019, 2021, 2024 or 2025.
+- **Built, not yet published** (branch `claude/valuations3`):
+  - Price against revenue for SUI, ETH, LINK, SOL and NEAR, context only. SOL and NEAR are labelled "approximate: past supply estimated", greyed, and never lead a card. ETH carries "Its fee history spans the move to rollups, which cut fees on Ethereum itself." HYPE shows "available in 26 days" and WAL "available in 118 days"; both switch on by themselves. DefiLlama is credited in the footer. Supply figures come from CoinGecko once a day; Ether's supply history from Coin Metrics.
+  - Owner's wording changes: the SD number is large inside every dial; the fair-value band is split into "below fair value" (−1 to 0) and "above fair value" (0 to +1), both amber; every card opens with "Long-term trend: Pal's method. Recent trend: compared with its 200-day average." The readings are headed "Long-term trend (log regression)", "Recent trend (stretch from its 200-day average)" and "Price against revenue".
+  - Price against revenue is always the last reading on a card.
+
+| Coin | Price against revenue now | Multiple (usual) | Still to unlock |
+|---|---|---|---|
+| SUI | +1.85, +1 SD overbought | 2,973x (median history lower) | 59% |
+| ETH | +0.90, above fair value | 1,219x (usually 286x) | 0% |
+| LINK | −1.26, −1 SD oversold | 148x (usually 1,614x) | 23% |
+| SOL | −0.66, below fair value (approximate) | 198x (usually 380x) | 7% |
+| NEAR | +0.69, above fair value (approximate) | 3,447x | 0% |
+| HYPE | available in 26 days | 68x | 76% |
+| WAL | available in 118 days | 970x | 47% |
+
+Tests: 453, all passing.
