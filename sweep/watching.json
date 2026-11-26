@@ -1,7 +1,7 @@
 {
  "enabled": true,
  "version": 1,
- "generated_at": "2026-11-26T11:12:16Z",
+ "generated_at": "2026-11-26T11:18:32Z",
  "week_end": "2026-11-26",
  "note": "Context only: what these people said this week. It never changes the buy / hold reading, a dial or a rule, except Coutts' stated levels under the owner's 15% rule.",
  "topics": {
@@ -506,11 +506,11 @@
    "date": "2026-11-26",
    "metric": "Bitcoin price",
    "their_text": "140%",
-   "theirs": 140.0,
+   "theirs": null,
    "hub": 60383.51,
    "hub_date": "2026-11-25",
-   "gap_pct": -99.8,
-   "note": null,
+   "gap_pct": null,
+   "note": "units not comparable",
    "url": "https://podcasts.apple.com/us/podcast/raoul-pal-economic-history-is-over-the-exponential/id1454112457?i=1000804148419&uo=4",
    "from_chart_only": false
   }
@@ -602,5 +602,6 @@
   "oddlots": "Odd Lots (Tracy Alloway and Joe Weisenthal)",
   "kedrosky": "Paul Kedrosky",
   "rasmussen": "Dan Rasmussen"
- }
+ },
+ "rebuilt_at": "2026-11-26T11:18:32Z"
 }
