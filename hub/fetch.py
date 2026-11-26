@@ -70,7 +70,8 @@ def run_fetch(data_dir, backfill=False, only=None, now=None, registry=None, root
             res = res(entries, ctx) if res else adapter(name).fetch(entries, ctx)
             added = 0
             for sid, s in res.history.items():
-                added += store.append(sid, s, now, backfill=backfill, once=sid in res.once)
+                first_load = sid not in ctx.last and sid not in res.once   # a new series' first history is marked as back-filled
+                added += store.append(sid, s, now, backfill=backfill or first_load, once=sid in res.once)
             for sid, (v, t) in res.live.items():
                 live[sid] = {"value": v, "time": t}
             got = [e["id"] for e in entries if e["id"] in res.history and len(res.history[e["id"]])]

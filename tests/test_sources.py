@@ -292,7 +292,8 @@ def test_config_families_refer_to_real_dials():
 # ------------------------------------------------------------------ review fixes (point 8)
 def test_look_back_reaches_the_last_stored_date_after_a_long_pause():
     e = {"id": "BTCUSD", "start": "2015-07-20"}
-    assert Ctx(now=NOW).since(e, 20) == pd.Timestamp("2026-11-05")                                  # normal short look-back
+    assert Ctx(now=NOW).since(e, 20) == pd.Timestamp("2015-07-20")                                  # nothing stored yet: full history
+    assert Ctx(now=NOW, last={"BTCUSD": pd.Timestamp("2026-11-24")}).since(e, 20) == pd.Timestamp("2026-11-05")   # normal short look-back
     paused = Ctx(now=NOW, last={"BTCUSD": pd.Timestamp("2026-08-01")})
     assert paused.since(e, 20) == pd.Timestamp("2026-07-29")                                        # hub paused since August: no hole
     assert Ctx(now=NOW, last={"BTCUSD": pd.Timestamp("2026-11-24")}).since(e, 20) == pd.Timestamp("2026-11-05")
@@ -357,3 +358,16 @@ def test_one_working_series_does_not_hide_another_that_keeps_failing(tmp_path):
     assert alerts.source_pushes(status, reg, load_config(), down)[0] == []                     # not repeated
     _, _, status = F.run_fetch(tmp_path, now=NOW + dt.timedelta(hours=5), registry=reg, fetchers={"fred": lambda e, c: Result(history={"DGS2": ok, "DGS10": ok})})
     assert status["fred"]["series_fails"] == {}
+
+
+def test_a_new_series_loads_its_full_history_once_marked_as_back_filled(tmp_path):
+    reg = {"sources": {"ecb": {"every": 30}}, "series": [{"id": "ECB_USD", "source": "ecb", "start": "2020-01-01", "lag_days": 0}]}
+    asked = []
+
+    def ecb_fake(entries, ctx):
+        asked.append(ctx.since(entries[0], 120))
+        return Result(history={"ECB_USD": pd.Series({pd.Timestamp("2020-01-02"): 1.1, pd.Timestamp("2026-11-24"): 1.2})})
+    store, _, _ = F.run_fetch(tmp_path, now=NOW, registry=reg, fetchers={"ecb": ecb_fake})
+    assert asked == [pd.Timestamp("2020-01-01")] and list(store.raw("ECB_USD")["backfill"]) == [1, 1]
+    store, _, _ = F.run_fetch(tmp_path, now=NOW + dt.timedelta(hours=1), registry=reg, fetchers={"ecb": ecb_fake})
+    assert asked[1] == pd.Timestamp("2026-07-28")                       # afterwards only the usual 120-day look-back

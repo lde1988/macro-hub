@@ -21,6 +21,7 @@ from hub.outputs import dashboard, feed as feedmod, icons
 from hub.replay import replay
 from hub.signals.core import View
 from hub.signals.engine import evaluate
+from hub.signals.valuation import all_coins
 from hub.util import ROOT, load_config, load_registry, utcnow
 
 WARM_DAYS = 150
@@ -98,11 +99,13 @@ def main(data, site, runtime, push=True, now=None, fetchers=None, sender=None):
         for _ in range(cfg["general"]["confirm_runs"]):
             dial_state = evaluate(View(store, registry, now, live=live), cfg, dial_state)["state"]
         st = {"dials": dial_state["dials"], "since": since, "summary": None, "outbox": [], "down": [], "last_digest": ""}
-    out = evaluate(View(store, registry, now, live=live), cfg, {"dials": st["dials"]})
-    fd = feedmod.build(out, cfg, registry, now, status, st["since"])
+    view = View(store, registry, now, live=live)
+    out = evaluate(view, cfg, {"dials": st["dials"]})
+    vals = all_coins(view, cfg)
+    fd = feedmod.build(out, cfg, registry, now, status, st["since"], valuations=vals)
     cur = alerts.summary(fd)
     st["since"] = update_since(st["since"], st["summary"], cur, now)
-    fd = feedmod.build(out, cfg, registry, now, status, st["since"])
+    fd = feedmod.build(out, cfg, registry, now, status, st["since"], valuations=vals)
     fd["stale_minutes"] = cfg["general"]["stale_minutes"]
 
     pushes = alerts.plan(st["summary"], fd, cfg)

@@ -49,7 +49,7 @@ def section(sid, name, kind, dials):
             "dials": [d["id"] for d in dials]}
 
 
-def build(out, cfg, registry, now, status, since, record=None):
+def build(out, cfg, registry, now, status, since, record=None, valuations=None):
     """out: engine.evaluate() result. since: {"reading":, "regime":, "trend_exit":} ISO dates."""
     now = pd.Timestamp(now)
     today = now.tz_localize(None).normalize() if now.tzinfo is None else now.tz_convert("UTC").tz_localize(None).normalize()
@@ -106,6 +106,7 @@ def build(out, cfg, registry, now, status, since, record=None):
                         "problem": v.get("last_error", "") or "; ".join(f"{a}: {b}" for a, b in (v.get("series_errors") or {}).items())}
                     for k, v in sorted(status.items())},
         "watching": {"enabled": False, "note": "Weekly sweep (Phase 2) is switched off."},
+        "valuations": valuations or [],   # coin log-regression channels: context only, never part of the reading
     }
     fd["plain"] = plain.build(fd)      # plain-English wording for people; the fields above stay as they are for bots
     return fd

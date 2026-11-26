@@ -1,5 +1,6 @@
 """Feed, dashboard, alerts and the whole run, with made-up data. Nothing is fetched or sent."""
 import datetime as dt
+import re
 import json
 
 import pandas as pd
@@ -92,7 +93,9 @@ def test_dashboard_is_self_contained_and_in_the_agreed_order(tmp_path):
     fd, _ = small_feed(tmp_path)
     page = dashboard.render(fd)
     assert "<script src" not in page and "http://" not in page and "@import" not in page and "fonts.googleapis" not in page
-    assert page.count("https://") == 0                                   # no external resource at all
+    loads = re.findall(r'(?:src|href)="(https?://[^"]+)"', page)
+    assert loads == ["https://coinmetrics.io"]                            # nothing is loaded from outside; one attribution link
+    assert re.search(r'<a href="https://coinmetrics.io">Coin Metrics</a>', page) and "<link rel=\"stylesheet\"" not in page
     order = [page.index(x) for x in ('class="lamp"', "Of the ", ">Backdrop<", "weekly trend<", ">Altcoins<", "Is it cheap?", "Rates and dollar",
                                      "Has the turn started?", "What they're watching", "Sources: last successful fetch")]
     assert order == sorted(order)

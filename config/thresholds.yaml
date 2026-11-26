@@ -215,3 +215,21 @@ turn_families:
   rates:            [front_end, hikes_out]  # dials 20 and 25
   fed_treasury:     [fed_bills, buybacks]   # bank reserves alone never confirm a turn
   crypto_liquidity: [stable_turn]  # dial 22
+
+# Coin valuations tab (context only: never part of the reading, the backdrop or any push)
+valuations:
+  coins:                     # card order; each: name, history series (Coin Metrics), live-price series (Coinbase)
+    - {sym: BTC,  name: Bitcoin,     history: CMP_BTC,  live: BTCUSD}  # card 1
+    - {sym: ETH,  name: Ether,       history: CMP_ETH,  live: ETHUSD}  # card 2
+    - {sym: SOL,  name: Solana,      history: CMP_SOL,  live: SOLUSD}  # card 3
+    - {sym: SUI,  name: Sui,         history: CMP_SUI,  live: SUIUSD}  # card 4
+    - {sym: LINK, name: Chainlink,   history: CMP_LINK, live: LINKUSD}  # card 5
+    - {sym: NEAR, name: NEAR,        history: CMP_NEAR, live: NEARUSD}  # card 6
+    - {sym: ZEC,  name: Zcash,       history: CMP_ZEC,  live: ZECUSD}  # card 7
+    - {sym: HYPE, name: Hyperliquid, history: CMP_HYPE, live: HYPEUSD}  # card 8
+    - {sym: WAL,  name: Walrus,      history: CMP_WAL,  live: WALUSD}  # card 9
+    - {sym: DEEP, name: DeepBook,    history: CMP_DEEP, live: DEEPUSD}  # card 10
+  min_years_dial: 1.0        # under this: no dial, only "too little history"
+  min_years_confident: 3.0   # under this: dial greyed, "short history, low confidence"
+  min_r_squared: 0.3         # under this: dial greyed, "the line does not fit this coin's history; reading not meaningful"
+  live_max_gap: 0.25         # ignore a live price more than 25% away from the last daily close (bad print)

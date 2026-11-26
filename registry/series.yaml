@@ -19,7 +19,7 @@ sources:
   # every: minimum minutes between fetches. credit: shown in the dashboard footer.
   coinbase:    {every: 15,   credit: "Coinbase Exchange"}
   bitview:     {every: 60,   credit: "Bitview (bitview.space), CC BY 4.0"}
-  coinmetrics: {every: 360,  credit: "Coin Metrics community data"}
+  coinmetrics: {every: 360,  credit: "Coin Metrics community data (coinmetrics.io), CC BY-NC 4.0"}
   defillama:   {every: 60,   credit: "DefiLlama"}
   ecb:         {every: 30,   credit: "European Central Bank reference rates"}
   fred:        {every: 60,   credit: "FRED, Federal Reserve Bank of St. Louis"}
@@ -39,6 +39,11 @@ series:
   - {id: SUIUSD,  source: coinbase, code: SUI-USD,  units: USD, freq: D, lag_days: 1, start: "2023-05-01", meaning: "Sui price, daily close"}
   - {id: NEARUSD, source: coinbase, code: NEAR-USD, units: USD, freq: D, lag_days: 1, start: "2021-09-01", meaning: "NEAR price, daily close"}
   - {id: LINKUSD, source: coinbase, code: LINK-USD, units: USD, freq: D, lag_days: 1, start: "2019-06-01", meaning: "Chainlink price, daily close"}
+  - {id: ETHUSD,  source: coinbase, code: ETH-USD,  units: USD, freq: D, lag_days: 1, start: "2016-05-18", meaning: "Ether price, daily close"}
+  - {id: ZECUSD,  source: coinbase, code: ZEC-USD,  units: USD, freq: D, lag_days: 1, start: "2020-12-01", meaning: "Zcash price, daily close"}
+  - {id: HYPEUSD, source: coinbase, code: HYPE-USD, units: USD, freq: D, lag_days: 1, start: "2026-02-05", meaning: "Hyperliquid price, daily close"}
+  - {id: WALUSD,  source: coinbase, code: WAL-USD,  units: USD, freq: D, lag_days: 1, start: "2026-02-11", meaning: "Walrus price, daily close"}
+  - {id: DEEPUSD, source: coinbase, code: DEEP-USD, units: USD, freq: D, lag_days: 1, start: "2026-02-11", meaning: "DeepBook price, daily close"}
   - {id: TAOUSD,  source: coinbase, code: TAO-USD,  units: USD, freq: D, lag_days: 1, start: "2024-01-01", meaning: "Bittensor price, daily close"}
 
   # ---- On-chain (Bitview; long-term holder = coins unmoved 150 days or more)
@@ -49,6 +54,18 @@ series:
   - {id: BV_LTH_SOPR_1W,        source: bitview, code: lth_sopr_1w,             units: ratio, freq: D, lag_days: 1, start: "2011-01-01", meaning: "Same, 7 days (early warning)"}
   - {id: BV_NET_PNL_1M,         source: bitview, code: net_realized_pnl_sum_1m, units: USD,   freq: D, lag_days: 1, start: "2011-01-01", meaning: "Profits minus losses realised on-chain over 30 days (negative = net losses)"}
   - {id: BV_REALIZED_CAP,       source: bitview, code: realized_cap,            units: USD,   freq: D, lag_days: 1, start: "2011-01-01", meaning: "Value of all bitcoin at the price each last moved (realised cap)"}
+  # ---- Full daily price histories for the coin-valuation tab (Coin Metrics: longest free history for these coins).
+  #      Context only: they never enter the reading, the backdrop or any push.
+  - {id: CMP_BTC, source: coinmetrics, code: "price:btc", units: USD, freq: D, lag_days: 1, start: "2010-07-18", meaning: "Bitcoin daily price, full history"}
+  - {id: CMP_ETH, source: coinmetrics, code: "price:eth", units: USD, freq: D, lag_days: 1, start: "2015-08-08", meaning: "Ether daily price, full history"}
+  - {id: CMP_SOL, source: coinmetrics, code: "price:sol", units: USD, freq: D, lag_days: 1, start: "2020-04-10", meaning: "Solana daily price, full history"}
+  - {id: CMP_SUI, source: coinmetrics, code: "price:sui", units: USD, freq: D, lag_days: 1, start: "2023-08-17", meaning: "Sui daily price, full history"}
+  - {id: CMP_LINK, source: coinmetrics, code: "price:link", units: USD, freq: D, lag_days: 1, start: "2017-09-29", meaning: "Chainlink daily price, full history"}
+  - {id: CMP_NEAR, source: coinmetrics, code: "price:near", units: USD, freq: D, lag_days: 1, start: "2020-10-15", meaning: "NEAR daily price, full history"}
+  - {id: CMP_ZEC, source: coinmetrics, code: "price:zec", units: USD, freq: D, lag_days: 1, start: "2016-10-29", meaning: "Zcash daily price, full history"}
+  - {id: CMP_HYPE, source: coinmetrics, code: "price:hype", units: USD, freq: D, lag_days: 1, start: "2024-12-13", meaning: "Hyperliquid daily price, full history"}
+  - {id: CMP_WAL, source: coinmetrics, code: "price:wal", units: USD, freq: D, lag_days: 1, start: "2025-05-14", meaning: "Walrus daily price, full history"}
+  - {id: CMP_DEEP, source: coinmetrics, code: "price:deep", units: USD, freq: D, lag_days: 1, start: "2024-11-08", meaning: "DeepBook daily price, full history"}
   - {id: CM_REALIZED_PRICE,     source: coinmetrics, code: "PriceUSD/CapMVRVCur", units: USD, freq: D, lag_days: 1, start: "2011-01-01", meaning: "Realised price from Coin Metrics, used as a cross-check"}
 
   # ---- Stablecoins (DefiLlama)

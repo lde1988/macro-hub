@@ -115,8 +115,23 @@ def digest(feed, cfg):
              "Sources failing: " + ", ".join(bad) + "." if bad else "All sources answering."]
     if pl["backdrop"]["early"]:
         lines.insert(2, pl["backdrop"]["early"])
+    if feed.get("valuations"):
+        lines.append(valuation_line(feed["valuations"]))
     stale = [d["title"] for d in feed["dials"] if d["stale"]]
     if stale:
         lines.append("Old data: " + ", ".join(stale) + ".")
     return {"title": "macro-hub daily digest", "message": "\n".join(lines) + f'\n{feed["disclaimer"]}.',
             "priority": cfg["alerts"]["digest_priority"], "tags": ["sunrise"]}
+
+
+def valuation_line(vals):
+    """The coin valuations in one digest line (context only)."""
+    ok = [f'{v["sym"]} {v["z"]:+.1f}' for v in vals if v.get("status") == "ok"]
+    grey = [f'{v["sym"]} {v["z"]:+.1f}*' for v in vals if v.get("status") == "greyed"]
+    none = [v["sym"] for v in vals if v.get("status") not in ("ok", "greyed")]
+    line = "Coin valuations (SD from trend): " + ", ".join(ok + grey)
+    if grey:
+        line += " (* greyed: short history or the line does not fit)"
+    if none:
+        line += "; no reading: " + ", ".join(none)
+    return line + "."

@@ -30,8 +30,8 @@ class Ctx:
     def since(self, entry, days):
         """First date to ask for: the registry start on a back-fill, otherwise a short look-back
         that is stretched to reach the last stored date, so a pause never leaves a hole in history."""
-        if self.backfill:
-            return pd.Timestamp(entry["start"])
+        if self.backfill or (entry.get("id") and entry["id"] not in self.last):
+            return pd.Timestamp(entry["start"])     # a back-fill, or a series with nothing stored yet: load its full history
         start = pd.Timestamp(self.now.date()) - pd.Timedelta(days=days)
         have = self.last.get(entry.get("id"))
         if have is not None and pd.Timestamp(have) - pd.Timedelta(days=3) < start:

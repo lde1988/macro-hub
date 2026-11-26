@@ -65,6 +65,83 @@ def dial_card(d):
             f'<p class="age">{age}</p></article>')
 
 
+def fmt_price(x):
+    if x is None:
+        return "n/a"
+    if x >= 1_000_000:
+        return f"${x / 1e6:,.2f}m"
+    if x >= 100:
+        return f"${x:,.0f}"
+    if x >= 1:
+        return f"${x:,.2f}"
+    if x >= 0.01:
+        return f"${x:,.4f}"
+    return f"${x:.6f}"
+
+
+VZ = [(-4, -3, "green", "−3 SD"), (-3, -2, "green", "−2 SD"), (-2, -1, "green", "−1 SD"), (-1, 1, "amber", "fair"),
+      (1, 2, "red", "+1 SD"), (2, 3, "red", "+2 SD"), (3, 4, "red", "+3 SD")]
+
+
+def valuation_svg(v):
+    """Seven-zone gauge from -4 to +4 SD with a needle at the reading."""
+    cx, cy, r = 150, 132, 100
+    frac = lambda z: (min(max(z, -4), 4) + 4) / 8
+    parts = [f'<svg viewBox="0 0 300 150" role="img" aria-label="{esc(v["sym"])}: {v["z"]:+.2f} standard deviations, {esc(v["zone"])}">']
+    for lo, hi, colour, lab in VZ:
+        f0, f1 = frac(lo) + 0.004, frac(hi) - 0.004
+        on = lo < v["z"] <= hi or (lo == -4 and v["z"] <= -4) or (hi == 4 and v["z"] > 3)
+        parts.append(f'<path d="{_arc(cx, cy, r, f0, f1)}" fill="none" stroke="{COL[colour]}" stroke-width="16" opacity="{0.95 if on else 0.35}"/>')
+        x, y = _pt(cx, cy, r + 22, (frac(lo) + frac(hi)) / 2)
+        parts.append(f'<text x="{x:.1f}" y="{y + 4:.1f}" text-anchor="middle" font-size="11" fill="#c9ced4"{" font-weight=\"700\"" if on else ""}>{lab}</text>')
+    x, y = _pt(cx, cy, r - 18, frac(v["z"]))
+    parts.append(f'<line x1="{cx}" y1="{cy}" x2="{x:.1f}" y2="{y:.1f}" stroke="#f2f2f2" stroke-width="3.5" stroke-linecap="round"/>'
+                 f'<circle cx="{cx}" cy="{cy}" r="6" fill="#f2f2f2"/></svg>')
+    return "".join(parts)
+
+
+def minus(text):
+    """Typographic minus sign, so "-1.71" does not read as a dash."""
+    return text.replace("-", "\u2212")
+
+
+def valuation_card(v):
+    head = f'<h4>{esc(v["sym"])} <span class="cvname">{esc(v["name"])}</span></h4>'
+    foot = f'<p class="cvnote">{esc(v.get("drift_note", ""))}</p>'
+    if v["status"] in ("none", "too_little"):
+        foot = f'<p class="cvnote">{esc(v.get("label", ""))}</p>' + foot
+        msg = "too little history" + (f' ({v["months"]} months)' if v.get("months") is not None else "") if v["status"] == "too_little" else "no data yet"
+        return f'<article class="cvcard" id="cv-{esc(v["sym"].lower())}">{head}<p class="cvbig muted">{esc(msg)}</p><p class="cvsub">No dial is drawn for under a year of history.</p>{foot}</article>'
+    grey = v["status"] == "greyed"
+    c = v["colour"]
+    warn = "".join(f'<p class="cvwarn">{esc(w[:1].upper() + w[1:])}.</p>' for w in v.get("warnings", []))
+    bands = "".join(f'<tr><td>{lab}</td><td>{fmt_price(v["bands"][f"{k:+d}"]) if k else fmt_price(v["fair_value"])}</td></tr>'
+                    for k, lab in ((3, "+3 SD"), (2, "+2 SD"), (1, "+1 SD"), (0, "Fair value"), (-1, "−1 SD"), (-2, "−2 SD"), (-3, "−3 SD")))
+    when = "live" if v.get("price_is_live") else f'close {v["last_close_date"]}'
+    yrs = v["years"]
+    hist = f'{yrs:.1f} years' if yrs >= 1 else f'{v["months"]} months'
+    return (f'<article class="cvcard{" grey" if grey else ""}" id="cv-{esc(v["sym"].lower())}">{head}'
+            f'<p class="cvbig" style="color:{COL[c] if not grey else "#8a9097"}">{minus(f"{v[chr(122)]:+.2f}")} SD</p>'
+            f'<p class="cvzone" style="color:{COL[c] if not grey else "#8a9097"}"><span aria-hidden="true">{SYM[c]}</span> {esc(minus(v["zone"][:1].upper() + v["zone"][1:]))}</p>'
+            f'<p class="cvlabel">{esc(v.get("label", ""))}</p>'
+            f'{warn}<div class="cvdial">{valuation_svg(v)}</div>'
+            f'<p class="cvsub">Fair value {fmt_price(v["fair_value"])} · assumes {minus(f"{v[chr(103) + 'rowth_per_year'] * 100:+.0f}")}% a year</p>'
+            f'<p class="cvprice">Price now <b>{fmt_price(v["price"])}</b> <span class="cvsub">({esc(when)})</span></p>'
+            f'<table class="cvbands">{bands}</table>'
+            f'<p class="cvsub">History used: {hist}, from {esc(v["history_from"])} · line fit R² {v["r2"]:.2f}</p>{foot}</article>')
+
+
+def valuations_pane(vals):
+    if not vals:
+        return '<section class="card"><p class="disc">No coin data yet.</p></section>'
+    strip = "".join(f'<a href="#cv-{esc(v["sym"].lower())}" data-i="{i}"><span class="dot" style="background:'
+                    f'{COL[v.get("colour")] if v.get("status") == "ok" else "#6b6b6b"}"></span>{esc(v["sym"])}</a>' for i, v in enumerate(vals))
+    cards = "".join(valuation_card(v) for v in vals)
+    return (f'<p class="disc cvintro">Log-regression channels: how far each coin\'s price sits from a straight line fitted to the log of its whole price history. '
+            f'Context only: these do not enter the reading above or any alert.</p>'
+            f'<nav class="cvstrip" aria-label="Coins">{strip}</nav><div class="cvtrack" id="cvtrack">{cards}</div>')
+
+
 def section_block(s, dials, sentence):
     c = s["colour"]
     cards = "".join(dial_card(dials[i]) for i in s["dials"])
@@ -165,12 +242,34 @@ summary::-webkit-details-marker{{display:none}}
 .tag{{font-size:11px;border:1px solid currentColor;border-radius:8px;padding:0 6px;margin-left:4px;vertical-align:middle}}
 table{{width:100%;border-collapse:collapse;font-size:13px;color:var(--mute)}} td{{padding:4px 6px 4px 0;border-top:1px solid var(--line);vertical-align:top}}
 footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:8px}} a{{color:#9ecbff}}
+.tabr{{position:absolute;opacity:0;pointer-events:none}}
+.tabs{{display:flex;gap:6px;margin:6px 0 2px}} .tabs label{{flex:1;text-align:center;padding:9px 6px;border:1px solid var(--line);border-radius:10px;cursor:pointer;color:var(--mute);font-weight:600;font-size:15px}}
+#tab1:checked ~ .tabs label[for=tab1],#tab2:checked ~ .tabs label[for=tab2]{{background:var(--card);color:var(--ink);border-color:#4a5158}}
+.pane{{display:none}} #tab1:checked ~ .p1,#tab2:checked ~ .p2{{display:block}}
+.cvintro{{margin-top:12px}}
+.cvstrip{{display:flex;gap:6px;overflow-x:auto;padding:10px 0 6px;scrollbar-width:none}} .cvstrip::-webkit-scrollbar{{display:none}}
+.cvstrip a{{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:16px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:600}}
+.cvstrip a.on{{background:var(--card);border-color:#9ecbff}}
+.cvtrack{{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:10px;scrollbar-width:thin}}
+.cvcard{{flex:0 0 100%;scroll-snap-align:center;scroll-snap-stop:always;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}}
+.cvcard h4{{font-size:18px}} .cvname{{color:var(--mute);font-weight:400;font-size:15px}}
+.cvbig{{font-size:40px;font-weight:800;line-height:1.1;margin-top:8px;font-variant-numeric:tabular-nums}} .cvbig.muted{{font-size:22px;color:var(--mute)}}
+.cvzone{{font-size:18px;font-weight:700;margin-top:2px}} .cvlabel{{font-size:13px;color:#c9ced4;margin-top:6px}}
+.cvwarn{{font-size:14px;color:var(--amber);margin-top:6px}}
+.cvdial svg{{display:block;width:100%;max-width:340px;margin:8px auto 0}}
+.cvcard.grey .cvdial{{filter:grayscale(1);opacity:.45}}
+.cvsub{{font-size:13px;color:var(--mute);margin-top:4px}} .cvprice{{margin-top:8px}}
+.cvbands{{margin-top:8px;font-size:14px;color:var(--ink)}} .cvbands td{{padding:3px 0}} .cvbands td:last-child{{text-align:right;font-variant-numeric:tabular-nums}}
+.cvnote{{font-size:12px;color:var(--mute);margin-top:8px;font-style:italic}}
 @media(min-width:700px){{.top{{grid-template-columns:150px 1fr;gap:22px}}.lamp{{margin:0}}.grid{{grid-template-columns:repeat(2,1fr)}}
 .lines{{grid-template-columns:repeat(3,1fr);gap:18px}}.line{{border-top:0;border-left:1px solid var(--line);padding:0 0 0 14px}}.lines .line:first-child{{border-left:0;padding-left:0}}}}
-@media(min-width:1040px){{.grid{{grid-template-columns:repeat(3,1fr)}}}}
+@media(min-width:700px){{.cvcard{{flex-basis:calc(50% - 6px)}}}}
+@media(min-width:1040px){{.grid{{grid-template-columns:repeat(3,1fr)}}.cvcard{{flex-basis:calc(33.333% - 8px)}}}}
 </style></head><body><main>
 <h1><span>macro-hub</span><span class="upd" id="upd" data-t="{esc(feed["generated_at"])}">updated {esc(feed["generated_at_hkt"])}</span></h1>
-
+<input type="radio" name="tab" id="tab1" class="tabr" checked><input type="radio" name="tab" id="tab2" class="tabr">
+<nav class="tabs"><label for="tab1">Dashboard</label><label for="tab2">Coin valuations</label></nav>
+<div class="pane p1">
 <section class="card" aria-label="Reading">
 <div class="top">
 <div class="lamp" role="img" aria-label="{esc(hl["word"])}"><span class="sym" aria-hidden="true">{hl["symbol"]}</span><span class="w">{esc(hl["word"])}</span></div>
@@ -197,10 +296,13 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 
 <h3>What they're watching</h3>
 <section class="card"><p class="disc">{esc(w.get("note", ""))}</p></section>
+</div>
+<div class="pane p2" id="valuations">{valuations_pane(feed.get("valuations") or [])}</div>
 
 <footer>
 <h3>Sources: last successful fetch</h3>
 <table>{srcs}</table>
+<p>Coin price histories: <a href="https://coinmetrics.io">Coin Metrics</a> community data, CC BY-NC 4.0, used for non-commercial purposes.</p>
 <p>On-chain data: Bitview (bitview.space), CC BY 4.0. The dollar index is computed from ECB reference rates and is not the official ICE index. The liquidity figure is a proxy.</p>
 <p>Green = supports buying crypto, amber = neutral, red = argues against. A dial changes colour only after two runs in a row beyond a band edge.</p>
 <p>Feed for bots: <a href="feed/latest.json">feed/latest.json</a> (version {esc(feed["version"])}) · <a href="feed/FEED.md">layout</a> · <a href="feed/verdicts.csv">verdict log</a></p>
@@ -212,6 +314,13 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 e.textContent=t0+' · '+(m<1?'just now':m<120?m+' min ago':Math.round(m/60)+' h ago');
 e.className='upd'+(m>{int(feed.get("stale_minutes", 60))}?' late':'');}}f();setInterval(f,60000);
 if(window.matchMedia('(min-width:1040px)').matches){{document.querySelectorAll('details.fam').forEach(function(d){{d.open=true}})}}
+var t2=document.getElementById('tab2'),tr=document.getElementById('cvtrack');
+function showVal(){{if(location.hash.indexOf('#cv')===0||location.hash==='#valuations')t2.checked=true;}}showVal();window.addEventListener('hashchange',showVal);
+if(tr){{var links=document.querySelectorAll('.cvstrip a');
+links.forEach(function(a){{a.addEventListener('click',function(ev){{ev.preventDefault();var c=document.getElementById(a.getAttribute('href').slice(1));
+tr.scrollTo({{left:c.offsetLeft-tr.offsetLeft,behavior:'smooth'}});}})}});
+function mark(){{var w=tr.firstElementChild?tr.firstElementChild.getBoundingClientRect().width+12:1,i=Math.round(tr.scrollLeft/w);
+links.forEach(function(a,j){{a.classList.toggle('on',j===i)}});}}tr.addEventListener('scroll',function(){{window.requestAnimationFrame(mark)}});mark();}}
 }})();
 </script>
 </body></html>

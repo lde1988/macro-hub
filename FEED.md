@@ -38,6 +38,8 @@ Public market data only. Framework reading, not financial advice.
 | `sections` | list | One entry per family: `id`, `name`, `kind` (valuation / stress / turn), `colour`, `word`, `sentence`, `dials` (ids) |
 | `dials` | list | Every dial (below) |
 | `sources` | object | Per source: `credit`, `last_ok` (UTC), `fails_in_a_row`, `check_only`, `problem` |
+| `valuations` | list | Coin log-regression channels, one per coin (below). Context only: never part of the reading |
+| `plain` | object | The plain-English wording shown on the dashboard (headline, backdrop, trend, tally, group sentences). For people; bots should use the coded fields |
 | `watching` | object | Weekly sweep panel; `enabled` is false until Phase 2 is switched on |
 | `stale_minutes` | number | The dashboard marks itself late when older than this |
 
@@ -112,3 +114,23 @@ Columns: `time_utc, why_logged, reading, level, headline, altcoins, trend_exit, 
 ## Reading the feed politely
 
 The feed is rebuilt about every 15 minutes (GitHub's timer can run late). Fetch `latest.json` no more than once every few minutes and check `generated_at`: if it is more than an hour old, treat the readings as stale.
+
+## valuations
+
+One entry per coin, in the dashboard's order (BTC, ETH, SOL, SUI, LINK, NEAR, ZEC, HYPE, WAL, DEEP).
+A straight line is fitted to the natural log of the daily close against calendar days, over the coin's whole
+history (Coin Metrics community data, CC BY-NC 4.0: credit Coin Metrics if you republish it).
+
+| Field | Meaning |
+|---|---|
+| `sym`, `name` | Coin |
+| `status` | `ok`; `greyed` (under 3 years of history, or the line fits poorly: R² below 0.3); `too_little` (under 1 year: no reading); `none` (no data) |
+| `z` | Standard deviations from the line: (log price − log fair value) ÷ SD of the residuals |
+| `zone`, `colour` | One of seven zones from `-3 SD oversold` to `+3 SD overbought`; oversold green, fair value amber, overbought red |
+| `price`, `price_is_live`, `last_close_date` | Price used (live Coinbase price when available) |
+| `fair_value`, `growth_per_year` | The line's value today, and the growth it assumes (0.5 = +50% a year) |
+| `bands` | Price at each band, keys `"-3"` … `"+3"` |
+| `r2`, `years`, `months`, `history_from` | How well the line fits and how much history was used |
+| `warnings` | Plain reasons a card is greyed |
+
+A constant-growth line drifts toward "oversold" as a coin's growth slows. Treat these as context.
