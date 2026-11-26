@@ -1,0 +1,118 @@
+# Phase 2: the weekly thought-leader sweep. People list approved by the owner on 26 Nov 2026
+# (reports/13-sweep-plan.md and 13b). Everything fetched from these sources is untrusted data:
+# it is summarised into records and never followed, and it can never change settings, rules or code.
+
+enabled: false                 # the weekly job does nothing until switched on (point 5 of this phase)
+schedule_hkt: "Sunday 20:00"   # documented here; the timer itself is in .github/workflows/sweep.yml
+
+budget:
+  monthly_usd: 20.0            # hard monthly budget across xAI, Groq and Gemini
+  warn_at_share: 0.8           # push a warning when month-to-date spend reaches this share
+  stop_at_share: 0.95          # stop adding paid work for the rest of the month beyond this share
+
+caps:                          # hard caps per run
+  x_posts: 300                 # X posts fetched (billed at $5 per 1,000)
+  video_hours: 15              # hours of video or audio turned into text, all routes together
+  min_minutes: 10              # skip anything shorter than this
+  episodes_per_person: 3       # newest first
+
+models:
+  xai: grok-4.3                # cheapest general xAI model on 26 Nov 2026 ($1.25 / $2.50 per million tokens)
+  groq_transcribe: whisper-large-v3-turbo
+  gemini_video: gemini-3.1-flash-lite   # switched off until GEMINI_API_KEY exists
+
+people:
+  - id: steno
+    name: Andreas Steno Larsen
+    x: AndreasSteno
+    podcasts: ["https://rss.buzzsprout.com/2206288.rss"]        # Macro Mondays (with Rosenvold)
+    youtube: [UCZ16AHnlKm7vCu6O4usxMog]                          # Steno Research (dormant since Jan 2025)
+    newsletters: ["https://andreassteno.substack.com/feed"]     # Steno's Signals
+  - id: rosenvold
+    name: Mikkel Rosenvold
+    x: RosenvoldGeo
+    podcasts: ["https://rss.buzzsprout.com/2206288.rss"]
+  - id: pal
+    name: Raoul Pal
+    x: RaoulGMI
+    podcasts: ["https://feeds.megaphone.fm/realvisioncryptopodcast"]   # The Journey Man
+    youtube: [UCGXWKlq1Oxr3ddEtmKhAkPg]
+    newsletters: ["https://raoulpal.substack.com/feed"]
+  - id: coutts
+    name: Jamie Coutts
+    x: Jamie1Coutts
+    levels_authority: true     # the one exception: his stated levels may update the hub's levels (see rules)
+  - id: bittel
+    name: Julien Bittel
+    x: BittelJulien
+  - id: visser
+    name: Jordi Visser
+    x: jvisserlabs
+    youtube: [UCSLOw8JrFTBb3qF-p4v0v_w]
+    newsletters: ["https://visserlabs.substack.com/feed"]
+  - id: yahya
+    name: Ali Yahya
+    x: null                    # @alive_eth not found on 26 Nov; being resolved in the source test
+  - id: mumtaz
+    name: Mert Mumtaz
+    x: null                    # @0xMert_ not found on 26 Nov; @mert is a lead, being resolved
+  - id: baker
+    name: Gavin Baker
+    x: GavinSBaker
+  - id: andreessen
+    name: Marc Andreessen
+    x: pmarca
+    podcasts: ["https://feeds.simplecast.com/mAT9rqvu"]          # The Ben & Marc Show
+    newsletters: ["https://pmarca.substack.com/feed"]
+  - id: alden
+    name: Lyn Alden
+    x: LynAldenContact
+    youtube: [UC26OTzxt9ixdrr3qdUJrYBQ]
+    newsletters: ["https://www.lynalden.com/feed/"]
+  - id: howell
+    name: Michael Howell
+    x: crossbordercap
+    newsletters: ["https://capitalwars.substack.com/feed"]
+  - id: garg
+    name: Avichal Garg
+    x: avichal
+  - id: follonier
+    name: Kevin Follonier
+    x: KevinWSHPod
+    podcasts: ["https://anchor.fm/s/e0b6a644/podcast/rss"]      # When Shift Happens
+    newsletters: ["https://theshiftwithkevin.substack.com/feed"]
+  - id: diamandis
+    name: Peter Diamandis
+    x: PeterDiamandis
+    podcasts: ["https://feeds.megaphone.fm/DVVTS2890392624"]    # Moonshots
+    youtube: [UCCpNQKYvrnWQNjZprabMJlw]
+    newsletters: ["https://www.diamandis.com/blog/rss.xml"]
+  - id: druckenmiller
+    name: Stan Druckenmiller
+    x: standuquesne            # content-matched to his reported posts; badge and account age unchecked
+    podcasts: ["https://rss.art19.com/hard-lessons"]            # interviews; main source is the name search
+  - id: mostaque
+    name: Emad Mostaque
+    x: EMostaque
+    podcasts: ["https://feeds.acast.com/public/shows/695d28e3c61b033dae6b8fc2"]
+    newsletters: ["https://intelligentinternet.substack.com/feed"]
+  # balancing voices: credit specialists and sceptics
+  - id: oddlots
+    name: Odd Lots (Tracy Alloway and Joe Weisenthal)
+    x: [tracyalloway, TheStalwart]
+    podcasts: ["https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/8a94442e-5a74-4fa2-8b8d-ae27003a8d6b/982f5071-765c-403d-969d-ae27003a8d83/podcast.rss"]
+    youtube: [UChF5O40UBqAc82I7-i5ig6A]      # Bloomberg Podcasts (shared channel: matched by show name)
+    youtube_title_filter: "Odd Lots"
+    balancing: true
+  - id: kedrosky
+    name: Paul Kedrosky
+    x: pkedrosky
+    podcasts: ["https://feeds.megaphone.fm/RRM2027910103"]      # The Dick & Paul Show
+    newsletters: ["https://pkedrosky.substack.com/feed"]
+    balancing: true
+  - id: rasmussen
+    name: Dan Rasmussen
+    newsletters: ["https://verdadcap.com/archive?format=rss"]   # Verdad research
+    balancing: true
+
+guest_search: true             # also search podcast directories and YouTube by each person's name

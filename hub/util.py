@@ -8,7 +8,7 @@ import requests
 import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
-SECRET_NAMES = ["FRED_API_KEY", "COINALYZE_API_KEY", "NTFY_TOPIC", "XAI_API_KEY", "GEMINI_API_KEY", "YOUTUBE_API_KEY"]
+SECRET_NAMES = ["FRED_API_KEY", "COINALYZE_API_KEY", "NTFY_TOPIC", "XAI_API_KEY", "GEMINI_API_KEY", "YOUTUBE_API_KEY", "GROQ_API_KEY"]
 
 
 def utcnow():

@@ -1,0 +1,40 @@
+# Phase 2, point 2: source test on one real week (reports/14). Runs on a push to claude/sweep-check.
+# Spends a little on xAI and Groq (the script stops paid work at $6). Results go to sweep-check-results.
+name: Sweep source test
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/sweep-check]
+    paths: [tools/sweep_source_test.py, hub/sweep/**, config/sweep.yaml, .github/workflows/sweep-source-test.yml]
+permissions:
+  contents: write
+concurrency:
+  group: sweep-source-test
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
+      - run: pip install --quiet -r requirements.txt youtube-transcript-api yt-dlp
+      - name: Run the source test
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python tools/sweep_source_test.py out
+      - name: Publish the result to a side branch
+        if: always()
+        run: |
+          mkdir -p out && cd out
+          git init -q -b sweep-check-results
+          git config user.name "macro-hub bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Sweep source test result" || exit 0
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" sweep-check-results
