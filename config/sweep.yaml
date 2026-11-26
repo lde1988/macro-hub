@@ -3,7 +3,8 @@
 # it is summarised into records and never followed, and it can never change settings, rules or code.
 
 enabled: false                 # the weekly job does nothing until switched on (point 5 of this phase)
-schedule_hkt: "Sunday 20:00"   # documented here; the timer itself is in .github/workflows/sweep.yml
+schedule_hkt: "Sunday 20:07"   # documented here; the timer itself is in .github/workflows/sweep.yml
+window_days: 7                 # each run reads the 7 days before it
 
 budget:
   monthly_usd: 20.0            # hard monthly budget across xAI, Groq and Gemini
@@ -11,15 +12,33 @@ budget:
   stop_at_share: 0.95          # stop adding paid work for the rest of the month beyond this share
 
 caps:                          # hard caps per run
-  x_posts: 300                 # X posts fetched (billed at $5 per 1,000)
-  video_hours: 15              # hours of video or audio turned into text, all routes together
+  x_posts: 300                 # X posts fetched (billed at $5 per 1,000); the run stops searching X beyond this
+  x_handles_per_call: 5        # small batches so every account is searched (source test: 10 per call was thin)
+  x_max_turns: 4               # searches the model may make per call
+  video_hours: 25              # hours of audio or video turned into text, all routes together (owner, 26 Nov)
+  episode_max_minutes: 120     # at most this much of any one episode
   min_minutes: 10              # skip anything shorter than this
   episodes_per_person: 3       # newest first
+  newsletter_posts_per_person: 3
+
+prices:                        # used to estimate before spending; the real cost is read from each provider's reply
+  groq_usd_per_hour: 0.04      # whisper-large-v3-turbo, confirmed at the source test (3.6 h for $0.144)
+  xai_usd_per_x_call: 0.25     # rough: posts at $5 per 1,000 plus reading; real cost logged
+  xai_usd_per_text_hour: 0.02  # reading one hour of transcript
+  gemini_usd_per_video_hour: 0.10   # 3.1 Flash-Lite, low resolution; free tier may make it $0
+
+gemini_enabled: true           # the route also needs GEMINI_API_KEY; without the secret it stays off by itself
+
+analysis:
+  cited_by_min_people: 2       # "cited by several this week" = at least this many people
+  proposal_min_people: 3       # a dial is proposed when at least this many people cite an untracked measure ...
+  proposal_min_weeks: 2        # ... in at least this many of the last 4 weeks
+  levels_max_change: 0.15      # Coutts' level updates beyond 15% are asked, not applied (owner's rule)
 
 models:
   xai: grok-4.3                # cheapest general xAI model on 26 Nov 2026 ($1.25 / $2.50 per million tokens)
   groq_transcribe: whisper-large-v3-turbo
-  gemini_video: gemini-3.1-flash-lite   # switched off until GEMINI_API_KEY exists
+  gemini_video: gemini-3.1-flash-lite   # switched off until GEMINI_API_KEY exists (owner adds it Monday 30 Nov)
 
 people:
   - id: steno
@@ -103,6 +122,7 @@ people:
     podcasts: ["https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/8a94442e-5a74-4fa2-8b8d-ae27003a8d6b/982f5071-765c-403d-969d-ae27003a8d83/podcast.rss"]
     youtube: [UChF5O40UBqAc82I7-i5ig6A]      # Bloomberg Podcasts (shared channel: matched by show name)
     youtube_title_filter: "Odd Lots"
+    guest_search: false        # a show, not a person: its own feed and X accounts only
     balancing: true
   - id: kedrosky
     name: Paul Kedrosky
@@ -116,6 +136,63 @@ people:
     balancing: true
 
 guest_search: true             # also search podcast directories and YouTube by each person's name
+
+# Measures a record may be tagged with. The reading model must pick one of these keys (or "other").
+# `hub` says how the hub reads the same measure, for the calibration table; measures without it are not tracked
+# by the hub and can become dial proposals. units: usd, pct, bp_as_pct (stored in %, quoted in bp), x, index, yoy_pct.
+metrics:
+  realised_price:    {label: "Bitcoin realised price", hub: {series: BV_REALIZED_PRICE}, units: usd}
+  lth_cost:          {label: "Long-term holder cost basis", hub: {series: BV_LTH_REALIZED_PRICE}, units: usd}
+  sth_cost:          {label: "Short-term holder cost basis", hub: {series: BV_STH_REALIZED_PRICE}, units: usd}
+  regime_filter:     {label: "Coutts' regime-filter level", hub: {level: btc_break}, units: usd}
+  btc_price:         {label: "Bitcoin price", hub: {series: BTCUSD}, units: usd}
+  mvrv:              {label: "Bitcoin price / realised price (MVRV)", hub: {ratio: [BTCUSD, BV_REALIZED_PRICE]}, units: x}
+  lth_sopr:          {label: "Long-term holder SOPR", hub: {series: BV_LTH_SOPR_1M}, units: index}
+  btc_log_regression: {label: "Bitcoin log-regression reading (SD)", hub: {valuation: BTC}, units: index}
+  alt_btc_oi:        {label: "Altcoin / Bitcoin open interest", hub: {ratio: [OI_ALT, OI_BTC]}, units: x}
+  funding_rate:      {label: "Bitcoin funding rate", hub: {tracked: true}}
+  stablecoin_supply: {label: "Stablecoin supply", hub: {series: STABLE_USD}, units: usd}
+  global_liquidity:  {label: "Global liquidity", hub: {tracked: true}}
+  fed_balance_sheet: {label: "Fed balance sheet", hub: {series: WALCL, scale: 1.0e6}, units: usd}
+  m2:                {label: "US M2 money supply growth", hub: {yoy: M2SL}, units: yoy_pct}
+  hy_spread:         {label: "High-yield credit spread", hub: {series: BAMLH0A0HYM2}, units: bp_as_pct}
+  ccc_spread:        {label: "CCC credit spread", hub: {series: BAMLH0A3HYC}, units: bp_as_pct}
+  bbb_spread:        {label: "BBB credit spread", hub: {series: BAMLC0A4CBBB}, units: bp_as_pct}
+  dxy:               {label: "Dollar index", hub: {series: DXY_PUB}, units: index}
+  us10y:             {label: "US 10-year yield", hub: {series: DGS10}, units: pct}
+  us2y:              {label: "US 2-year yield", hub: {series: DGS2}, units: pct}
+  fed_funds:         {label: "Fed funds rate", hub: {series: DFF}, units: pct}
+  cpi:               {label: "US inflation (CPI, year on year)", hub: {yoy: CPIAUCSL}, units: yoy_pct}
+  sp500:             {label: "S&P 500", hub: {series: SP500}, units: index}
+  nasdaq100:         {label: "Nasdaq-100", hub: {series: NASDAQ100}, units: index}
+  margin_debt:       {label: "Margin debt", hub: {tracked: true}}
+  private_credit:    {label: "Private credit / BDCs", hub: {tracked: true}}
+  regional_banks:    {label: "Regional banks", hub: {tracked: true}}
+  ai_capex:          {label: "AI capital spending"}
+  gpu_prices:        {label: "GPU rental prices"}
+  earnings:          {label: "Corporate earnings"}
+  equity_valuation:  {label: "Stock valuation multiples"}
+  oil:               {label: "Oil price"}
+  gold:              {label: "Gold price"}
+  defi_revenue:      {label: "DeFi revenue"}
+  data_centers:      {label: "Data-centre capacity"}
+  tariffs:           {label: "Tariffs and trade"}
+  fiscal_deficit:    {label: "US fiscal deficit"}
+  other:             {label: "Other"}
+
+# The one exception to "context only" (owner's rule): Jamie Coutts stating a new value for a level the hub
+# tracks updates it, within 15%; beyond that, or if the post is ambiguous, the owner is asked.
+# Each metric key maps to the level it may update in config/thresholds.yaml `levels` (overrides kept on the
+# data branch in sweep/levels.json; nothing else in the config can ever be changed by the sweep).
+level_updates:
+  person: coutts
+  keys:
+    realised_price: realised_price          # fallback value (the live figure comes from Bitview)
+    lth_cost: lth_cost                       # fallback value
+    sth_cost: sth_cost                       # fallback value
+    regime_filter:                           # needs the post to say which line it is
+      break: btc_break
+      reclaim: btc_reclaim
 
 # YouTube name search keeps only these channels (a channel name starting with one of these).
 # YouTube is full of re-upload and clickbait channels that put famous names on clips and invented quotes;

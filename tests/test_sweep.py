@@ -85,14 +85,69 @@ def test_stance_needs_a_valid_word_and_a_real_sentence():
 
 def test_unknown_fields_are_thrown_away():
     ok, _ = extract.clean_record(rec(set_level=10, config={"levels": {"btc_break": 10}}, run="rm -rf /"), MATERIAL)
-    assert set(ok) == {"claim", "quote", "metric", "level", "stances", "call", "speaker_certain"}
+    assert set(ok) == {"claim", "quote", "metric", "level", "level_in_quote", "metric_key", "level_role",
+                       "stances", "call", "speaker_certain"}
 
 
-def test_a_call_needs_text_and_a_date():
-    ok, _ = extract.clean_record(rec(call={"text": "BTC above 100k", "by": "2026-12-31", "measure": "BTC", "target": ">100000"}), MATERIAL)
-    assert ok["call"]["by"] == "2026-12-31"
-    ok, _ = extract.clean_record(rec(call={"text": "BTC goes up eventually"}), MATERIAL)
+def test_a_call_needs_text_and_a_deadline_after_it_was_made():
+    said = dt.date(2026, 11, 21)
+    ok, _ = extract.clean_record(rec(call={"text": "BTC above 100k", "by": "2026-12-31"}), MATERIAL, said=said)
+    assert ok["call"]["by"] == "2026-12-31" and ok["call"]["made"] == "2026-11-21"
+    ok, _ = extract.clean_record(rec(call={"text": "BTC goes up eventually"}), MATERIAL, said=said)
     assert ok["call"] is None
+    ok, _ = extract.clean_record(rec(call={"text": "AI cycle does not roll over", "by": "2026-11-21"}), MATERIAL, said=said)
+    assert ok["call"] is None                               # the source test's bug: deadline = the day it was said
+
+
+def test_call_deadline_comes_from_the_words_not_the_model():
+    # Visser, 21 Nov 2026: "S&P 500 up 15 next year"; the model said 2026-12-31
+    said = dt.date(2026, 11, 21)
+    c = extract.clean_call({"text": "S&P 500 up 15% next year", "horizon": "next year", "by": "2026-12-31",
+                            "measure_key": "sp500", "direction": "above", "threshold": "15%"}, said)
+    assert c["by"] == "2027-12-31" and c["threshold"] == 15.0
+    c = extract.clean_call({"text": "x", "horizon": "", "by": "2027-03-31", "measure_key": "made_up", "direction": "up"}, said)
+    assert c["by"] == "2027-03-31" and c["measure_key"] is None and c["direction"] is None
+
+
+@pytest.mark.parametrize("words,expected", [
+    ("next year", "2027-12-31"), ("by end of 2027", "2027-12-31"), ("this year", "2026-12-31"),
+    ("in three months", "2027-02-21"), ("within 6 weeks", "2027-01-02"), ("in the next 12 months", "2027-11-21"),
+    ("by Q2 2027", "2027-06-30"), ("by March 2027", "2027-03-31"), ("next month", "2026-12-31"),
+    ("next quarter", "2027-03-31"), ("eventually", None), ("by 2025", None)])
+def test_deadline_words(words, expected):
+    from hub.sweep import deadline
+    d = deadline.resolve(words, None, dt.date(2026, 11, 21))
+    assert (d.isoformat() if d else None) == expected
+
+
+def test_metric_and_level_swapped_are_put_right():
+    # Coutts in the source test: metric "5.5x", level "DeFi revenue"
+    m = "In DeFi, revenue is 5.5x, and the multiple is sub-10x (down 80%)."
+    ok, _ = extract.clean_record(rec(quote=m, metric="5.5x", level="DeFi revenue"), m)
+    assert ok["metric"] == "DeFi revenue" and ok["level"] == "5.5x" and ok["level_in_quote"]
+    ok, _ = extract.clean_record(rec(quote=m, metric="12", level="34"), m)
+    assert ok["metric"] is None and ok["level"] is None       # 34 is not in the material
+
+
+def test_metric_key_must_be_on_the_list():
+    extract.set_metric_keys(["realised_price", "other"])
+    try:
+        assert extract.clean_record(rec(metric_key="realised_price"), MATERIAL)[0]["metric_key"] == "realised_price"
+        assert extract.clean_record(rec(metric_key="btc_break_override"), MATERIAL)[0]["metric_key"] == "other"
+        assert "realised_price, other" in extract.system_prompt()
+    finally:
+        extract.set_metric_keys(["other"])
+
+
+def test_shared_show_makes_every_speaker_uncertain(monkeypatch):
+    import json
+    m = "We think global liquidity bottomed in October."
+    monkeypatch.setattr(xai, "call", lambda body, timeout=300: ({}, 0.0, json.dumps(
+        {"records": [rec(speaker="Andreas Steno Larsen", speaker_certain=True)]})))
+    keep, _, _ = extract.from_text("m", ["Mikkel Rosenvold", "Andreas Steno Larsen"], "Macro Mondays", m)
+    assert keep[0]["speaker"] == "Andreas Steno Larsen" and keep[0]["speaker_certain"] is False
+    keep, _, _ = extract.from_text("m", ["Andreas Steno Larsen"], "own newsletter", m)
+    assert keep[0]["speaker_certain"] is True
 
 
 def test_speaker_certain_only_when_exactly_true():
@@ -179,7 +234,7 @@ def test_from_text_wraps_material_as_data_and_checks_quotes(monkeypatch):
     user = seen["input"][1]["content"]
     assert "<material>" in user and user.rstrip().endswith("</material>")
     assert "tools" not in seen                      # the reading model has no tools at all
-    assert seen["input"][0]["content"] == extract.SYSTEM
+    assert seen["input"][0]["content"] == extract.system_prompt()
 
 
 class FakeFetch:

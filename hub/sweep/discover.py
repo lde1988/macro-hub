@@ -91,3 +91,12 @@ def youtube_search(fetch, name, now, channels=None):
                     "duration_s": _length_s((v.get("lengthText") or {}).get("simpleText")),
                     "date": date, "link": f"https://www.youtube.com/watch?v={v.get('videoId')}"})
     return 200, out
+
+
+def video_length(fetch, video_id):
+    """Length in seconds from the video's own page (the channel feed does not give it), or None."""
+    st, body = fetch.get(f"https://www.youtube.com/watch?v={video_id}", max_bytes=3_000_000)
+    if st != 200:
+        return None
+    m = re.search(rb'"lengthSeconds":"(\d+)"', body)
+    return int(m.group(1)) if m else None
