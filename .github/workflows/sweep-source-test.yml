@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     branches: [claude/sweep-check]
-    paths: [tools/sweep_source_test.py, hub/sweep/**, config/sweep.yaml, .github/workflows/sweep-source-test.yml]
+    paths: [tools/sweep_week_check.py, hub/sweep/**, config/sweep.yaml, .github/workflows/sweep-source-test.yml]
 permissions:
   contents: write
 concurrency:
@@ -27,7 +27,7 @@ jobs:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python tools/sweep_source_test.py out
+        run: python tools/sweep_week_check.py out
       - name: Publish the result to a side branch
         if: always()
         run: |

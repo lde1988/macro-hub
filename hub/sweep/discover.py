@@ -43,8 +43,10 @@ def _length_s(t):
     return s or None
 
 
-def youtube_search(fetch, name, now):
-    """Videos uploaded this week whose title names the person (YouTube's 'this week' filter)."""
+def youtube_search(fetch, name, now, channels=None):
+    """Videos uploaded this week whose title has the person's full name (YouTube's 'this week' filter).
+    With `channels`, only videos from those channel names are kept: YouTube is full of re-upload and
+    clickbait channels that put famous names on clips and made-up quotes."""
     url = "https://www.youtube.com/results?" + urllib.parse.urlencode({"search_query": name, "sp": "EgIIAw=="})
     status, body = fetch.get(url, max_bytes=8_000_000)
     if status != 200:
@@ -68,11 +70,15 @@ def youtube_search(fetch, name, now):
             for v in x:
                 walk(v)
     walk(data)
-    surname = name.split()[-1].lower()
+    full = name.lower()
+    allowed = {c.lower() for c in channels} if channels is not None else None
     out = []
     for v in found:
         title = "".join(r.get("text", "") for r in v.get("title", {}).get("runs", []))
-        if surname not in title.lower():
+        channel = "".join(r.get("text", "") for r in v.get("ownerText", {}).get("runs", []))
+        if full not in title.lower():
+            continue
+        if allowed is not None and not any(channel.lower().startswith(a) for a in allowed):
             continue
         ago = (v.get("publishedTimeText") or {}).get("simpleText", "")
         a = _AGO.search(ago)
@@ -81,7 +87,7 @@ def youtube_search(fetch, name, now):
             n, unit = int(a.group(1)), a.group(2)
             date = now - dt.timedelta(**{unit + "s": n})
         out.append({"video_id": v.get("videoId"), "title": title,
-                    "channel": "".join(r.get("text", "") for r in v.get("ownerText", {}).get("runs", [])),
+                    "channel": channel,
                     "duration_s": _length_s((v.get("lengthText") or {}).get("simpleText")),
                     "date": date, "link": f"https://www.youtube.com/watch?v={v.get('videoId')}"})
     return 200, out

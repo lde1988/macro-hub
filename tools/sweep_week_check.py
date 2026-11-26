@@ -22,9 +22,9 @@ from hub.sweep import discover, extract, feeds, transcribe, xai  # noqa: E402
 from hub.sweep.net import Fetch  # noqa: E402
 
 TEST_BUDGET = 6.00          # dollars: no further paid work once spent reaches this
-AUDIO_CAP_S = 3 * 3600      # transcribe at most 3 hours in this test
+AUDIO_CAP_S = 5 * 3600      # transcribe at most 5 hours in this test
 EPISODE_CAP_S = 90 * 60     # and at most 90 minutes of any one episode
-MAX_TRANSCRIBE = 3
+MAX_TRANSCRIBE = 5
 MAX_NEWSLETTER_POSTS = 5
 
 OUT = Path(sys.argv[1] if len(sys.argv) > 1 else "out")
@@ -103,7 +103,7 @@ lines += ["## 1. Newsletters and blogs", "",
           "| Person | Feed | Plain request | Browser-like request | Substack archive | Posts this week | Note |",
           "|---|---|---|---|---|---|---|"]
 for p in cfg["people"]:
-    for url in p.get("newsletters", []):
+    for url in p.get("newsletters", []) + (["https://lynalden.com/feed", "https://www.lynalden.com/feed"] if p["id"] == "alden" else []):
         s1, b1 = polite.get(url)
         s2, b2 = (s1, b1) if s1 == 200 else browser.get(url)
         s3, arch = ("not tried", [])
@@ -167,7 +167,7 @@ for p in cfg["people"]:
                 videos.setdefault(i["video_id"], (p, "own channel", cid, {**i, "channel": cid}))
     if p["id"] in ("oddlots",):
         continue
-    st, vids = discover.youtube_search(browser, p["name"], NOW)
+    st, vids = discover.youtube_search(browser, p["name"], NOW, cfg["youtube_guest_channels"])
     if st != 200:
         notes.append(f"YouTube search for {p['name']}: {st}")
     for v in vids:
@@ -210,7 +210,7 @@ by_person = {}
 for key, (p, how, show, e) in episodes.items():
     if e.get("audio_url") and p["id"] not in by_person:
         by_person[p["id"]] = (p, how, show, e)
-preferred = ["steno", "pal", "oddlots", "kedrosky", "howell", "alden", "diamandis", "follonier"]
+preferred = ["rosenvold", "baker", "alden", "visser", "rasmussen", "oddlots", "pal", "kedrosky"]
 for pid in preferred + list(by_person):
     if pid in by_person and by_person[pid] not in picked and len(picked) < MAX_TRANSCRIBE:
         picked.append(by_person[pid])
@@ -228,11 +228,18 @@ for p, how, show, e in picked:
             segs, billed, cost = transcribe.transcribe(src, Path(td) / "parts", cfg["models"]["groq_transcribe"], max_s)
         spent["groq"] += cost
         used_s += billed
-        text = "\n".join(f"[{mmss(s['start'])}] {s['text']}" for s in segs)
-        recs, dropped, c2 = extract.from_text(MODEL, p["name"], f"podcast {show}: {e['title']} ({how})", text)
+        text = " ".join(s["text"] for s in segs)          # plain words; times are found afterwards from the segments
+        names = [q["name"] for q in cfg["people"] if q["name"].split()[-1].lower() in e["title"].lower()]
+        speakers = list(dict.fromkeys([p["name"]] + names + (["Andreas Steno Larsen", "Mikkel Rosenvold"]
+                                                              if "macro mondays" in e["title"].lower() else [])))
+        recs, dropped, c2 = extract.from_text(MODEL, speakers, f"podcast {show}: {e['title']} ({how})", text)
+        by_name = {q["name"]: q for q in cfg["people"]}
+        for r in recs:                                       # each record belongs to whoever said it
+            q = by_name.get(r["speaker"], p)
+            add(q, "podcast", show if how == "name search" else e.get("title", ""), e["title"], e["date"],
+                e.get("link") or e["audio_url"], [r], ts_segments=segs)
+        recs_kept = len(recs)
         spent["xai"] += c2
-        add(p, "podcast", show if how == "name search" else e.get("title", ""), e["title"], e["date"],
-            e.get("link") or e["audio_url"], recs, ts_segments=segs)
         lines.append(f"| {p['name']} | {clip(e['title'], 50)} | {billed / 60:.0f} | ${cost:.3f} + ${c2:.3f} reading | "
                      f"{len(recs)} | {len(dropped)} {('(' + ', '.join(sorted(set(dropped))) + ')') if dropped else ''} |")
     except Exception as ex:  # noqa: BLE001
@@ -246,7 +253,7 @@ for p, url, i in newsletter_items[:MAX_NEWSLETTER_POSTS]:
         lines.append(f"| {p['name']} | {clip(i['title'], 50)} | {fmt_d(i['date'])} | skipped (too short or budget) | |")
         continue
     try:
-        recs, dropped, c = extract.from_text(MODEL, p["name"], f"newsletter post: {i['title']}", i["text"])
+        recs, dropped, c = extract.from_text(MODEL, [p["name"]], f"newsletter post: {i['title']}", i["text"])
         spent["xai"] += c
         add(p, "newsletter", url, i["title"], i["date"], i["link"], recs)
         lines.append(f"| {p['name']} | {clip(i['title'], 50)} | {fmt_d(i['date'])} | {len(recs)} | {len(dropped)} |")
@@ -261,8 +268,9 @@ for p in cfg["people"]:
     for h in ([xs] if isinstance(xs, str) else xs or []):
         handles.append(h)
         owner[h.lower()] = p
-handles.append("mert")      # candidate for Mert Mumtaz, checked below; records kept only if confirmed
-owner["mert"] = {"id": "mumtaz", "name": "Mert Mumtaz (candidate @mert)"}
+for h, pid, nm in (("alive_", "yahya", "Ali Yahya (candidate @alive_)"), ("mert", "mumtaz", "Mert Mumtaz (candidate @mert)")):
+    handles.append(h)       # candidates found by search on 26 Nov; confirmed or not in the report
+    owner[h] = {"id": pid, "name": nm}
 batches = [handles[:10], handles[10:20]]
 for b in batches:
     if total() >= TEST_BUDGET or not b:
@@ -281,15 +289,14 @@ for b in batches:
 
 # Who are Ali Yahya and Mert Mumtaz on X now?
 if total() < TEST_BUDGET:
-    q = ("Find the current X (Twitter) accounts of (1) Ali Yahya, who was a general partner at a16z crypto until "
-         "October 2026, and (2) Mert Mumtaz, CEO of Helius (Solana). For each give the handle, display name, bio and "
-         "the date and URL of one recent post. Say 'not found' rather than guess.")
+    q = ("Find the current X (Twitter) account of Mert Mumtaz, CEO of Helius (Solana). Give the handle, display "
+         "name, bio and the date and URL of one recent post. Is @mert his account? Say 'not found' rather than guess.")
     try:
         j, c, text = xai.call({"model": MODEL, "max_turns": 4, "input": [{"role": "user", "content": q}],
                                "tools": [{"type": "x_search"}]})
         spent["xai"] += c
-        lines += ["", "### Handle search: Ali Yahya and Mert Mumtaz (cost ${:.3f})".format(c), "",
-                  "> " + clip(text, 1500).replace("\n", " ")]
+        lines += ["", "### Handle search: Mert Mumtaz (cost ${:.3f})".format(c), "",
+                  "> " + clip(text, 3000).replace("\n", " ")]
     except Exception as ex:  # noqa: BLE001
         lines.append(f"Handle search failed: {clip(ex, 200)}")
 

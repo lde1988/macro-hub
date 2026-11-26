@@ -28,13 +28,15 @@ Rules:
   For credit_risk, "positive" means credit conditions are healthy (low risk); "negative" means rising risk.
 - "call": only a dated, checkable prediction (an outcome and a date or period by which it can be judged),
   e.g. {"text": "...", "by": "2026-12-31", "measure": "Bitcoin price", "target": ">100000"}; else null.
-- "speaker_certain": true only if the material makes clear the named person said it (their own post or
-  newsletter, or a transcript where they are plainly the speaker); false otherwise.
+- "speaker": who said it, chosen ONLY from the list of people given; null if it was someone else (a host,
+  another guest) or if you cannot tell. Never attribute a host's words to a guest or the other way round.
+- "speaker_certain": true only if the material makes clear that speaker said it (their own post or
+  newsletter, or a transcript where they are plainly the one talking); false otherwise.
 """
 
 FORMAT = """{"records": [{"claim": "...", "quote": "...", "metric": null, "level": null,
   "stances": {"liquidity": null, "crypto": {"stance": "negative", "quote": "..."}, "ai_spending": null, "credit_risk": null},
-  "call": null, "speaker_certain": true}]}"""
+  "call": null, "speaker": "Name From The List", "speaker_certain": true}]}"""
 
 
 def norm(s):
@@ -47,8 +49,9 @@ def quote_found(quote, material):
     return len(q) >= 12 and q in norm(material)
 
 
-def clean_record(r, material=None):
-    """Keep only known fields of the right type. Returns (record or None, reason)."""
+def clean_record(r, material=None, speakers=None):
+    """Keep only known fields of the right type. Returns (record or None, reason).
+    With `speakers`, the record must name one of them as the speaker, else it is dropped."""
     if not isinstance(r, dict):
         return None, "not an object"
     claim, quote = r.get("claim"), r.get("quote")
@@ -76,21 +79,28 @@ def clean_record(r, material=None):
     out["call"] = ({k: str(c.get(k))[:200] for k in ("text", "by", "measure", "target") if c.get(k) is not None}
                    if isinstance(c, dict) and c.get("text") and c.get("by") else None)
     out["speaker_certain"] = r.get("speaker_certain") is True
+    if speakers is not None:
+        who = r.get("speaker")
+        if who not in speakers:
+            return None, "said by someone not on the list, or speaker unclear"
+        out["speaker"] = who
     return out, "ok"
 
 
-def from_text(model, person_name, source_desc, material, max_chars=90_000):
-    """Records from one piece of material (newsletter post, transcript). Returns (records, dropped, cost)."""
+def from_text(model, speakers, source_desc, material, max_chars=90_000):
+    """Records from one piece of material (newsletter post, transcript), attributed only to `speakers`.
+    Returns (records, dropped reasons, cost)."""
     material = material[:max_chars]
     body = {"model": model, "max_turns": 1, "input": [
         {"role": "system", "content": SYSTEM},
-        {"role": "user", "content": f"Person: {person_name}\nSource: {source_desc}\nFormat: {FORMAT}\n\n"
+        {"role": "user", "content": f"People (the only possible speakers): {'; '.join(speakers)}\n"
+                                    f"Source: {source_desc}\nFormat: {FORMAT}\n\n"
                                     f"<material>\n{material}\n</material>"}]}
     j, cost, text = xai.call(body)
     data = xai.first_json(text) or {}
     keep, dropped = [], []
     for r in data.get("records", []) if isinstance(data.get("records"), list) else []:
-        rec, why = clean_record(r, material)
+        rec, why = clean_record(r, material, speakers)
         (keep.append(rec) if rec else dropped.append(why))
     return keep, dropped, cost
 
@@ -110,8 +120,8 @@ def from_x(model, handles, start, end, max_turns=6):
     """Records straight from X search, limited to the handles (at most 20), images read."""
     assert 0 < len(handles) <= 20
     body = {"model": model, "max_turns": max_turns,
-            "input": [{"role": "user", "content": X_PROMPT.format(
-                start=start, end=end, handles=", ".join("@" + h for h in handles), fmt=FORMAT)}],
+            "input": [{"role": "user", "content": (X_PROMPT.replace("{start}", start)
+                .replace("{end}", end).replace("{handles}", ", ".join("@" + h for h in handles)).replace("{fmt}", FORMAT))}],
             "tools": [{"type": "x_search", "allowed_x_handles": handles, "from_date": start, "to_date": end,
                        "enable_image_understanding": True}]}
     j, cost, text = xai.call(body, timeout=600)

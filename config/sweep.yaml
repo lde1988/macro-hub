@@ -116,3 +116,14 @@ people:
     balancing: true
 
 guest_search: true             # also search podcast directories and YouTube by each person's name
+
+# YouTube name search keeps only these channels (a channel name starting with one of these).
+# YouTube is full of re-upload and clickbait channels that put famous names on clips and invented quotes;
+# the 19-25 Nov test found many (reports/14). Add a show here to include it.
+youtube_guest_channels: [Real Vision, Raoul Pal The Journey Man, The Monetary Matters Network, Monetary Matters,
+  Sourcery, TFTC, Palisades Gold Radio, Cointelegraph, Morgan Stanley, The Alpha Exchange, The Acquirers Podcast,
+  Anthony Pompliano, Forward Guidance, Blockworks, Bankless, Milk Road, Bloomberg, Coin Stories, Natalie Brunell,
+  What Bitcoin Did, Peter McCormack, Invest Like the Best, Colossus, BG2Pod, TBPN, a16z, Unchained, Lightspeed,
+  The Index Podcast, When Shift Happens, Peter H. Diamandis, Jordi Visser, CNBC, Bloomberg Television,
+  Norges Bank Investment Management, Macro Voices, MacroVoices, The Meb Faber Show, Big Technology,
+  Stansberry Research, The David Lin Report, Kitco NEWS, Natalie Brunell, Steno Research, Crossborder Capital]
