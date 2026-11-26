@@ -1,0 +1,35 @@
+# One-off, read-only check for the Phase 2 people list (reports/13-sweep-plan.md).
+# Runs on a push to the claude/sweep-check branch. Publishes its table to the sweep-check-results branch.
+# The X part spends a little from the xAI account (under $1); the cost is printed at the end.
+name: Sweep people check
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/sweep-check]
+    paths: [tools/sweep_people_check.py, .github/workflows/sweep-people-check.yml]
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet requests
+      - name: Run people check
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+        run: mkdir -p out && python tools/sweep_people_check.py --x > out/people_check.md
+      - name: Publish the result to a side branch
+        if: always()
+        run: |
+          cd out
+          git init -q -b sweep-check-results
+          git config user.name "macro-hub bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add people_check.md
+          git commit -q -m "Sweep people check result"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" sweep-check-results
