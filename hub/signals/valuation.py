@@ -71,10 +71,37 @@ def reading(history, cfg, price_now=None, today=None):
     return out
 
 
+STRETCH_LABEL = "Compared with its own recent trend, not a fair value"
+
+
+def stretch(history, cfg, price_now=None):
+    """Stretch from trend: log(price / 200-day moving average), as a z-score against the coin's own
+    history of the same measure. Needs at least 365 days of the measure."""
+    v = cfg["valuations"]
+    s = history[history > 0].sort_index() if len(history) else history
+    n = v["stretch_ma_days"]
+    base = {"label": STRETCH_LABEL}
+    if len(s) < n + 1:
+        return {**base, "status": "too_little", "text": "too little history", "days": 0}
+    ma = s.rolling(n).mean()
+    m = np.log(s / ma).dropna()
+    if len(m) < v["stretch_min_days"]:
+        return {**base, "status": "too_little", "text": "too little history", "days": len(m)}
+    last = float(s.iloc[-1])
+    p = float(price_now) if price_now and abs(float(price_now) / last - 1) <= v["live_max_gap"] else last
+    now = math.log(p / float(ma.iloc[-1]))
+    sd = float(m.std())
+    z = (now - float(m.mean())) / sd if sd > 0 else 0.0
+    name, colour = zone(z)
+    return {**base, "status": "ok", "z": round(z, 3), "zone": name, "colour": colour, "ratio": p / float(ma.iloc[-1]),
+            "ma": float(ma.iloc[-1]), "days": len(m), "typical_ratio": math.exp(float(m.mean()))}
+
+
 def all_coins(view, cfg):
     """One reading per coin, in the configured order. view: hub.signals.core.View."""
     out = []
     for c in cfg["valuations"]["coins"]:
         r = reading(view.s(c["history"]), cfg, price_now=view.live(c["live"]), today=view.now.normalize())
-        out.append({"sym": c["sym"], "name": c["name"], **r})
+        st = stretch(view.s(c["history"]), cfg, price_now=view.live(c["live"]))
+        out.append({"sym": c["sym"], "name": c["name"], **r, "stretch": st})
     return out

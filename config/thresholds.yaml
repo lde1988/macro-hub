@@ -83,6 +83,12 @@ btc_ndx:
   green_above: 0.02          # 2% or more above the average
   red_below: -0.02           # 2% or more below
 
+btc_ma:                      # context only: shown in "Is it cheap?" but not counted in the group or the reading
+  ma_days: 200               # 200-day moving average of the daily close
+  ma_weeks: 200              # 200-week moving average of the weekly close, shown as a marker
+  green_at_or_below: 0.8     # price at or below 0.8 times its 200-day average
+  red_at_or_above: 2.4       # price at or above 2.4 times its 200-day average
+
 alt_value:
   change_days: 30  # days over which the change is measured
   green_at_or_above: 0.05    # altcoin value / Bitcoin value up 5% or more in 30 days
@@ -233,3 +239,5 @@ valuations:
   min_years_confident: 3.0   # under this: dial greyed, "short history, low confidence"
   min_r_squared: 0.3         # under this: dial greyed, "the line does not fit this coin's history; reading not meaningful"
   live_max_gap: 0.25         # ignore a live price more than 25% away from the last daily close (bad print)
+  stretch_ma_days: 200       # "stretch from trend": log of price over its 200-day moving average ...
+  stretch_min_days: 365      # ... scored against at least 365 days of its own history of that measure

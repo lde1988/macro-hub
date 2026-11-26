@@ -19,6 +19,7 @@ PHRASE = {
     "lth_sopr": {G: "long-term holders are selling at a loss, as they did at past lows", A: "long-term holders are not selling at a loss", R: "long-term holders are cashing in large profits"},
     "net_loss": {G: "losses being taken are as heavy as at past lows", A: "losses being taken are not extreme", R: "losses being taken are not extreme"},
     "btc_ndx": {G: "Bitcoin is gaining on tech shares", A: "Bitcoin is moving in line with tech shares", R: "Bitcoin is losing ground to tech shares"},
+    "btc_ma": {G: "Bitcoin is well below its 200-day average", A: "Bitcoin is within its normal range of its 200-day average", R: "Bitcoin is far above its 200-day average"},
     "alt_value": {G: "smaller coins are gaining on Bitcoin", A: "smaller coins are holding level with Bitcoin", R: "smaller coins are losing ground to Bitcoin"},
     "alt_watch": {G: "the watchlist coins are gaining on Bitcoin", A: "the watchlist coins are roughly level with Bitcoin", R: "the watchlist coins are losing ground to Bitcoin"},
     # ---- rates and the dollar
@@ -116,7 +117,7 @@ def _phrases(dials, colour, limit):
 
 def group_sentence(section, dials):
     """One or two plain sentences: what the group is doing now, and what that means for crypto."""
-    mine = [dials[i] for i in section["dials"] if i in dials]
+    mine = [dials[i] for i in section["dials"] if i in dials and not dials[i].get("context_only")]
     colour = section.get("colour")
     if colour is None or not any(d.get("colour") for d in mine):
         return "No data yet."

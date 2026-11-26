@@ -155,7 +155,8 @@ def test_cards_always_carry_a_word_and_symbol_not_just_colour(tmp_path):
         if v["status"] in ("ok", "greyed"):
             card = dashboard.valuation_card(v)
             assert v["zone"][3:] in card and any(sym in card for sym in "▲●▼")
-            assert f'{v["z"]:+.2f} SD'.replace("-", "\u2212") in card and card.index("Trend-based estimate") < card.index("<svg")
+            assert f'{v["z"]:+.2f} SD'.replace("-", "\u2212") in card
+            assert card.index("Trend-based estimate") < card.index('<div class="cvdial"><svg', card.index("Log-regression channel") if "Log-regression channel" in card else 0)
 
 
 def test_valuations_are_one_digest_line_and_never_a_push_or_part_of_the_reading(tmp_path):
@@ -180,3 +181,76 @@ def test_the_card_renders_from_the_published_json_too(tmp_path):
     v = {"sym": "BTC", "name": "Bitcoin", **reading(exp_series(8, growth=0.8, noise=wave(0.3)), C)}
     back = json.loads(json.dumps(v, default=str))
     assert dashboard.valuation_card(back) == dashboard.valuation_card(v)
+
+
+# ------------------------------------------------------------------ stretch from trend
+from hub.signals.valuation import STRETCH_LABEL, stretch  # noqa: E402
+
+
+def test_stretch_is_log_price_over_200_day_average_scored_against_its_own_history():
+    s = exp_series(4, growth=0.5, noise=wave(0.3, 400))
+    st = stretch(s, C)
+    ma = s.rolling(200).mean()
+    m = np.log(s / ma).dropna()
+    now = math.log(s.iloc[-1] / ma.iloc[-1])
+    assert st["status"] == "ok" and st["days"] == len(m)
+    assert abs(st["z"] - round((now - m.mean()) / m.std(ddof=0), 3)) < 1e-9
+    assert abs(st["ratio"] - s.iloc[-1] / ma.iloc[-1]) < 1e-12 and st["label"] == STRETCH_LABEL
+    assert STRETCH_LABEL == "Compared with its own recent trend, not a fair value"
+
+
+def test_stretch_needs_365_days_of_the_measure():
+    assert stretch(exp_series(1.5, growth=0.5), C)["status"] == "too_little"           # 548 days: 349 of the measure
+    assert stretch(exp_series(1.55, growth=0.5), C)["status"] == "ok"                  # 567 days: 368 of the measure
+    assert stretch(exp_series(0.3, growth=0.5), C)["text"] == "too little history"
+
+
+def test_stretch_reads_high_after_a_spike_and_low_after_a_crash():
+    base = exp_series(4, growth=0.5, noise=wave(0.2, 300))
+    up, down = base.copy(), base.copy()
+    up.iloc[-30:] *= np.exp(np.linspace(0, 0.8, 30))
+    down.iloc[-30:] *= np.exp(np.linspace(0, -0.8, 30))
+    assert stretch(up, C)["colour"] == "red" and stretch(down, C)["colour"] == "green"
+
+
+def test_greyed_cards_lead_with_the_stretch_reading(tmp_path):
+    vals = all_coins(ten_coin_view(tmp_path), C)
+    for v in vals:
+        card = dashboard.valuation_card(v)
+        if v["status"] == "greyed" and v["stretch"]["status"] == "ok":
+            assert card.index("Stretch from trend") < card.index("Log-regression channel")
+        elif v["status"] == "ok":
+            assert card.index("<svg") < card.index("Stretch from trend")            # under the log-regression dial
+        assert "Stretch from trend" in card and "not a fair value" in card
+
+
+# ------------------------------------------------------------------ Bitcoin moving averages (context only)
+def test_btc_moving_average_dial_bands_and_200_week_marker(tmp_path):
+    from hub.signals import dials as D
+    from tests.helpers import daily
+    for i, (last, want) in enumerate([(0.79, "green"), (0.8, "green"), (1.5, "amber"), (2.39, "amber"), (2.4, "red")]):
+        s = daily([100.0] * 1500)                                  # 200-day average exactly 100; the live price is tested against it
+        r = D.btc_ma(view(tmp_path / str(i), {"BTCUSD": s}, live={"BTCUSD": 100.0 * last}), C)
+        assert r.colour == want, (last, r.colour)
+    s = daily([50.0] * 1200 + [100.0] * 300)
+    r = D.btc_ma(view(tmp_path / "w", {"BTCUSD": s}), C)
+    assert r.extra["above_200w"] is True and "above the 200-week average" in r.text and r.extra["context_only"]
+    assert abs(r.extra["ma200d"] - 100.0) < 1e-9
+
+
+def test_btc_moving_average_dial_is_context_only(tmp_path):
+    from hub.signals.engine import evaluate, reading
+    from tests.helpers import daily
+    from tests.test_outputs import small_feed
+    fd, out = small_feed(tmp_path)
+    d = next(x for x in fd["dials"] if x["id"] == "btc_ma")
+    assert d["context_only"] is True
+    sec = next(x for x in fd["sections"] if x["id"] == "valuation")
+    assert "btc_ma" in sec["dials"]                                                  # shown in the group ...
+    prev = alerts.summary(fd)
+    prev["dials"]["btc_ma"] = "green" if d["colour"] != "green" else "red"
+    assert [p for p in alerts.plan(prev, fd, C) if "moving" in p["title"]] == []    # ... never pushes
+    r = out["readings"]
+    before = reading(r, C)["headline"]
+    r["btc_ma"].update(colour="red")
+    assert reading(r, C)["headline"] == before                                       # ... and never moves the reading

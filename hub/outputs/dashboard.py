@@ -111,7 +111,8 @@ def valuation_card(v):
     if v["status"] in ("none", "too_little"):
         foot = f'<p class="cvnote">{esc(v.get("label", ""))}</p>' + foot
         msg = "too little history" + (f' ({v["months"]} months)' if v.get("months") is not None else "") if v["status"] == "too_little" else "no data yet"
-        return f'<article class="cvcard" id="cv-{esc(v["sym"].lower())}">{head}<p class="cvbig muted">{esc(msg)}</p><p class="cvsub">No dial is drawn for under a year of history.</p>{foot}</article>'
+        return (f'<article class="cvcard" id="cv-{esc(v["sym"].lower())}">{head}<p class="cvh">Log-regression channel</p><p class="cvbig muted">{esc(msg)}</p>'
+                f'<p class="cvsub">No dial is drawn for under a year of history.</p>{stretch_block(v.get("stretch"))}{foot}</article>')
     grey = v["status"] == "greyed"
     c = v["colour"]
     warn = "".join(f'<p class="cvwarn">{esc(w[:1].upper() + w[1:])}.</p>' for w in v.get("warnings", []))
@@ -120,7 +121,10 @@ def valuation_card(v):
     when = "live" if v.get("price_is_live") else f'close {v["last_close_date"]}'
     yrs = v["years"]
     hist = f'{yrs:.1f} years' if yrs >= 1 else f'{v["months"]} months'
-    return (f'<article class="cvcard{" grey" if grey else ""}" id="cv-{esc(v["sym"].lower())}">{head}'
+    lead = grey and (v.get("stretch") or {}).get("status") == "ok"
+    first = stretch_block(v.get("stretch"), lead=True) + '<p class="cvh">Log-regression channel</p>' if lead else ""
+    after = "" if lead else stretch_block(v.get("stretch"))
+    return (f'<article class="cvcard{" grey" if grey else ""}" id="cv-{esc(v["sym"].lower())}">{head}{first}'
             f'<p class="cvbig" style="color:{COL[c] if not grey else "#8a9097"}">{minus(f"{v[chr(122)]:+.2f}")} SD</p>'
             f'<p class="cvzone" style="color:{COL[c] if not grey else "#8a9097"}"><span aria-hidden="true">{SYM[c]}</span> {esc(minus(v["zone"][:1].upper() + v["zone"][1:]))}</p>'
             f'<p class="cvlabel">{esc(v.get("label", ""))}</p>'
@@ -128,7 +132,27 @@ def valuation_card(v):
             f'<p class="cvsub">Fair value {fmt_price(v["fair_value"])} · assumes {minus(f"{v[chr(103) + 'rowth_per_year'] * 100:+.0f}")}% a year</p>'
             f'<p class="cvprice">Price now <b>{fmt_price(v["price"])}</b> <span class="cvsub">({esc(when)})</span></p>'
             f'<table class="cvbands">{bands}</table>'
-            f'<p class="cvsub">History used: {hist}, from {esc(v["history_from"])} · line fit R² {v["r2"]:.2f}</p>{foot}</article>')
+            f'<p class="cvsub">History used: {hist}, from {esc(v["history_from"])} · line fit R² {v["r2"]:.2f}</p>{after}{foot}</article>')
+
+
+def stretch_block(st, lead=False):
+    """The second reading: stretch from the 200-day trend, same seven zones."""
+    if not st:
+        return ""
+    title = '<p class="cvh">Stretch from trend</p>'
+    lab = f'<p class="cvlabel">{esc(st.get("label", ""))}</p>'
+    if st.get("status") != "ok":
+        days = st.get("days") or 0
+        return (f'<div class="cvstretch{" lead" if lead else ""} grey">{title}<p class="cvmid muted">too little history</p>'
+                f'<p class="cvsub">Needs 365 days of the measure; {days} available.</p>{lab}</div>')
+    c = st["colour"]
+    v = {"sym": "stretch", "z": st["z"], "zone": st["zone"]}
+    return (f'<div class="cvstretch{" lead" if lead else ""}">{title}'
+            f'<p class="{"cvbig" if lead else "cvmid"}" style="color:{COL[c]}">{minus(f"{st[chr(122)]:+.2f}")} SD</p>'
+            f'<p class="cvzone" style="color:{COL[c]}"><span aria-hidden="true">{SYM[c]}</span> {esc(minus(st["zone"][:1].upper() + st["zone"][1:]))}</p>'
+            f'{lab}<div class="cvdial">{valuation_svg(v)}</div>'
+            f'<p class="cvsub">Price is {st["ratio"]:.2f} times its 200-day average ({fmt_price(st["ma"])}); usually {st["typical_ratio"]:.2f} times. '
+            f'Scored against {st["days"]:,} days.</p></div>')
 
 
 def valuations_pane(vals):
@@ -257,7 +281,10 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 .cvzone{{font-size:18px;font-weight:700;margin-top:2px}} .cvlabel{{font-size:13px;color:#c9ced4;margin-top:6px}}
 .cvwarn{{font-size:14px;color:var(--amber);margin-top:6px}}
 .cvdial svg{{display:block;width:100%;max-width:340px;margin:8px auto 0}}
-.cvcard.grey .cvdial{{filter:grayscale(1);opacity:.45}}
+.cvcard.grey > .cvdial{{filter:grayscale(1);opacity:.45}} .cvstretch.grey .cvmid{{color:var(--mute)}}
+.cvstretch{{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}} .cvstretch.lead{{border-top:0;margin-top:6px;padding-top:0}}
+.cvstretch.lead + .cvh{{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}}
+.cvh{{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin-top:10px}} .cvmid{{font-size:26px;font-weight:800;margin-top:4px}} .cvmid.muted{{font-size:18px}}
 .cvsub{{font-size:13px;color:var(--mute);margin-top:4px}} .cvprice{{margin-top:8px}}
 .cvbands{{margin-top:8px;font-size:14px;color:var(--ink)}} .cvbands td{{padding:3px 0}} .cvbands td:last-child{{text-align:right;font-variant-numeric:tabular-nums}}
 .cvnote{{font-size:12px;color:var(--mute);margin-top:8px;font-style:italic}}

@@ -213,6 +213,25 @@ def alt_value_ratio(v):
     return ((df.iloc[:, 0] - btc - stable) / btc).dropna()
 
 
+@dial("btc_ma", "A", "Bitcoin against its moving averages")
+def btc_ma(v, c, prev=None):
+    """Context only: shown in the group, not counted in it, and not part of the reading."""
+    k, s = c["btc_ma"], v.s("BTCUSD")
+    if len(s) < k["ma_days"]:
+        return Raw()
+    price, pdate = v.latest("BTCUSD")
+    ma = float(s.iloc[-k["ma_days"]:].mean())
+    x = price / ma
+    col = band(x, [k["green_at_or_below"], k["red_at_or_above"]], [G, A, R], right=[True, False])
+    w = weekly_closes(s)
+    wk = float(w.iloc[-k["ma_weeks"]:].mean()) if len(w) >= k["ma_weeks"] else None
+    side = "" if wk is None else (" · price is above the 200-week average" if price >= wk else " · price is below the 200-week average")
+    return Raw(x, col, f"{x:.2f}x its 200-day average ({money(ma)}){side}" + (f" ({money(wk)})" if wk else ""),
+               "Context only. Green at 0.8 times the 200-day average or lower; red at 2.4 times or higher.", pdate,
+               gauge(0.4, 3.2, [k["green_at_or_below"], k["red_at_or_above"]], [G, A, R]),
+               {"ma200d": ma, "ma200w": wk, "above_200w": None if wk is None else price >= wk, "context_only": True})
+
+
 @dial("alt_value", "A", "Altcoin value against Bitcoin")
 def alt_value(v, c, prev=None):
     k, r = c["alt_value"], alt_value_ratio(v)
@@ -690,6 +709,9 @@ def hikes_out(v, c, prev=None):
     return _hike(v, c, "hikes_out")
 
 
+CONTEXT_ONLY = {"btc_ma"}      # shown, but not counted in their group, the reading, or pushes (until replayed and approved)
+for _d in DIALS:
+    _d["context_only"] = _d["id"] in CONTEXT_ONLY
 for _d in DIALS:  # the dollar dials change only on a new ECB fixing, handled inside level_state
     if _d["id"] in ("dollar", "dollar_reversal", "btc_weekly", "weekly_reclaim"):
         _d["confirm"] = "none"

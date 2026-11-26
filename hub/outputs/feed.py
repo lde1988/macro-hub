@@ -25,7 +25,9 @@ def days_since(since, now):
 
 
 def section(sid, name, kind, dials):
-    """One line per family: a colour and a plain sentence."""
+    """One line per family: a colour and a plain sentence. Context-only dials are listed but not counted."""
+    shown = dials
+    dials = [d for d in dials if not d.get("context_only")]
     live = [d for d in dials if d["colour"]]
     red = [d["title"] for d in live if d["colour"] == R]
     amber = [d for d in live if d["colour"] == A]
@@ -46,7 +48,7 @@ def section(sid, name, kind, dials):
     if stale:
         sentence += " Stale: " + ", ".join(stale) + "."
     return {"id": sid, "name": name, "kind": kind, "colour": colour, "word": WORD[colour], "sentence": sentence,
-            "dials": [d["id"] for d in dials]}
+            "dials": [d["id"] for d in shown]}
 
 
 def build(out, cfg, registry, now, status, since, record=None, valuations=None):
@@ -63,6 +65,7 @@ def build(out, cfg, registry, now, status, since, record=None, valuations=None):
         dials.append({
             "id": r["id"], "title": r["title"], "group": r["group"],
             "family": fam_of.get(r["id"], "valuation" if r["group"] == "A" else "turn"),
+            "context_only": bool(r.get("context_only")),
             "value": r["value"], "text": r["text"], "colour": r["colour"], "word": WORD[r["colour"]],
             "since": r["since"], "data_date": obs, "data_age_days": age, "stale": stale,
             "stale_reason": (f"newest data is {age} days old" + ("; last colour kept" if r["colour"] else "; no colour given") if too_old else

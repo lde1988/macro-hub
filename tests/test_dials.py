@@ -489,7 +489,7 @@ def test_every_dial_copes_with_no_data(tmp_path):
 
 def test_dial_ids_are_unique_and_grouped():
     ids = [d["id"] for d in D.DIALS]
-    assert len(ids) == len(set(ids)) == 39
+    assert len(ids) == len(set(ids)) == 40
     assert {d["group"] for d in D.DIALS} == {"A", "B", "C", "D"}
 
 

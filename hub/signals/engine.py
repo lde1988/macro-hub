@@ -79,7 +79,7 @@ def evaluate_dials(view, cfg, state):
         fresh_green = (st["colour"] == G and not st["baseline"] and st["since"] is not None
                        and (view.now - pd.Timestamp(st["since"])).days < cfg["turn"]["fresh_weeks"] * 7)
         readings[d["id"]] = {
-            "id": d["id"], "group": d["group"], "title": d["title"], "value": raw.value, "text": raw.text,
+            "id": d["id"], "group": d["group"], "title": d["title"], "context_only": d.get("context_only", False), "value": raw.value, "text": raw.text,
             "colour": st["colour"], "word": WORD[st["colour"]], "raw_colour": raw.colour, "moves": raw.moves,
             "obs_date": str(raw.obs)[:10] if raw.obs is not None else None, "since": st["since"],
             "changed_from": changed_from, "fresh_red": fresh_red, "fresh_green": fresh_green, "no_data": raw.colour is None,

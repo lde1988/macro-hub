@@ -34,7 +34,7 @@ def test_feed_has_version_reading_regime_and_every_dial(tmp_path):
     assert fd["version"] == "1.0" and fd["generated_at"] == "2026-11-25T09:00:00Z" and "HKT" in fd["generated_at_hkt"]
     assert fd["reading"]["label"] == "HOLD" and fd["reading"]["days_in_force"] == 9
     assert fd["trend_exit"]["state"] == "RISK-OFF" and fd["regime"]["name"] == "BREAK"
-    assert len(fd["dials"]) == 39
+    assert len(fd["dials"]) == 40
     for d in fd["dials"]:
         assert {"id", "title", "group", "family", "value", "text", "colour", "word", "data_date", "data_age_days", "stale", "moves", "gauge"} <= set(d)
     json.dumps(fd, default=str)                                   # must be writable as JSON
@@ -108,10 +108,10 @@ def test_dashboard_is_self_contained_and_in_the_agreed_order(tmp_path):
 def test_dashboard_never_relies_on_colour_alone(tmp_path):
     fd, _ = small_feed(tmp_path)
     page = dashboard.render(fd)
-    assert page.count('<article class="dial') == 39 and page.count("<svg") == 39
+    assert page.count('<article class="dial') == 40 and page.count("<svg") == 40
     for word in ("Supports", "Neutral", "Against"):
         assert word in page
-    assert page.count('class="moves"') == 39                             # one sentence on what would move each dial
+    assert page.count('class="moves"') == 40                             # one sentence on what would move each dial
 
 
 def test_red_light_shows_the_weak_record_line(tmp_path):

@@ -50,8 +50,8 @@ def plan(prev, feed, cfg, down_before=None):
     changes, top = [], 0
     for d in feed["dials"]:
         old, new = prev.get("dials", {}).get(d["id"]), d["colour"]
-        if old is None or new is None or old == new:
-            continue
+        if old is None or new is None or old == new or d.get("context_only"):
+            continue                                    # context-only dials never push
         pr = (a["dial_red_priority"] if new == "red" else
               a["improvement_priority"] if (new == "green" or old == "red") else a["dial_change_priority"])
         top = max(top, pr)
