@@ -57,8 +57,9 @@ def run_fetch(data_dir, backfill=False, only=None, now=None, registry=None, root
         if reg["sources"].get(name, {}).get("scheduled") is False and not (only and name in only):
             continue                                    # runs only in its own workflow (asked for by name)
         st = status.setdefault(name, {"fails": 0})
-        if not backfill and not is_due(st, reg["sources"][name].get("every", 60), now_ts):
-            continue
+        never_loaded = any(not len(store.series(e["id"])) for e in entries if e["id"] not in (st.get("series_errors") or {}))
+        if not backfill and not never_loaded and not is_due(st, reg["sources"][name].get("every", 60), now_ts):
+            continue                                    # (a source with a series never loaded is always due)
         st["last_try"] = now.isoformat()
         ctx = Ctx(now=now, backfill=backfill, root=str(root))
         for e in entries:

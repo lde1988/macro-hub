@@ -371,3 +371,15 @@ def test_a_new_series_loads_its_full_history_once_marked_as_back_filled(tmp_path
     assert asked == [pd.Timestamp("2020-01-01")] and list(store.raw("ECB_USD")["backfill"]) == [1, 1]
     store, _, _ = F.run_fetch(tmp_path, now=NOW + dt.timedelta(hours=1), registry=reg, fetchers={"ecb": ecb_fake})
     assert asked[1] == pd.Timestamp("2026-07-28")                       # afterwards only the usual 120-day look-back
+
+
+def test_a_source_with_a_never_loaded_series_is_asked_at_once(tmp_path):
+    reg = {"sources": {"ecb": {"every": 360}}, "series": [{"id": "ECB_USD", "source": "ecb", "start": "2026-01-01"}]}
+    calls = []
+    one = pd.Series({pd.Timestamp("2026-11-24"): 1.1})
+    F.run_fetch(tmp_path, now=NOW, registry=reg, fetchers={"ecb": lambda e, c: calls.append(1) or Result(history={"ECB_USD": one})})
+    reg["series"].append({"id": "ECB_JPY", "source": "ecb", "start": "2026-01-01"})            # a series added later
+    F.run_fetch(tmp_path, now=NOW + dt.timedelta(minutes=15), registry=reg,
+                fetchers={"ecb": lambda e, c: calls.append(2) or Result(history={"ECB_USD": one, "ECB_JPY": one})})
+    F.run_fetch(tmp_path, now=NOW + dt.timedelta(minutes=30), registry=reg, fetchers={"ecb": lambda e, c: calls.append(3) or Result()})
+    assert calls == [1, 2]                                    # asked at once for the new series, then back to every 6 hours
