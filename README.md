@@ -177,8 +177,9 @@ dial, band, threshold or rule. The one exception is Jamie Coutts' stated levels 
 - **Cost guard**: a monthly budget (`budget.monthly_usd`, $20) and hard caps per run (300 X posts, 25 hours of
   audio and video), all in `config/sweep.yaml`. Each run's cost is logged in the data branch's `sweep/costs.csv`.
   A push comes at 80% of the month's budget; at 95% paid work stops until the next month.
-- **Switching it on or off**: `enabled: true` or `false` in `config/sweep.yaml`. The button (Actions → Weekly
-  sweep → Run workflow) has a tick-box to run it once even while switched off.
+- **Switching it on or off**: `enabled: true` or `false` in `config/sweep.yaml` (on since 26 November 2026). The
+  button (Actions → Weekly sweep → Run workflow) has a tick-box to run it once even while switched off, and another,
+  "rebuild only", that works the panel out again from the records already saved (free: nothing is fetched).
 
 ## How to add a dial
 

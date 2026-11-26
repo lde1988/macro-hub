@@ -34,7 +34,7 @@ def rec(person="coutts", week="2026-11-29", date="2026-11-27", **kw):
 def test_config_caps_and_budget_as_approved():
     assert SWEEP["caps"]["video_hours"] == 25 and SWEEP["caps"]["min_minutes"] == 10
     assert SWEEP["budget"]["monthly_usd"] == 20.0 and SWEEP["caps"]["x_handles_per_call"] <= 20
-    assert SWEEP["enabled"] is False                               # switched on only at point 5
+    assert SWEEP["enabled"] is True                                # switched on 26 Nov after the first full run
     assert SWEEP["analysis"]["levels_max_change"] == 0.15
 
 
@@ -513,3 +513,88 @@ def test_new_keys_are_scrubbed(monkeypatch):
 def test_the_window_is_the_seven_days_before_the_run():
     run = collect.Run(small_cfg(), "/nonexistent", NOW, fetch=FakeFetch({}), browser=FakeFetch({}))
     assert run.end == NOW and run.start == NOW - dt.timedelta(days=7) and run.start < run.end <= NOW
+
+
+# ------------------------------------------------------------------ fixes after the first full run (26 Nov)
+def test_a_percentage_is_never_compared_with_a_price():
+    assert analyse.parse_level("140%", "usd") is None and analyse.parse_level("330bp", "usd") is None
+    assert analyse.parse_level("13%", "index") is None and analyse.parse_level("$140", "usd") == 140
+    st = FakeStore({"BTCUSD": daily(60383.5)})
+    rows = analyse.calibration([rec("pal", metric_key="btc_price", level="140%")], SWEEP["metrics"], st, TH, {})
+    assert rows[0]["gap_pct"] is None and rows[0]["note"] == "units not comparable"
+
+
+def test_older_talks_republished_this_week_are_skipped():
+    assert collect.older_talk("Robin Hood NYC 2023 Fireside Chat Stan Druckenmiller", NOW)
+    assert not collect.older_talk("Outlook for 2027: Lyn Alden", NOW) and not collect.older_talk("No year here", NOW)
+
+
+def test_a_shows_hosts_are_one_speaker_not_a_shared_show(tmp_path, monkeypatch):
+    cfg = small_cfg()
+    cfg["people"].append({"id": "oddlots", "name": "Odd Lots (Tracy Alloway and Joe Weisenthal)",
+                          "aliases": ["Tracy Alloway", "Joe Weisenthal"]})
+    seen = {}
+
+    def from_text(model, speakers, desc, text, said=None, shared=None):
+        seen.update(speakers=speakers, shared=shared)
+        return [{**rec("x"), "speaker": "Tracy Alloway", "quote": "q" * 20}], [], 0.01
+    monkeypatch.setattr(collect.extract, "from_text", from_text)
+    run = collect.Run(cfg, tmp_path, NOW, fetch=FakeFetch({}), browser=FakeFetch({}))
+    p = run.people["oddlots"]
+    recs, _ = run.read(run.speakers_for(p, "What Jensen Huang's Return Means"), "d", "t", NOW.date())
+    assert seen["shared"] is False and "Tracy Alloway" in seen["speakers"]
+    run.add(p, "podcast", "Odd Lots", "t", NOW, "https://ex.com", recs)
+    assert run.records[-1]["person_id"] == "oddlots"
+
+
+def test_x_batch_with_an_unreadable_answer_is_retried_account_by_account(tmp_path, monkeypatch):
+    calls = []
+
+    def from_x(model, batch, start, end, max_turns=4):
+        calls.append(batch)
+        if len(batch) > 1:
+            return [], ["answer not readable (status incomplete, 0 characters)"], 0.1, {"x_posts_fetched": 40}
+        return [{**rec("pal"), "handle": batch[0].lower(), "url": f"https://x.com/{batch[0]}/status/1"}], [], 0.05, {"x_posts_fetched": 10}
+    monkeypatch.setattr(collect.extract, "from_x", from_x)
+    run = collect.Run(small_cfg(), tmp_path, NOW, fetch=FakeFetch({}), browser=FakeFetch({}))
+    run.do_x()
+    assert calls == [["RaoulGMI", "Jamie1Coutts"], ["RaoulGMI"], ["Jamie1Coutts"]] and len(run.records) == 2
+    assert any("trying each account on its own" in line for line in run.log)
+
+
+def test_unreadable_x_answer_is_reported(monkeypatch):
+    monkeypatch.setattr(extract.xai, "call", lambda body, timeout=300: ({"status": "incomplete"}, 0.1, "I could not finish"))
+    keep, dropped, cost, _ = extract.from_x("m", ["a"], "2026-11-19", "2026-11-25")
+    assert keep == [] and dropped[0].startswith("answer not readable (status incomplete")
+
+
+def test_rebuild_changes_only_the_panel(tmp_path):
+    data, inp = tmp_path / "data", tmp_path / "in"
+    write_run(inp, [rec("pal", metric_key="btc_price", level="140%", crypto="positive")])
+    applymod.main(["--data", str(data), "--in", str(inp)], now=NOW, sender=lambda *a, **k: (True, "sent"))
+    before = {p: p.read_bytes() for p in (data / "sweep").rglob("*") if p.is_file() and p.name != "watching.json"}
+    sent = []
+    panel = applymod.main(["--data", str(data), "--rebuild"], now=NOW + dt.timedelta(hours=1),
+                          sender=lambda *a, **k: (sent.append(a), (True, "sent"))[1])
+    assert sent == [] and panel["rebuilt_at"] and panel["calibration"][0]["gap_pct"] is None
+    assert all(p.read_bytes() == b for p, b in before.items())
+
+
+def test_tiny_audio_pieces_are_not_sent(tmp_path, monkeypatch):
+    from hub.sweep import transcribe
+    monkeypatch.setenv("GROQ_API_KEY", "k")
+    parts = [(tmp_path / "a.mp3", 0), (tmp_path / "b.mp3", 1200)]
+    for f, _ in parts:
+        f.write_bytes(b"x")
+    monkeypatch.setattr(transcribe, "split", lambda *a: parts)
+    monkeypatch.setattr(transcribe, "duration_s", lambda p: 1200.0 if p.name == "a.mp3" else 0.004)
+    posted = []
+
+    class R:
+        status_code = 200
+
+        def json(self):
+            return {"segments": [{"start": 0, "end": 5, "text": "hi"}]}
+    monkeypatch.setattr(transcribe.requests, "post", lambda *a, **k: (posted.append(k["files"]["file"][0]), R())[1])
+    segs, billed, cost = transcribe.transcribe(tmp_path / "in", tmp_path / "w", "m", 3600)
+    assert posted == ["a.mp3"] and billed == 1200

@@ -126,12 +126,17 @@ def pushes_for(run, sweep_cfg, applied, asks, changes, panel, state, now):
 def main(argv=None, now=None, sender=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", required=True)
-    ap.add_argument("--in", dest="inp", required=True)
+    ap.add_argument("--in", dest="inp")
     ap.add_argument("--no-push", action="store_true")
+    ap.add_argument("--rebuild", action="store_true",
+                    help="rebuild the panel from the records already stored (free: nothing fetched, no pushes)")
     a = ap.parse_args(argv)
     now = now or utcnow()
-    data, inp = Path(a.data), Path(a.inp)
+    data = Path(a.data)
     sweep_dir = data / "sweep"
+    if a.rebuild:
+        return rebuild(data, now)
+    inp = Path(a.inp)
     (sweep_dir / "records").mkdir(parents=True, exist_ok=True)
     sweep_cfg = yaml.safe_load(open(ROOT / "config" / "sweep.yaml"))
     thresholds = load_config()
@@ -173,6 +178,23 @@ def main(argv=None, now=None, sender=None):
         print(f'push "{p["title"]}" priority {p["priority"]}: {why}')
     print(f"sweep save: {len(fresh)} new records; {len(applied)} level updates; {len(asks)} questions; "
           f"cost ${run['costs']['total']:.3f}")
+    return panel
+
+
+def rebuild(data, now):
+    """The panel worked out again from stored records, after a fix to the analysis. Changes nothing else."""
+    sweep_dir = Path(data) / "sweep"
+    run = json.loads((sweep_dir / "last_run.json").read_text())
+    sweep_cfg = yaml.safe_load(open(ROOT / "config" / "sweep.yaml"))
+    records = all_records(sweep_dir)
+    lv = levels.load(data)
+    week_end = run["window"][1][:10]
+    old = json.loads((sweep_dir / "watching.json").read_text()) if (sweep_dir / "watching.json").exists() else {}
+    panel = build_panel(records, sweep_cfg, load_config(), Store(data), lv, now, run, week_end)
+    panel["run"]["time_utc"] = (old.get("run") or {}).get("time_utc", panel["run"]["time_utc"])
+    panel["rebuilt_at"] = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    (sweep_dir / "watching.json").write_text(json.dumps(panel, indent=1, default=str))
+    print(f"sweep panel rebuilt from {len(records)} stored records; nothing fetched, nothing pushed")
     return panel
 
 

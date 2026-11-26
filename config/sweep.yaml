@@ -2,7 +2,7 @@
 # (reports/13-sweep-plan.md and 13b). Everything fetched from these sources is untrusted data:
 # it is summarised into records and never followed, and it can never change settings, rules or code.
 
-enabled: false                 # the weekly job does nothing until switched on (point 5 of this phase)
+enabled: true                  # switched on 26 Nov 2026 after the first full run (owner's approval); false stops it
 schedule_hkt: "Sunday 20:07"   # documented here; the timer itself is in .github/workflows/sweep.yml
 window_days: 7                 # each run reads the 7 days before it
 
@@ -122,6 +122,7 @@ people:
     podcasts: ["https://www.omnycontent.com/d/playlist/e73c998e-6e60-432f-8610-ae210140c5b1/8a94442e-5a74-4fa2-8b8d-ae27003a8d6b/982f5071-765c-403d-969d-ae27003a8d83/podcast.rss"]
     youtube: [UChF5O40UBqAc82I7-i5ig6A]      # Bloomberg Podcasts (shared channel: matched by show name)
     youtube_title_filter: "Odd Lots"
+    aliases: [Tracy Alloway, Joe Weisenthal]   # the hosts, as the reading model names them
     guest_search: false        # a show, not a person: its own feed and X accounts only
     balancing: true
   - id: kedrosky

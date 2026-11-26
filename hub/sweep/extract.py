@@ -141,7 +141,7 @@ def clean_call(c, said):
     return out
 
 
-def from_text(model, speakers, source_desc, material, said=None, max_chars=90_000):
+def from_text(model, speakers, source_desc, material, said=None, max_chars=90_000, shared=None):
     """Records from one piece of material (newsletter post, transcript), attributed only to `speakers`.
     When two or more listed people share the material (a shared show), nobody's speaker is certain:
     transcripts carry no speaker names, so who said what is only the model's judgement.
@@ -157,7 +157,7 @@ def from_text(model, speakers, source_desc, material, said=None, max_chars=90_00
     keep, dropped = [], []
     for r in data.get("records", []) if isinstance(data.get("records"), list) else []:
         rec, why = clean_record(r, material, speakers, said)
-        if rec and len(speakers) > 1:
+        if rec and (shared if shared is not None else len(speakers) > 1):
             rec["speaker_certain"] = False
         (keep.append(rec) if rec else dropped.append(why))
     return keep, dropped, cost
@@ -184,8 +184,13 @@ def from_x(model, handles, start, end, max_turns=6):
             "tools": [{"type": "x_search", "allowed_x_handles": handles, "from_date": start, "to_date": end,
                        "enable_image_understanding": True}]}
     j, cost, text = xai.call(body, timeout=600)
-    data = xai.first_json(text) or {}
+    data = xai.first_json(text)
     keep, dropped = [], []
+    if not isinstance(data, dict) or not isinstance(data.get("records"), list):
+        status = j.get("status") or "?"
+        why = (j.get("incomplete_details") or {}).get("reason") if isinstance(j.get("incomplete_details"), dict) else None
+        dropped.append(f"answer not readable (status {status}{', ' + why if why else ''}, {len(text)} characters)")
+        data = {}
     allowed = {h.lower() for h in handles}
     for r in data.get("records", []) if isinstance(data.get("records"), list) else []:
         try:

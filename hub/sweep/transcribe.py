@@ -45,6 +45,8 @@ def transcribe(path, workdir, model, max_s):
     segs, billed = [], 0.0
     for part, offset in split(path, workdir, max_s):
         d = duration_s(part) or 0
+        if d < 1:                 # ffmpeg can leave a near-empty last piece; Groq refuses it (first run, 26 Nov)
+            continue
         billed += max(d, MIN_BILLED_S)
         with open(part, "rb") as f:
             try:

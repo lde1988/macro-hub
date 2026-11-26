@@ -30,6 +30,13 @@ def rec_id(r):
     return hashlib.sha1(f'{r.get("url")}|{r.get("person_id")}|{r.get("quote")}'.encode()).hexdigest()[:16]
 
 
+def older_talk(title, now):
+    """A title naming an earlier year ("Robin Hood NYC 2023 Fireside Chat") is an old talk re-published.
+    Its words are not this week's view, so it is skipped (first run, 26 Nov)."""
+    years = [int(y) for y in re.findall(r"\b(20\d\d)\b", title or "")]
+    return bool(years) and max(years) < now.year
+
+
 def norm_title(t):
     return re.sub(r"[^a-z0-9]+", " ", (t or "").lower()).strip()[:40]
 
@@ -55,7 +62,7 @@ class Run:
         self.counts = {"x_posts": 0, "audio_s": 0, "video_s": 0, "episodes": 0, "videos": 0, "newsletter_posts": 0}
         self.waiting_for_gemini = []
         self.people = {p["id"]: p for p in cfg["people"]}
-        self.by_name = {p["name"]: p for p in cfg["people"]}
+        self.by_name = {n: p for p in cfg["people"] for n in [p["name"], *p.get("aliases", [])]}
         extract.set_metric_keys(list(cfg["metrics"]))
 
     def note(self, msg):
@@ -82,7 +89,8 @@ class Run:
     def read(self, speakers, desc, text, said):
         if not self.budget.allow(0.02, f"reading {desc}"):
             return [], ["budget"]
-        recs, dropped, c = extract.from_text(self.model, speakers, desc, text, said=said)
+        shared = len({self.by_name[n]["id"] if n in self.by_name else n for n in speakers}) > 1   # people, not names
+        recs, dropped, c = extract.from_text(self.model, speakers, desc, text, said=said, shared=shared)
         self.budget.add("xai", c)
         return recs, dropped
 
@@ -146,7 +154,7 @@ class Run:
         names = [q["name"] for q in self.cfg["people"] if q["name"].split()[-1].lower() in t and len(q["name"].split()) > 1]
         if "macro mondays" in t or "drinks with the danes" in t:
             names += ["Andreas Steno Larsen", "Mikkel Rosenvold"]
-        return list(dict.fromkeys([p["name"]] + names))
+        return list(dict.fromkeys([p["name"]] + p.get("aliases", []) + names))
 
     def do_podcasts(self):
         caps = self.cfg["caps"]
@@ -159,6 +167,9 @@ class Run:
             if key in self.seen or per_person.get(p["id"], 0) >= caps["episodes_per_person"]:
                 continue
             if norm_title(e["title"]) in done_titles:
+                continue
+            if older_talk(e["title"], self.now):
+                self.note(f"{p['name']}: skipped, looks like an older talk re-published: {e['title'][:70]}")
                 continue
             left = cap_s - self.counts["audio_s"] - self.counts["video_s"]
             if left < caps["min_minutes"] * 60:
@@ -217,8 +228,9 @@ class Run:
         on = gemini.available(self.cfg)
         for vid, (p, how, ch, v) in vids.items():
             url = f"https://www.youtube.com/watch?v={vid}"
-            if url in self.seen or norm_title(v["title"]) in getattr(self, "podcast_titles", set()):
-                continue                                  # already heard as a podcast
+            if url in self.seen or norm_title(v["title"]) in getattr(self, "podcast_titles", set()) \
+                    or older_talk(v["title"], self.now):
+                continue                                  # already heard as a podcast, or an old talk re-published
             if not on:
                 self.waiting_for_gemini.append({"person": p["name"], "title": v["title"], "url": url, "how": how})
                 continue
@@ -273,13 +285,30 @@ class Run:
                 continue
             self.budget.add("xai", c)
             self.counts["x_posts"] += int(use.get("x_posts_fetched") or 0)
+            if any(d.startswith("answer not readable") for d in dropped) and len(batch) > 1:
+                # the first run had two batches come back unreadable (26 Nov): try each account on its own
+                self.note(f"X {', '.join('@' + h for h in batch)}: {dropped[0]}; trying each account on its own")
+                for h in batch:
+                    if self.counts["x_posts"] >= caps["x_posts"] or not self.budget.allow(
+                            self.cfg["prices"]["xai_usd_per_x_call"] / 2, f"X retry @{h}"):
+                        break
+                    try:
+                        r1, d1, c1, u1 = extract.from_x(self.model, [h], start_s, end_s, max_turns=caps["x_max_turns"])
+                    except xai.XaiError as e:
+                        self.note(f"X @{h}: failed: {e}")
+                        continue
+                    self.budget.add("xai", c1)
+                    self.counts["x_posts"] += int(u1.get("x_posts_fetched") or 0)
+                    recs += r1
+                    self.note(f"X @{h} on its own: {len(r1)} records, {u1.get('x_posts_fetched')} posts, ${c1:.3f}"
+                              + (f" ({d1[0]})" if d1 else ""))
             for r in recs:
                 if r["url"] in self.seen:
                     continue
                 self.add(owner[r["handle"]], "x", "@" + r["handle"], "", None, r["url"], [r], quote_checked=False)
                 self.new_seen.add(r["url"])
             self.note(f"X {', '.join('@' + h for h in batch)}: {len(recs)} records, {len(dropped)} dropped, "
-                      f"{use.get('x_posts_fetched')} posts, ${c:.3f}")
+                      f"{use.get('x_posts_fetched')} posts, ${c:.3f}" + (f" ({dropped[0]})" if dropped else ""))
 
     def run(self):
         for step in (self.do_x, self.do_newsletters, self.do_podcasts, self.do_videos):

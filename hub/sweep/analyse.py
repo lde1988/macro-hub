@@ -22,13 +22,15 @@ def parse_level(text, units):
     if text is None:
         return None
     t = str(text).lower().replace(",", "").replace("−", "-").strip()
-    m = re.search(r"(-?\d+(?:\.\d+)?)\s*(k|thousand|m|mn|million|b|bn|billion|t|tn|trillion|bp|bps|basis points?|%|x)?", t)
+    m = re.search(r"(-?\d+(?:\.\d+)?)\s*(bps|bp|basis points?|thousand|million|billion|trillion|mn|bn|tn|k|m|b|t|%|x)?(?![a-z])", t)
     if not m:
         return None
     v, suf = float(m.group(1)), (m.group(2) or "")
     mult = {"k": 1e3, "thousand": 1e3, "m": 1e6, "mn": 1e6, "million": 1e6, "b": 1e9, "bn": 1e9, "billion": 1e9,
             "t": 1e12, "tn": 1e12, "trillion": 1e12}
     if units == "usd":
+        if suf in ("%", "x", "bp", "bps") or suf.startswith("basis"):
+            return None               # "140%" is not a price (first run: Pal's "140%" was read as $140)
         return v * mult.get(suf, 1)
     if units == "bp_as_pct":
         if suf.startswith("b"):
@@ -43,7 +45,7 @@ def parse_level(text, units):
     if units == "x":
         return v if suf in ("x", "") else None
     if units == "index":
-        return v if suf in ("", "x") else None
+        return v if suf == "" else None
     return None
 
 
