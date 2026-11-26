@@ -235,11 +235,9 @@ valuations:
     - {sym: HYPE, name: Hyperliquid, history: CMP_HYPE, live: HYPEUSD, revenue: {fees: FEES_HYPE, supply: max, max_supply: 1000000000}}  # card 8
     - {sym: WAL,  name: Walrus,      history: CMP_WAL,  live: WALUSD, revenue: {fees: FEES_WAL, supply: max, max_supply: 5000000000}}  # card 9
     - {sym: DEEP, name: DeepBook,    history: CMP_DEEP, live: DEEPUSD}  # card 10
-  min_years_dial: 1.0        # under this: no dial, only "too little history"
-  min_years_confident: 3.0   # under this: dial greyed, "short history, low confidence"
-  min_r_squared: 0.3         # under this: dial greyed, "the line does not fit this coin's history; reading not meaningful"
+  short_days: 365            # short term: z-score of the log price against the last 365 daily closes (needs all 365)
+  long_days: 1461            # long term: trend channel fitted to the last 4 years (1,461 days); coins with less get none
+  min_r_squared: 0.3         # under this the 4-year channel is greyed: "the line does not fit this coin's last 4 years"
   live_max_gap: 0.25         # ignore a live price more than 25% away from the last daily close (bad print)
-  stretch_ma_days: 200       # "stretch from trend": log of price over its 200-day moving average ...
-  stretch_min_days: 365      # ... scored against at least 365 days of its own history of that measure
   revenue_days: 365          # "price against revenue": fully diluted value / the last 365 days of fees ...
   revenue_min_days: 365      # ... scored against at least 365 days of its own history of that multiple

@@ -15,11 +15,14 @@ Public market data only. Framework reading, not financial advice.
 
 ## Stability promise
 
-`latest.json` has a `version`, currently **1.0**.
+`latest.json` has a `version`, currently **2.0**.
 
 - Within version 1.x, fields are only **added**. Nothing is renamed, removed or given a new meaning.
 - A breaking change raises the first number (2.0) and is announced in this file.
-- A bot should check that `version` starts with `1.` and ignore fields it does not know.
+- A bot should check that `version` starts with `2.` and ignore fields it does not know.
+
+Changes:
+- **2.0 (26 Nov 2026):** the `valuations` entries were restructured (the coin tab's price readings changed method). Nothing outside `valuations` changed.
 
 ## latest.json
 
@@ -117,22 +120,22 @@ The feed is rebuilt about every 15 minutes (GitHub's timer can run late). Fetch 
 
 ## valuations
 
-One entry per coin, in the dashboard's order (BTC, ETH, SOL, SUI, LINK, NEAR, ZEC, HYPE, WAL, DEEP).
-A straight line is fitted to the natural log of the daily close against calendar days, over the coin's whole
-history (Coin Metrics community data, CC BY-NC 4.0: credit Coin Metrics if you republish it).
+One entry per coin, in the dashboard's order (BTC, ETH, SOL, SUI, LINK, NEAR, ZEC, HYPE, WAL, DEEP). Context only:
+never part of the reading. Price histories: Coin Metrics community data (CC BY-NC 4.0: credit Coin Metrics if you republish).
 
 | Field | Meaning |
 |---|---|
-| `sym`, `name` | Coin |
-| `status` | `ok`; `greyed` (under 3 years of history, or the line fits poorly: R² below 0.3); `too_little` (under 1 year: no reading); `none` (no data) |
-| `z` | Standard deviations from the line: (log price − log fair value) ÷ SD of the residuals |
-| `zone`, `colour` | One of eight zones: `-3 SD oversold`, `-2 SD oversold`, `-1 SD oversold`, `below fair value` (−1 to 0), `above fair value` (0 to +1), `+1 SD overbought`, `+2 SD overbought`, `+3 SD overbought`; oversold green, the two fair-value zones amber, overbought red |
-| `price`, `price_is_live`, `last_close_date` | Price used (live Coinbase price when available) |
-| `fair_value`, `growth_per_year` | The line's value today, and the growth it assumes (0.5 = +50% a year) |
-| `bands` | Price at each band, keys `"-3"` … `"+3"` |
-| `r2`, `years`, `months`, `history_from` | How well the line fits and how much history was used |
-| `warnings` | Plain reasons a card is greyed |
-| `stretch` | Recent trend: `status`, `z`, `zone`, `colour`, `ratio` (price ÷ 200-day average), `ma`, `typical_ratio`, `days` |
-| `revenue` | Price against revenue (SUI, ETH, LINK, SOL, NEAR; HYPE and WAL once they have enough history; otherwise null): `status` (`ok`, `waiting` with `available_in` days, or `none`), `z`, `zone`, `colour`, `multiple` (fully diluted value ÷ last 365 days of DefiLlama fees), `typical_multiple`, `fdv`, `fees_365`, `unlock` (share of supply still to unlock), `approximate` (true where past supply is estimated: SOL, NEAR), `caveat` (text shown beside a greyed reading: "approximate: past supply estimated" for SOL and NEAR, "short fee history" for LINK), `note` |
+| `sym`, `name`, `methods` | Coin, and the one-line description of the methods |
+| `history_from`, `years` | Price history available |
+| `short` | 1-year z-score: `status` (`ok` or `too_little`), `z`, `zone`, `colour`, `price`, `price_is_live`, `fair_value` (exp of the mean log close over the last 365 days), `bands` (keys `"-3"` … `"+3"`), `window_from`, `label` |
+| `long` | 4-year trend channel, or null for a coin with under 4 years of prices: `status` (`ok`, or `greyed` when R² is below 0.3), `z`, `zone`, `colour`, `fair_value`, `growth_per_year`, `r2`, `bands`, `window_from`, `warnings`, `label` |
+| `revenue` | Price against revenue (below), or null |
 
-A constant-growth line drifts toward "oversold" as a coin's growth slows. Treat these as context.
+Zones (all three readings): `-3 SD oversold`, `-2 SD oversold`, `-1 SD oversold`, `below fair value` (−1 to 0), `above fair value`
+(0 to +1), `+1 SD overbought`, `+2 SD overbought`, `+3 SD overbought`. Oversold green, the two fair-value zones amber, overbought red.
+
+`revenue`: `status` (`ok`, `waiting` with `available_in` days, or `none`), `z`, `zone`, `colour`, `multiple` (fully diluted value ÷
+last 365 days of DefiLlama fees), `typical_multiple`, `fdv`, `fees_365`, `unlock` (share of supply still to unlock), `approximate`
+(true where past supply is estimated: SOL, NEAR), `caveat` (text shown beside a greyed reading), `note`.
+
+A coin in a long uptrend sits above its 1-year average most of the time, so the short-term reading leans "overbought" in rising years.
