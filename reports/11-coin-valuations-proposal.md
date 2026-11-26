@@ -80,3 +80,14 @@ For comparison only: a log-log fit (a power law, the curve behind most "Bitcoin 
 4. **Proposed extra honesty rule, not adopted without approval:** below an R² of 0.3, grey the dial and label it "the line does not fit this coin's history; reading not meaningful". This would grey SUI, NEAR and ZEC.
 
 Sources: [Log-Regression Channels RV](https://www.tradingview.com/script/AWBVmz7a/) (not readable from here; description from search results), [Log Regression Channel v2](https://ar.tradingview.com/script/YDEqp4Zb-Log-Regression-Channel-v2/), [Blockonomi on Pal, June 2026](https://blockonomi.com/ex-goldman-sachs-exec-says-crypto-cycle-remains-mid-phase/), [Bitget on Pal](https://www.bitget.com/amp/news/detail/12560605479488), [Cryptonews on Pal](https://cryptonews.net/news/bitcoin/33698083/), [Pal on X, 2022](https://x.com/RaoulGMI/status/1502638171145842692).
+
+## Owner's decisions (26 Nov 2026) and what was built
+
+- **Full history for every coin**, start dates unchanged. Bitcoin reads −1.69 on 26 June 2026 against Pal's reported −1.5; the gap is recorded here and not tuned away.
+- **R² rule adopted:** below 0.3 the dial is greyed with "the line does not fit this coin's history; reading not meaningful". On 26 Nov this greys SUI (0.01), NEAR (0.06) and ZEC (0.00).
+- **Card layout:** the SD reading and zone lead; the "trend-based estimate" label follows; the fair value is in smaller text with its assumed growth ("assumes +101% a year"); then price now, the price at every band, the history used and R²; and on every card: "A constant-growth line drifts toward oversold as a coin's growth slows; read with care for older coins."
+- **Licence:** Coin Metrics' terms grant use under Creative Commons Attribution-NonCommercial 4.0, and its attribution guidelines ask for the name "Coin Metrics" with a link to coinmetrics.io wherever its data is shown. This is a personal, non-commercial dashboard, so the use is covered. The credit is in the dashboard footer and the source list. **If the feed is ever used commercially (for example by a bot run as a business), this licence would no longer cover it.**
+- **Data:** ten new history series from Coin Metrics, plus Coinbase live prices for the five coins not already tracked (ETH, ZEC, HYPE, WAL, DEEP). A newly added series now loads its full history automatically on its first run, marked as back-filled.
+- **Context only, as specified:** the readings do not enter the buy / hold reading, the backdrop or any push. They appear in the daily digest as one line.
+- **Tests:** 437 in all, 30 of them for this tab (the regression arithmetic, the seven zones and their edges, the honesty rules, live-price handling, the page, the digest line, and a check that a valuation change never causes a push).
+- **Status:** built on the `claude/valuations` branch; phone screenshots sent; not published.
