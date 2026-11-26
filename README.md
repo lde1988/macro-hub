@@ -32,6 +32,7 @@ There is no machine learning and there are no hidden weights. The rules are in
 | **Hub run**: fetch, dials, dashboard, feed, pushes | Every 15 minutes, started by an outside scheduler (see "Outside scheduler"), with GitHub's own timer (at :07, :22, :37, :52) as a backup. GitHub's timer is "best effort": runs are often 5 to 20 minutes late and, when GitHub is busy, some are skipped. After any change to a workflow file GitHub can take hours to pick the timer up again | Actions tab → Hub run |
 | **Open interest (daily)**: altcoin and Bitcoin open interest from about 1,060 markets | Once a day at 00:40 UTC; takes about half an hour | Actions tab → Open interest (daily) |
 | **Watchdog**: checks the dashboard is fresh and restarts the hub if not | Four times a day | Actions tab → Watchdog |
+| **Weekly sweep** (Phase 2): what the listed commentators said this week | Sunday 20:07 Hong Kong time, once switched on in `config/sweep.yaml`; also by hand | Actions tab → Weekly sweep; dashboard → "What they're watching" |
 | **Tests** | On every change to the code | Actions tab → Tests |
 | **Daily digest** push | First run after 08:00 Hong Kong time. It doubles as a heartbeat: no digest means something is wrong | Your phone |
 
@@ -51,6 +52,10 @@ Hong Kong time is UTC+8, so 00:40 UTC is 08:40 in Hong Kong.
 | A source has failed four runs in a row, or a dial's data has gone stale | 3 |
 | A run failed, the hub had gone quiet, or it is running again after a gap | 4 |
 | Daily digest | 2 (silent) |
+| Weekly sweep: Coutts stated a level and it was updated (within 15%) | 3 |
+| Weekly sweep: a Coutts level needs your answer (more than 15%, or unclear) | 4 |
+| Weekly sweep: budget 80% used this month | 3 |
+| Weekly sweep done (records, cost, who changed their mind) | 2 (silent) |
 
 The first run after a reset records a silent baseline. A push that cannot be delivered is retried on the next run.
 
@@ -129,9 +134,51 @@ repository, the logs, the feed or the data branch; tests check this.
 | `FRED_API_KEY` | Free key for US economic data | fred.stlouisfed.org → My Account → API Keys |
 | `COINALYZE_API_KEY` | Free key for funding rates and open interest | coinalyze.net/account/api-key |
 | `NTFY_TOPIC` | The private topic name your phone subscribes to | You choose it in the ntfy app |
-| `XAI_API_KEY` | Phase 2 only (weekly sweep). Not set: the sweep stays switched off | console.x.ai |
+| `XAI_API_KEY` | Weekly sweep: X search and reading the material | console.x.ai |
+| `GROQ_API_KEY` | Weekly sweep: turning podcast audio into text (paid, about $0.04 an hour) | console.groq.com → API Keys |
+| `GEMINI_API_KEY` | Weekly sweep: reading YouTube-only videos. Not set: those videos are listed but not read | aistudio.google.com |
 
 Anyone who knows the ntfy topic name can read the pushes, so treat it like a password.
+
+## The weekly sweep (Phase 2)
+
+Once a week the sweep reads what about twenty commentators said in the past seven days and shows it in the
+dashboard's "What they're watching" panel. **It is context only**: it never changes the buy / hold reading, any
+dial, band, threshold or rule. The one exception is Jamie Coutts' stated levels (below).
+
+- **Who and where**: `config/sweep.yaml` lists the people, their X accounts, podcasts, YouTube channels and newsletters.
+- **Sources**:
+  - X posts from the listed accounts (xAI's X search, charts in posts are read).
+  - Newsletter feeds.
+  - Podcast episodes, their own shows plus guest appearances found by name.
+  - YouTube videos (only through Gemini, once `GEMINI_API_KEY` exists).
+  - Anything under 10 minutes is skipped.
+- **Everything fetched is untrusted.** It is only summarised into records of a fixed shape; anything else the
+  model returns is thrown away. Quotes from newsletters and podcasts must appear word for word in the source.
+  The sweep can write only inside the data branch's `sweep/` folder.
+- **Records**: who, date, source, link (with the minute for audio and video), the claim, any measure and level,
+  and a stance (positive / neutral / negative) on liquidity, crypto, AI spending and credit risk, each with the
+  sentence that shows it. On shows with two listed people (e.g. Macro Mondays) the speaker is marked "not
+  certain" and does not count toward anyone's change of mind, because transcripts carry no speaker names.
+- **The panel** shows:
+  - each person's latest stance;
+  - the tally across the group;
+  - a ⚑ when someone changed their mind;
+  - the measures several people cited;
+  - Coutts' and Pal's numbers against the hub's own;
+  - a scorecard of dated calls (marked right or wrong when the date passes and the hub can check it);
+  - proposals for new dials (proposals only).
+- **Coutts' levels**: when he states a new value for realised price, long-term or short-term holder cost, or his
+  regime-filter line, the hub updates it if it is within 15% of the old value, logs old and new with the link,
+  and pushes a notice. Bigger changes, or a post that is unclear (a number read off a chart, a line not named as
+  break or reclaim), are asked instead. To answer: Actions → "Sweep: answer a level question" → Run workflow,
+  with the question id from the push. The values live in the data branch's `sweep/levels.json`; only these
+  five levels can ever be changed this way.
+- **Cost guard**: a monthly budget (`budget.monthly_usd`, $20) and hard caps per run (300 X posts, 25 hours of
+  audio and video), all in `config/sweep.yaml`. Each run's cost is logged in the data branch's `sweep/costs.csv`.
+  A push comes at 80% of the month's budget; at 95% paid work stops until the next month.
+- **Switching it on or off**: `enabled: true` or `false` in `config/sweep.yaml`. The button (Actions → Weekly
+  sweep → Run workflow) has a tick-box to run it once even while switched off.
 
 ## How to add a dial
 
@@ -178,6 +225,9 @@ Read [FEED.md](FEED.md) for the full layout. In short:
 | `hub/replay.py`, `tools/replay_report.py` | Replaying the rules over history |
 | `tests/` | Tests, all with made-up data |
 | `manual/margin_debt.csv` | Hand-filled fallback if FINRA's file cannot be read |
+| `config/sweep.yaml` | The weekly sweep: people, sources, caps, budget, measures |
+| `hub/sweep/` | The weekly sweep: collect, read, analyse, Coutts' levels, save |
+| `hub/outputs/watching.py` | The "What they're watching" panel |
 
 Branches:
 

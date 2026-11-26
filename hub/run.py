@@ -22,6 +22,8 @@ from hub.replay import replay
 from hub.signals.core import View
 from hub.signals.engine import evaluate
 from hub.signals.valuation import all_coins
+from hub.outputs import watching
+from hub.sweep import levels as sweep_levels
 from hub.util import ROOT, load_config, load_registry, utcnow
 
 WARM_DAYS = 150
@@ -86,6 +88,7 @@ def main(data, site, runtime, push=True, now=None, fetchers=None, sender=None):
     now = now or utcnow()
     data, runtime = Path(data), Path(runtime)
     cfg, registry = load_config(), load_registry()
+    cfg = sweep_levels.with_overrides(cfg, data)        # Coutts' stated levels (owner's 15% rule); only 5 keys can change
     store, live, status = run_fetch(data, now=now, registry=registry, fetchers=fetchers, state_dir=runtime)
     for old in ("sources.json", "live.json"):          # bookkeeping from the first back-fill; now kept in `runtime`
         (data / "state" / old).unlink(missing_ok=True)
@@ -107,6 +110,7 @@ def main(data, site, runtime, push=True, now=None, fetchers=None, sender=None):
     st["since"] = update_since(st["since"], st["summary"], cur, now)
     fd = feedmod.build(out, cfg, registry, now, status, st["since"], valuations=vals)
     fd["stale_minutes"] = cfg["general"]["stale_minutes"]
+    fd["watching"] = watching.load(data)                # weekly sweep panel: context only, never part of the reading
 
     pushes = alerts.plan(st["summary"], fd, cfg)
     # if the hub has been silent for hours (schedule switched off, GitHub outage), say so when it comes back

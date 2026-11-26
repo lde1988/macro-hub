@@ -1,0 +1,50 @@
+# Answer a question from the weekly sweep about one of Jamie Coutts' levels.
+# Actions tab -> "Sweep: answer a level question" -> Run workflow, then fill in the question id from the push.
+name: "Sweep: answer a level question"
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: "Question id (8 letters and digits, from the push or the dashboard)"
+        required: true
+        type: string
+      answer:
+        description: "Apply the new value?"
+        required: true
+        type: choice
+        options: ["yes", "no"]
+      value:
+        description: "Optional: a different value to use instead, in dollars (e.g. 71500)"
+        required: false
+        type: string
+      line:
+        description: "Only if the question says the line is unclear: is it the break or the reclaim line?"
+        required: false
+        type: choice
+        options: ["", "break", "reclaim"]
+permissions:
+  contents: write
+concurrency:
+  group: weekly-sweep
+  cancel-in-progress: false
+jobs:
+  answer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install --quiet -r requirements.txt
+      - run: tools/data_branch.sh open
+      - name: Record the answer
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          Q_ID: ${{ inputs.id }}
+          Q_ANSWER: ${{ inputs.answer }}
+          Q_VALUE: ${{ inputs.value }}
+          Q_LINE: ${{ inputs.line }}
+        run: python -m hub.sweep.answer --data data --id "$Q_ID" --answer "$Q_ANSWER" --value "$Q_VALUE" --line "$Q_LINE"
+      - run: tools/data_branch.sh save "Answer to a sweep level question"

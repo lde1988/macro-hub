@@ -1,0 +1,90 @@
+# Phase 2: the weekly thought-leader sweep. Context only (see config/sweep.yaml and README).
+# Runs Sunday 12:07 UTC (20:07 Hong Kong time) when `enabled: true` in config/sweep.yaml.
+# By hand: Actions tab -> Weekly sweep -> Run workflow (tick "run even if switched off" to test it while off).
+# Two jobs: "collect" reads the week's sources (slow, reads the data branch only); "save" writes the results to
+# the data branch's sweep/ folder in a minute. The hub's next 15-minute run shows them on the dashboard.
+name: Weekly sweep
+on:
+  schedule:
+    - cron: "7 12 * * 0"
+  workflow_dispatch:
+    inputs:
+      run_even_if_off:
+        description: "Run even if the sweep is switched off in config/sweep.yaml"
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: weekly-sweep
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    outputs:
+      go: ${{ steps.check.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install --quiet -r requirements.txt
+      - name: Is the sweep switched on?
+        id: check
+        run: |
+          on=$(python -c "import yaml;print(str(bool(yaml.safe_load(open('config/sweep.yaml')).get('enabled'))).lower())")
+          if [ "$on" = "true" ] || [ "${{ inputs.run_even_if_off }}" = "true" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; else
+            echo "go=false" >> "$GITHUB_OUTPUT"; echo "The sweep is switched off (config/sweep.yaml, enabled: false). Nothing done."; fi
+      - if: steps.check.outputs.go == 'true'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
+      - name: Read the data branch (read only)
+        if: steps.check.outputs.go == 'true'
+        run: |
+          git fetch --quiet --depth=1 origin data && git worktree add --quiet --detach data FETCH_HEAD || mkdir -p data
+      - name: Collect the week
+        if: steps.check.outputs.go == 'true'
+        env:
+          XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python -m hub.sweep.collect --data data --out sweepout
+      - if: steps.check.outputs.go == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sweepout
+          path: sweepout
+          retention-days: 14
+      - name: Tell the phone if the sweep failed
+        if: failure() || cancelled()
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python -m hub.notify --failed "the weekly sweep (collect)" --runtime runtime
+  save:
+    needs: collect
+    if: needs.collect.outputs.go == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install --quiet -r requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          name: sweepout
+          path: sweepout
+      - run: tools/data_branch.sh open
+      - name: Save records, apply Coutts' level rule, build the panel, push notices
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python -m hub.sweep.apply --data data --in sweepout
+      - run: tools/data_branch.sh save "Weekly sweep"
+      - name: Tell the phone if saving failed
+        if: failure() || cancelled()
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python -m hub.notify --failed "the weekly sweep (save)" --runtime runtime

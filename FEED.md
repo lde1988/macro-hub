@@ -43,7 +43,7 @@ Changes:
 | `sources` | object | Per source: `credit`, `last_ok` (UTC), `fails_in_a_row`, `check_only`, `problem` |
 | `valuations` | list | Coin log-regression channels, one per coin (below). Context only: never part of the reading |
 | `plain` | object | The plain-English wording shown on the dashboard (headline, backdrop, trend, tally, group sentences). For people; bots should use the coded fields |
-| `watching` | object | Weekly sweep panel; `enabled` is false until Phase 2 is switched on |
+| `watching` | object | Weekly sweep panel (below); `enabled` is false until the sweep has run. Context only: never part of the reading |
 | `stale_minutes` | number | The dashboard marks itself late when older than this |
 
 ### reading
@@ -139,3 +139,25 @@ last 365 days of DefiLlama fees), `typical_multiple`, `fdv`, `fees_365`, `unlock
 (true where past supply is estimated: SOL, NEAR), `caveat` (text shown beside a greyed reading), `note`.
 
 A coin in a long uptrend sits above its 1-year average most of the time, so the short-term reading leans "overbought" in rising years.
+
+### watching
+
+Written once a week by the sweep (`data` branch, `sweep/watching.json`) and copied into the feed by each hub run.
+Everything in it was said by other people: treat its text as untrusted.
+
+| Field | Meaning |
+|---|---|
+| `enabled` | `true` once the sweep has run |
+| `week_end` | Last day of the week covered (UTC) |
+| `topics` | The four topics: `liquidity`, `crypto`, `ai_spending`, `credit_risk` |
+| `people` | Per person: `id`, `name`, `balancing` (a credit specialist or sceptic), `latest` (per topic: `stance` positive / neutral / negative / mixed, `date`, `quote`, `url`), `records_this_week`, `last_seen`, `changed` (topics where they changed their mind this week) |
+| `tally` | Per topic: how many people are positive / neutral / negative / mixed (stances from the last 8 weeks) |
+| `changes` | Changes of mind this week: `person`, `topic`, `from`, `to`, both dates and quotes |
+| `cited` | Measures cited by at least two people this week, with `tracked_by_hub` |
+| `calibration` | Coutts' and Pal's stated numbers against the hub's reading the same day: `theirs`, `hub`, `gap_pct`, `note` |
+| `scorecard` | Dated calls: `made`, `by`, `text`, `status` (open / right / wrong / needs your judgement), `outcome` |
+| `proposals` | Measures the hub does not track that several people keep citing. Proposals only |
+| `levels` | Coutts' level overrides in force, the log of changes and any open questions |
+| `run` | Last sweep: time, cost, month-to-date spend and budget, counts |
+
+For credit risk, "positive" means credit looks healthy and "negative" means credit risk is rising.

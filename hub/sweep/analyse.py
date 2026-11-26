@@ -76,13 +76,6 @@ def hub_value(spec, store, thresholds, overrides, on_date):
     if "level" in spec:
         k = spec["level"]
         return float(overrides.get(k, thresholds["levels"][k])), day
-    if "valuation" in spec:
-        from hub.signals import valuation
-        c = next(c for c in thresholds["valuations"]["coins"] if c["sym"] == spec["valuation"])
-        s = store.series(c["history"])
-        s = s[s.index <= day]
-        r = valuation.reading(s, thresholds, today=day)
-        return (r.get("z"), s.index[-1]) if r.get("status") == "ok" else (None, None)
     return None, None
 
 
@@ -182,13 +175,16 @@ def calibration(records, metrics, store, thresholds, overrides, limit=40):
             continue
         theirs = parse_level(r["level"], units)
         hub, hub_date = hub_value(spec, store, thresholds, overrides, r.get("date") or r["week_end"])
+        note = spec.get("note") if hub is None and spec.get("tracked") else None
+        if hub is None and not note:
+            note = "the hub has no reading for that date"
         gap = None
         if theirs is not None and hub not in (None, 0):
             gap = (theirs - hub) / abs(hub) * 100
         rows.append({"person_id": r["person_id"], "date": r.get("date"), "metric": m["label"], "their_text": r["level"],
                      "theirs": theirs, "hub": hub, "hub_date": hub_date.strftime("%Y-%m-%d") if hub_date is not None else None,
                      "gap_pct": round(gap, 1) if gap is not None and math.isfinite(gap) else None,
-                     "note": None if theirs is not None else "units not comparable", "url": r.get("url"),
+                     "note": note or (None if theirs is not None else "units not comparable"), "url": r.get("url"),
                      "from_chart_only": not r.get("level_in_quote", True)})
     rows.sort(key=lambda x: x["date"] or "", reverse=True)
     return rows[:limit]

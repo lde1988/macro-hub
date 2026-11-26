@@ -264,8 +264,15 @@ def fake_sources(btc_weeks, breakeven):
     def fred(entries, ctx):
         return Result(history={"T5YIE": flat(breakeven, 300)})
     empty = lambda entries, ctx: Result()
-    names = ["coinmetrics", "defillama", "ecb", "finra", "treasury", "nasdaq", "coingecko", "coinalyze", "dxycheck"]
-    return {"coinbase": coinbase, "bitview": bitview, "fred": fred, **{n: empty for n in names}}
+    # every other source answers with nothing, so no test ever reaches the internet (a source added later,
+    # defillama_fees, was once missed here and the test quietly called DefiLlama: reports/14)
+    from hub.fetch import NAMES
+    return {**{n: empty for n in NAMES}, "coinbase": coinbase, "bitview": bitview, "fred": fred}
+
+
+def test_fake_sources_cover_every_source_so_tests_stay_offline():
+    from hub.fetch import NAMES
+    assert set(NAMES) <= set(fake_sources([80000] * 30, 2.1))
 
 
 def test_full_run_baseline_then_change_then_failed_push_is_retried(tmp_path):

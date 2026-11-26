@@ -148,7 +148,8 @@ metrics:
   btc_price:         {label: "Bitcoin price", hub: {series: BTCUSD}, units: usd}
   mvrv:              {label: "Bitcoin price / realised price (MVRV)", hub: {ratio: [BTCUSD, BV_REALIZED_PRICE]}, units: x}
   lth_sopr:          {label: "Long-term holder SOPR", hub: {series: BV_LTH_SOPR_1M}, units: index}
-  btc_log_regression: {label: "Bitcoin log-regression reading (SD)", hub: {valuation: BTC}, units: index}
+  btc_log_regression: {label: "Bitcoin log-regression reading (SD)", units: index,
+                       hub: {tracked: true, note: "the coin tab now uses a 4-year trend channel, not a fit from 2010, so the numbers are not the same measure"}}
   alt_btc_oi:        {label: "Altcoin / Bitcoin open interest", hub: {ratio: [OI_ALT, OI_BTC]}, units: x}
   funding_rate:      {label: "Bitcoin funding rate", hub: {tracked: true}}
   stablecoin_supply: {label: "Stablecoin supply", hub: {series: STABLE_USD}, units: usd}

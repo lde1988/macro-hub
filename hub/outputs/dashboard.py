@@ -7,6 +7,8 @@ Colour is never the only cue: every dial and family line carries a word and a sy
 import html
 import math
 
+from hub.outputs import watching
+
 COL = {"green": "#0aac23", "amber": "#fbb315", "red": "#dc3c3d", None: "#6b6b6b"}
 SYM = {"green": "▲", "amber": "●", "red": "▼", None: "○"}
 GROUPS = {"A": "Is it cheap?", "B": "Is stress still building?", "C": "Credit-event risk", "D": "Has the turn started?"}
@@ -325,7 +327,7 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 .cvsub{{font-size:13px;color:var(--mute);margin-top:4px}} .cvprice{{margin-top:8px}}
 .cvbands{{margin-top:8px;font-size:14px;color:var(--ink)}} .cvbands td{{padding:3px 0}} .cvbands td:last-child{{text-align:right;font-variant-numeric:tabular-nums}}
 .cvnote{{font-size:12px;color:var(--mute);margin-top:8px;font-style:italic}}
-@media(min-width:700px){{.top{{grid-template-columns:150px 1fr;gap:22px}}.lamp{{margin:0}}.grid{{grid-template-columns:repeat(2,1fr)}}
+{watching.CSS}@media(min-width:700px){{.top{{grid-template-columns:150px 1fr;gap:22px}}.lamp{{margin:0}}.grid{{grid-template-columns:repeat(2,1fr)}}
 .lines{{grid-template-columns:repeat(3,1fr);gap:18px}}.line{{border-top:0;border-left:1px solid var(--line);padding:0 0 0 14px}}.lines .line:first-child{{border-left:0;padding-left:0}}}}
 @media(min-width:700px){{.cvcard{{flex-basis:calc(50% - 6px)}}}}
 @media(min-width:1040px){{.grid{{grid-template-columns:repeat(3,1fr)}}.cvcard{{flex-basis:calc(33.333% - 8px)}}}}
@@ -359,7 +361,7 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 {"".join(blocks)}
 
 <h3>What they're watching</h3>
-<section class="card"><p class="disc">{esc(w.get("note", ""))}</p></section>
+{watching.render(w)}
 </div>
 <div class="pane p2" id="valuations">{valuations_pane(feed.get("valuations") or [])}</div>
 
