@@ -22,7 +22,7 @@ from hub.replay import replay
 from hub.signals.core import View
 from hub.signals.engine import evaluate
 from hub.signals.valuation import all_coins
-from hub.outputs import watching
+from hub.outputs import scanner as scannerpane, watching
 from hub.sweep import levels as sweep_levels
 from hub.util import ROOT, load_config, load_registry, utcnow
 
@@ -111,6 +111,7 @@ def main(data, site, runtime, push=True, now=None, fetchers=None, sender=None):
     fd = feedmod.build(out, cfg, registry, now, status, st["since"], valuations=vals)
     fd["stale_minutes"] = cfg["general"]["stale_minutes"]
     fd["watching"] = watching.load(data)                # weekly sweep panel: context only, never part of the reading
+    fd["scanner"] = scannerpane.load(data)              # coin scanner tab: context only, never part of the reading
 
     pushes = alerts.plan(st["summary"], fd, cfg)
     # if the hub has been silent for hours (schedule switched off, GitHub outage), say so when it comes back

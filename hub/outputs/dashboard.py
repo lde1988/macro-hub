@@ -7,7 +7,7 @@ Colour is never the only cue: every dial and family line carries a word and a sy
 import html
 import math
 
-from hub.outputs import watching
+from hub.outputs import scanner as scannerpane, watching
 
 COL = {"green": "#0aac23", "amber": "#fbb315", "red": "#dc3c3d", None: "#6b6b6b"}
 SYM = {"green": "▲", "amber": "●", "red": "▼", None: "○"}
@@ -308,8 +308,8 @@ table{{width:100%;border-collapse:collapse;font-size:13px;color:var(--mute)}} td
 footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:8px}} a{{color:#9ecbff}}
 .tabr{{position:absolute;opacity:0;pointer-events:none}}
 .tabs{{display:flex;gap:6px;margin:6px 0 2px}} .tabs label{{flex:1;text-align:center;padding:9px 6px;border:1px solid var(--line);border-radius:10px;cursor:pointer;color:var(--mute);font-weight:600;font-size:15px}}
-#tab1:checked ~ .tabs label[for=tab1],#tab2:checked ~ .tabs label[for=tab2]{{background:var(--card);color:var(--ink);border-color:#4a5158}}
-.pane{{display:none}} #tab1:checked ~ .p1,#tab2:checked ~ .p2{{display:block}}
+#tab1:checked ~ .tabs label[for=tab1],#tab2:checked ~ .tabs label[for=tab2],#tab3:checked ~ .tabs label[for=tab3]{{background:var(--card);color:var(--ink);border-color:#4a5158}}
+.pane{{display:none}} #tab1:checked ~ .p1,#tab2:checked ~ .p2,#tab3:checked ~ .p3{{display:block}}
 .cvintro{{margin-top:12px}}
 .cvstrip{{display:flex;gap:6px;overflow-x:auto;padding:10px 0 6px;scrollbar-width:none}} .cvstrip::-webkit-scrollbar{{display:none}}
 .cvstrip a{{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:16px;color:var(--ink);text-decoration:none;font-size:14px;font-weight:600}}
@@ -327,14 +327,14 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 .cvsub{{font-size:13px;color:var(--mute);margin-top:4px}} .cvprice{{margin-top:8px}}
 .cvbands{{margin-top:8px;font-size:14px;color:var(--ink)}} .cvbands td{{padding:3px 0}} .cvbands td:last-child{{text-align:right;font-variant-numeric:tabular-nums}}
 .cvnote{{font-size:12px;color:var(--mute);margin-top:8px;font-style:italic}}
-{watching.CSS}@media(min-width:700px){{.top{{grid-template-columns:150px 1fr;gap:22px}}.lamp{{margin:0}}.grid{{grid-template-columns:repeat(2,1fr)}}
+{watching.CSS}{scannerpane.CSS}@media(min-width:700px){{.top{{grid-template-columns:150px 1fr;gap:22px}}.lamp{{margin:0}}.grid{{grid-template-columns:repeat(2,1fr)}}
 .lines{{grid-template-columns:repeat(3,1fr);gap:18px}}.line{{border-top:0;border-left:1px solid var(--line);padding:0 0 0 14px}}.lines .line:first-child{{border-left:0;padding-left:0}}}}
 @media(min-width:700px){{.cvcard{{flex-basis:calc(50% - 6px)}}}}
 @media(min-width:1040px){{.grid{{grid-template-columns:repeat(3,1fr)}}.cvcard{{flex-basis:calc(33.333% - 8px)}}}}
 </style></head><body><main>
 <h1><span>macro-hub</span><span class="upd" id="upd" data-t="{esc(feed["generated_at"])}">updated {esc(feed["generated_at_hkt"])}</span></h1>
-<input type="radio" name="tab" id="tab1" class="tabr" checked><input type="radio" name="tab" id="tab2" class="tabr">
-<nav class="tabs"><label for="tab1">Dashboard</label><label for="tab2">Coin valuations</label></nav>
+<input type="radio" name="tab" id="tab1" class="tabr" checked><input type="radio" name="tab" id="tab2" class="tabr"><input type="radio" name="tab" id="tab3" class="tabr">
+<nav class="tabs"><label for="tab1">Dashboard</label><label for="tab2">Coin valuations</label><label for="tab3">Coin scanner</label></nav>
 <div class="pane p1">
 <section class="card" aria-label="Reading">
 <div class="top">
@@ -364,6 +364,7 @@ footer{{margin-top:26px;font-size:13px;color:var(--mute)}} footer p{{margin-top:
 {watching.render(w)}
 </div>
 <div class="pane p2" id="valuations">{valuations_pane(feed.get("valuations") or [])}</div>
+<div class="pane p3" id="scanner">{scannerpane.pane(feed.get("scanner"))}</div>
 
 <footer>
 <h3>Sources: last successful fetch</h3>
@@ -390,6 +391,7 @@ function mark(){{var w=tr.firstElementChild?tr.firstElementChild.getBoundingClie
 links.forEach(function(a,j){{a.classList.toggle('on',j===i)}});}}tr.addEventListener('scroll',function(){{window.requestAnimationFrame(mark)}});mark();}}
 }})();
 </script>
+<script>{scannerpane.JS}</script>
 </body></html>
 """
 

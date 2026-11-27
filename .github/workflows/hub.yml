@@ -69,6 +69,16 @@ jobs:
             busy=$(gh run list --repo "${{ github.repository }}" --workflow sweep.yml --limit 5 --json status --jq '[.[]|select(.status!="completed")]|length' 2>/dev/null || echo 1)
             if [ "$busy" = "0" ]; then gh workflow run sweep.yml --repo "${{ github.repository }}" --ref main && echo "weekly sweep was overdue: started it"; fi
           fi
+      - name: Start the coin scanner if its own timer missed it
+        # Free backstop: from 02:30 UTC, if yesterday's snapshot is missing and no scan is queued or running.
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(python -m hub.scanner.due --data data 2>/dev/null)" = "yes" ]; then
+            busy=$(gh run list --repo "${{ github.repository }}" --workflow scanner.yml --limit 5 --json status --jq '[.[]|select(.status!="completed")]|length' 2>/dev/null || echo 1)
+            if [ "$busy" = "0" ]; then gh workflow run scanner.yml --repo "${{ github.repository }}" --ref main && echo "coin scanner was overdue: started it"; fi
+          fi
       - uses: actions/upload-pages-artifact@v4
         with:
           path: site

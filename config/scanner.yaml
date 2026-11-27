@@ -1,0 +1,68 @@
+# Coin scanner tab (owner approved the plan on 27 Nov 2026, reports/18). Context only: it never changes the
+# buy / hold reading, a dial, a band or a rule. Free data only. Every setting below has its reason.
+
+universe:
+  top_n: 100                 # coins kept after exclusions, by market cap
+  fetch_n: 250               # CoinGecko's top 250 is one free call
+  owner_coins: [bitcoin, ethereum, solana, sui, chainlink, near, zcash, hyperliquid, walrus-2, deep]   # always in
+  exclude_categories:        # CoinGecko category ids: pegged, wrapped, staked copies and tokenized assets
+    [stablecoins, usd-stablecoin, bridged-stablecoins, yield-bearing-stablecoins, wrapped-tokens, bridged-tokens,
+     liquid-staking-tokens, liquid-staking, liquid-restaking-tokens, tokenized-gold, tokenized-commodities]
+  exclude_ids:               # tokenized funds, Treasuries and stocks the categories miss (check, 27 Nov)
+    [blackrock-usd-institutional-digital-liquidity-fund, usyc, ousg, superstate-short-duration-us-government-securities-fund-ustb,
+     janus-henderson-anemoy-aaa-clo-fund, spiko-eu-t-bills-money-market-fund]
+  pegged_max_vol_30d: 0.003  # daily moves averaging under 0.3% over 30 days = pegged, left out. (1% would also catch real
+                             # coins in quiet months: Bitcoin averaged under 1% a day in mid-2023. Pegged tokens move 0.01-0.1%.)
+  meme_category: meme-token  # labelled and hideable, never excluded
+  exchange_ids:              # exchange-issued tokens (decision B): kept, labelled "exchange token", hideable
+    [binancecoin, okb, leo-token, crypto-com-chain, kucoin-shares, gatechain-token, bitget-token, whitebit, htx-dao, mx-token]
+  categories_refresh_days: 7 # category membership is re-read weekly (about 15 free calls)
+
+regime:                      # decision A: the hub's own weekly trend exit, the same line as the dashboard
+  source: hub_trend_exit     # ON = RISK-ON. The short-term holder cost (Bitview) is shown as "the regime line"
+  watchlist_size: 15         # while OFF: the coins holding up best against Bitcoin since the regime turned OFF
+
+trend:                       # decision C (reports/18, section 3)
+  ma_days: 50                # the average the position and direction tests use
+  position_band: 0.03        # price more than 3% above / below the average
+  slope_days: 10             # the average's change over this many days ...
+  slope_band: 0.01           # ... must exceed 1% either way
+  momentum_days: 20          # the 20-day move ...
+  momentum_vol_days: 90      # ... against its usual size over 90 days
+  momentum_band: 0.75        # beyond 0.75 of its usual size counts
+  confirm_days: 5            # a new state counts only after 5 daily closes in a row
+  min_history_days: 120      # fewer days of prices: no rating ("too little history")
+
+quality:                     # decision D (owner: also relative to the median, 27 Nov)
+  revenue_days: 90           # last 90 days against the 90 before
+  revenue_good: 0.20         # fixed thresholds: up 20% or more is good ...
+  revenue_bad: -0.20         # ... down 20% or more is bad
+  revenue_relative: true     # also ranked against all scanned coins with data: top third good, bottom third bad.
+                             # The relative mark is the one that counts toward "passes quality" (owner: in a bear
+                             # market most revenues fall; the best relative performers should stand out)
+  min_revenue_usd_90d: 100000  # less revenue than this over 90 days is too small to judge: "no data"
+  dilution_good: 0.02        # circulating supply up under 2% a year is good
+  dilution_bad: 0.10         # over 10% a year is bad
+  float_bad: 0.50            # under 50% of the fully diluted supply circulating is bad (large overhang)
+  accrual_good: 0.50         # 50% or more of revenue to holders (buybacks, burns, staking) is good
+  accrual_bad: 0.10          # under 10% is bad
+
+defillama_map:               # coins DefiLlama does not link to CoinGecko by itself (check, 27 Nov)
+  chainlink: chainlink
+  deep: deepbook
+
+alerts:
+  priority: 3                # at most one push a day: coins newly Dual Bull that pass quality, only while the regime is ON
+
+sectors:                     # plain sector names from CoinGecko categories, first match wins
+  Meme: [meme-token]
+  Exchange: [exchange-based-tokens, centralized-exchange-token-cex]
+  AI: [artificial-intelligence, ai-agents, ai-framework]
+  Privacy: [privacy-coins]
+  DeFi: [decentralized-finance-defi, decentralized-exchange, lending-borrowing, derivatives, perpetuals]
+  Payments: [payment-solutions]
+  RWA: [real-world-assets-rwa]
+  Gaming: [gaming]
+  L2: [layer-2, zero-knowledge-zk, optimistic-rollups]
+  L1: [layer-1, smart-contract-platform]
+  Infrastructure: [oracle, infrastructure, storage, data-availability, interoperability]
