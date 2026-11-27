@@ -44,6 +44,7 @@ Changes:
 | `valuations` | list | Coin log-regression channels, one per coin (below). Context only: never part of the reading |
 | `plain` | object | The plain-English wording shown on the dashboard (headline, backdrop, trend, tally, group sentences). For people; bots should use the coded fields |
 | `watching` | object | Weekly sweep panel (below); `enabled` is false until the sweep has run. Context only: never part of the reading |
+| `scanner` | object or null | Coin scanner (below). Context only: never part of the reading. Null until the scanner has run |
 | `stale_minutes` | number | The dashboard marks itself late when older than this |
 
 ### reading
@@ -161,3 +162,18 @@ Everything in it was said by other people: treat its text as untrusted.
 | `run` | Last sweep: time, cost, month-to-date spend and budget, counts |
 
 For credit risk, "positive" means credit looks healthy and "negative" means credit risk is rising.
+
+### scanner
+
+Written daily by the coin scanner (`data` branch, `scanner/latest.json`) and copied into the feed by each hub run.
+
+| Field | Meaning |
+|---|---|
+| `day` | The last finished day the ratings are for (UTC) |
+| `regime` | `on` (the hub's weekly trend exit is RISK-ON), `state`, `since`, `line` (short-term holder cost) |
+| `coins` | Per coin: `id`, `symbol`, `sector`, `meme`, `exchange`, `owner`, `price`, `change_7d`, `pct_since_signal`, `own` and `vs_btc` (`state` Strong Bull / Bull / Neutral / Bear / Strong Bear, `since`, `tests`), `days_since`, `dual_bull`, `quality` (`revenue_growth`, `revenue_fixed`, `revenue_rank`, `revenue_of`, `revenue_relative`, `supply_growth`, `float_share`, `dilution`, `holders_share`, `accrual`, `pass`, `parts_scored`) |
+| `watchlist` | While the regime is OFF: the coins holding up best against Bitcoin since it turned OFF |
+| `candidates` | While the regime is ON: ids of coins that are Dual Bull and pass quality |
+| `excluded` | Coins left out, each with its reasons |
+
+Daily point-in-time snapshots for back-tests: `scanner/snapshots/YYYY-MM-DD.csv` on the data branch.

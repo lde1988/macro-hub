@@ -32,6 +32,7 @@ There is no machine learning and there are no hidden weights. The rules are in
 | **Hub run**: fetch, dials, dashboard, feed, pushes | Every 15 minutes, started by an outside scheduler (see "Outside scheduler"), with GitHub's own timer (at :07, :22, :37, :52) as a backup. GitHub's timer is "best effort": runs are often 5 to 20 minutes late and, when GitHub is busy, some are skipped. After any change to a workflow file GitHub can take hours to pick the timer up again | Actions tab → Hub run |
 | **Open interest (daily)**: altcoin and Bitcoin open interest from about 1,060 markets | Once a day at 00:40 UTC; takes about half an hour | Actions tab → Open interest (daily) |
 | **Watchdog**: checks the dashboard is fresh and restarts the hub if not | Four times a day | Actions tab → Watchdog |
+| **Coin scanner**: trend and quality ratings for about 100 coins | Daily at 00:50 UTC (08:50 Hong Kong); the hub starts it if missed | Actions tab → Coin scanner; dashboard → Coin scanner tab |
 | **Weekly sweep** (Phase 2): what the listed commentators said this week | Sunday 20:07 Hong Kong time, once switched on in `config/sweep.yaml`; also by hand | Actions tab → Weekly sweep; dashboard → "What they're watching" |
 | **Tests** | On every change to the code | Actions tab → Tests |
 | **Daily digest** push | First run after 08:00 Hong Kong time. It doubles as a heartbeat: no digest means something is wrong | Your phone |
@@ -56,6 +57,7 @@ Hong Kong time is UTC+8, so 00:40 UTC is 08:40 in Hong Kong.
 | Weekly sweep: a Coutts level needs your answer (more than 15%, or unclear) | 4 |
 | Weekly sweep: budget 80% used this month | 3 |
 | Weekly sweep done (records, cost, who changed their mind) | 2 (silent) |
+| Coin scanner: coins newly Dual Bull that pass quality, only while the Bitcoin regime is ON (at most once a day) | 3 |
 
 The first run after a reset records a silent baseline. A push that cannot be delivered is retried on the next run.
 
@@ -181,6 +183,39 @@ dial, band, threshold or rule. The one exception is Jamie Coutts' stated levels 
   button (Actions → Weekly sweep → Run workflow) has a tick-box to run it once even while switched off, and another,
   "rebuild only", that works the panel out again from the records already saved (free: nothing is fetched).
 
+## The coin scanner tab
+
+A daily scan of about 100 coins plus the owner's 10, inspired by Jamie Coutts' Helios tool. **Context only**: it never
+changes the buy / hold reading or any dial. **Free data only**: CoinGecko, Coin Metrics community data and DefiLlama, no keys.
+
+- **Universe**:
+  - CoinGecko's top 100 by market cap, without stablecoins, wrapped / bridged / staked copies, tokenized gold,
+    funds and stocks, and anything whose price hardly moves.
+  - The owner's coins are always in. Memecoins and exchange tokens (BNB, OKB…) are labelled and can be hidden.
+  - Every coin left out is listed with its reason.
+- **Regime gate**: the hub's own weekly trend line (the dashboard's trend exit). The short-term holder cost is shown as
+  the regime line.
+  - While it is OFF there are no buy candidates; instead a watchlist shows the coins holding up best against Bitcoin.
+  - When it turns ON, coins that are Dual Bull and pass quality are listed.
+- **Trend ratings**, own (in dollars) and against Bitcoin. Three daily tests, each +1, 0 or −1:
+  - price against its 50-day average (±3%);
+  - that average's 10-day change (±1%);
+  - the 20-day move against its usual size (±0.75).
+
+  The sum gives Strong Bull / Bull / Neutral / Bear / Strong Bear. A new state counts after 5 closes in a row.
+  **Dual Bull** = both Bull or better. This is an open approximation, not Alex Cole's Trend Chameleon.
+- **Quality** ("no data" is never bad):
+  - revenue last 90 days against the 90 before, ranked against all scanned coins (top third good, bottom third
+    bad; the fixed ±20% mark is shown too);
+  - supply growth over a year and the share of fully diluted supply circulating;
+  - the share of revenue going to holders.
+
+  Unlock schedules are not free, so they are not used.
+- **Push**: at most one a day, only for coins newly Dual Bull that pass quality while the regime is ON.
+- **History**: a point-in-time snapshot of every coin each day (`scanner/snapshots/` on the data branch). The backtest
+  (`tools/scanner_backtest.py`, reports/19) covers only coins that exist today: survivorship bias.
+- **Settings**: `config/scanner.yaml`, each with a comment.
+
 ## How to add a dial
 
 1. **Add the data series** to `registry/series.yaml`: one entry with an id, the source, the code at
@@ -229,6 +264,7 @@ Read [FEED.md](FEED.md) for the full layout. In short:
 | `config/sweep.yaml` | The weekly sweep: people, sources, caps, budget, measures |
 | `hub/sweep/` | The weekly sweep: collect, read, analyse, Coutts' levels, save |
 | `hub/outputs/watching.py` | The "What they're watching" panel |
+| `config/scanner.yaml`, `hub/scanner/`, `hub/outputs/scanner.py` | The coin scanner: settings, daily job, tab |
 
 Branches:
 
