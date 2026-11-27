@@ -85,7 +85,7 @@
    "colour": "amber",
    "count": 0,
    "extra": {
-    "ratio_to_realised": 1.157873257838407
+    "ratio_to_realised": 1.156514869664135
    },
    "pending": null,
    "since": "2026-02-27 23:59:00"
@@ -343,7 +343,7 @@
   "treasury"
  ],
  "last_digest": "2026-11-27",
- "last_run": "2026-11-27T03:45:37Z",
+ "last_run": "2026-11-27T04:00:53Z",
  "outbox": [],
  "since": {
   "reading": "2026-11-16",
