@@ -41,12 +41,12 @@
    "since": "2026-11-19 23:59:00"
   },
   "bbb_spread": {
-   "baseline": true,
-   "colour": "green",
-   "count": 1,
+   "baseline": false,
+   "colour": "amber",
+   "count": 0,
    "extra": {},
-   "pending": "amber",
-   "since": "2026-02-27 23:59:00"
+   "pending": null,
+   "since": "2026-11-27 18:15:38"
   },
   "bizd": {
    "baseline": false,
@@ -85,7 +85,7 @@
    "colour": "amber",
    "count": 0,
    "extra": {
-    "ratio_to_realised": 1.1267557398170862
+    "ratio_to_realised": 1.1287232622136125
    },
    "pending": null,
    "since": "2026-02-27 23:59:00"
@@ -112,11 +112,11 @@
   },
   "ccc_bb": {
    "baseline": false,
-   "colour": "red",
-   "count": 1,
+   "colour": "amber",
+   "count": 0,
    "extra": {},
-   "pending": "amber",
-   "since": "2026-11-26 02:50:30"
+   "pending": null,
+   "since": "2026-11-27 18:15:38"
   },
   "cpi_mom": {
    "baseline": false,
@@ -341,7 +341,7 @@
  },
  "down": [],
  "last_digest": "2026-11-27",
- "last_run": "2026-11-27T18:00:57Z",
+ "last_run": "2026-11-27T18:15:38Z",
  "outbox": [],
  "since": {
   "reading": "2026-11-16",
@@ -355,7 +355,7 @@
    "alt_oi": "green",
    "alt_value": null,
    "alt_watch": "amber",
-   "bbb_spread": "green",
+   "bbb_spread": "amber",
    "bizd": "amber",
    "breakeven": "green",
    "btc_ma": "amber",
@@ -363,7 +363,7 @@
    "btc_price": "amber",
    "btc_weekly": "red",
    "buybacks": "amber",
-   "ccc_bb": "red",
+   "ccc_bb": "amber",
    "cpi_mom": "red",
    "discount_window": "green",
    "dollar": "red",
