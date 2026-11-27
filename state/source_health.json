@@ -60,7 +60,7 @@
   "last_ok": "2026-11-27"
  },
  "treasury": {
-  "fails": 4,
+  "fails": 5,
   "last_error": "SourceError: HTTP 504 from https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/buybacks_operations",
   "last_ok": "2026-11-26"
  }
