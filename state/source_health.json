@@ -22,7 +22,7 @@
  "coinmetrics": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-26"
+  "last_ok": "2026-11-27"
  },
  "defillama": {
   "fails": 0,
@@ -32,7 +32,7 @@
  "defillama_fees": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-26"
+  "last_ok": "2026-11-27"
  },
  "dxycheck": {
   "fails": 0,
@@ -60,7 +60,7 @@
   "last_ok": "2026-11-27"
  },
  "treasury": {
-  "fails": 11,
+  "fails": 12,
   "last_error": "SourceError: HTTP 504 from https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/buybacks_operations",
   "last_ok": "2026-11-26"
  }
