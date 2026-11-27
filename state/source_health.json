@@ -37,7 +37,7 @@
  "dxycheck": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-26"
+  "last_ok": "2026-11-27"
  },
  "ecb": {
   "fails": 0,
@@ -60,8 +60,8 @@
   "last_ok": "2026-11-27"
  },
  "treasury": {
-  "fails": 0,
-  "last_error": "",
+  "fails": 1,
+  "last_error": "SourceError: HTTP 504 from https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/buybacks_operations",
   "last_ok": "2026-11-26"
  }
 }
