@@ -4,6 +4,8 @@ import html
 import json
 from pathlib import Path
 
+import pandas as pd
+
 STATE_COL = {"Strong Bull": "#13c43a", "Bull": "#0a8f22", "Neutral": "#8a8f96", "Bear": "#c43535", "Strong Bear": "#ff5a5a", None: "#5b6168"}
 STATE_SHORT = {"Strong Bull": "S.Bull", "Bull": "Bull", "Neutral": "Neutral", "Bear": "Bear", "Strong Bear": "S.Bear", None: "–"}
 ORDER = {"Strong Bull": 5, "Bull": 4, "Neutral": 3, "Bear": 2, "Strong Bear": 1, None: 0}
@@ -68,10 +70,10 @@ def detail(x):
             bits.append(f'{q["float_share"] * 100:.0f}% of fully diluted supply circulating')
         dil = f'{"; ".join(bits)} ({q["dilution"]})'
     acc = "no data" if q.get("accrual") is None else f'{q["holders_share"] * 100:.0f}% of revenue to holders ({q["accrual"]})'
-    return (f'<tr class="sd" hidden><td colspan="8"><p><b>Own trend</b> {esc(o.get("state") or "–")} since {esc(o.get("since") or "–")}: '
+    return (f'<tr class="sd" hidden><td colspan="8"><div class="sdi"><p><b>Own trend</b> {esc(o.get("state") or "–")} since {esc(o.get("since") or "–")}: '
             f'{tests(o)}</p><p><b>Against Bitcoin</b> {esc(v.get("state") or "–")} since {esc(v.get("since") or "–")}: {tests(v)}</p>'
             f'<p><b>Revenue</b> {esc(rev)}</p><p><b>Dilution</b> {esc(dil)}</p><p><b>To holders</b> {esc(acc)}</p>'
-            f'<p class="disc">Unlock schedules: no free data. Revenue from DefiLlama; supply from CoinGecko.</p></td></tr>')
+            f'<p class="disc">Unlock schedules: no free data. Revenue from DefiLlama; supply from CoinGecko.</p></div></td></tr>')
 
 
 def pane(scan):
@@ -90,11 +92,17 @@ def pane(scan):
     else:
         since = f' since {esc((reg.get("since") or "")[:10])}' if reg.get("since") else ""
         body = "".join(f'<li data-meme="{int(w["meme"])}" data-exch="{int(w["exchange"])}"><b>{esc(w["symbol"])}</b> '
-                       f'{pct(w["vs_btc_since_off_pct"])} against Bitcoin; vs BTC trend {chip(w["vs_btc_state"])}</li>'
+                       f'{pct(w["vs_btc_since_off_pct"])} · {chip(w["vs_btc_state"])}</li>'
                        for w in scan["watchlist"]) or "<li>No data yet.</li>"
+        try:
+            span = (pd.Timestamp(scan["day"]) - pd.Timestamp((reg.get("since") or "")[:10])).days
+        except (ValueError, TypeError):
+            span = None
+        short = (f' Only {span} days so far, so this list is still noisy.' if span is not None and span < 30 else "")
         banner = (f'<section class="card sban off"><h4>No buy candidates: Bitcoin regime OFF{since}</h4>'
                   f'<p class="disc">The hub\'s weekly trend line is {esc(reg["state"])}.{esc(line)} Meanwhile, the coins '
-                  f'holding up best against Bitcoin since the regime turned OFF:</p><ol class="wl">{body}</ol></section>')
+                  f'holding up best against Bitcoin since the regime turned OFF (change against Bitcoin · trend against '
+                  f'Bitcoin).{esc(short)}</p><ol class="wl swl">{body}</ol></section>')
     rows = []
     for c in coins:
         q = c["quality"]
@@ -149,6 +157,8 @@ text-transform:uppercase;letter-spacing:.04em;color:var(--mute);padding:6px 6px 
 .stab td{padding:7px 6px 7px 0;white-space:nowrap} .stab td:first-child,.stab th:first-child{position:sticky;left:0;background:var(--card);z-index:1}
 .stab tr.sr{cursor:pointer} .stab .sm{font-size:11px;color:var(--mute)} .sst{font-weight:600}
 .stab tr.sd td{white-space:normal;color:#c9ced4;background:#15181b;padding:8px} .stab tr.sd p{margin:3px 0}
+.sdi{position:sticky;left:8px;max-width:calc(100vw - 72px)} @media(min-width:700px){.sdi{max-width:none;position:static}}
+.swl{columns:2;column-gap:18px} .swl li{break-inside:avoid} @media(min-width:700px){.swl{columns:3}}
 .qv{font-size:11px;border:1px solid currentColor;border-radius:8px;padding:0 5px;margin-left:3px} .qv.pass{color:#13c43a} .qv.fail{color:#ff5a5a} .qv.nodata{color:#8a8f96}
 """
 

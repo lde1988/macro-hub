@@ -388,3 +388,16 @@ def test_scanner_workflow_schedule_and_no_secrets_but_ntfy():
     text = (ROOT / ".github" / "workflows" / "scanner.yml").read_text()
     assert 'cron: "50 0 * * *"' in text and "workflow_dispatch" in text
     assert "XAI_API_KEY" not in text and "GROQ" not in text           # free data only: no paid keys
+
+
+def test_impossible_price_jumps_are_cleaned():
+    p = series([0.001] * 5 + [1.0, 1.1, 1.2, 1.15] + [0.01] + [0.011, 0.012])   # listing artifact, then a redenomination
+    clean, notes = D.clean_prices(p)
+    assert list(clean.round(3)) == [0.01, 0.011, 0.012] and len(notes) == 1 and "x0.0087 on" in notes[0]
+    real, notes = D.clean_prices(series([1.0, 3.1, 2.9]))                       # DOGE-style x3.1 day is real
+    assert len(real) == 3 and notes == []
+    assert len(D.clean_prices(series(range(1, 40)), skip_days=14)[0]) == 25
+
+
+def test_figure_heloc_is_excluded():
+    assert "figure-heloc" in CFG["universe"]["exclude_ids"]

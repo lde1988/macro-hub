@@ -165,6 +165,27 @@ def revenue(api, slug):
     return {"revenue": rev, "kind": kind, "holders": llama_daily(api, slug, "dailyHoldersRevenue")}
 
 
+def clean_prices(p, max_jump=10.0, skip_days=0):
+    """Remove impossible jumps: a one-day move beyond 10x (or 1/10) is a listing artifact or a redenomination
+    (trial, 27 Nov: Aptos x1,045 on its listing day in Coin Metrics, SUN x112 at a redenomination). Only the data
+    after the last such jump is kept. `skip_days` drops a coin's first days after listing as well.
+    Returns (cleaned series, list of notes)."""
+    p = p.dropna()
+    p = p[p > 0]
+    notes = []
+    if len(p) < 2:
+        return p, notes
+    ratio = p / p.shift(1)
+    bad = ratio[(ratio > max_jump) | (ratio < 1 / max_jump)]
+    if len(bad):
+        cut = bad.index[-1]
+        notes.append(f"one-day move of x{float(bad.iloc[-1]):.3g} on {cut:%Y-%m-%d} treated as a data error: history before it dropped")
+        p = p[p.index >= cut]
+    if skip_days and len(p):
+        p = p[p.index >= p.index[0] + pd.Timedelta(days=skip_days)]
+    return p, notes
+
+
 def save_json(p, obj):
     p = Path(p)
     p.parent.mkdir(parents=True, exist_ok=True)

@@ -10,7 +10,8 @@ universe:
      liquid-staking-tokens, liquid-staking, liquid-restaking-tokens, tokenized-gold, tokenized-commodities]
   exclude_ids:               # tokenized funds, Treasuries and stocks the categories miss (check, 27 Nov)
     [blackrock-usd-institutional-digital-liquidity-fund, usyc, ousg, superstate-short-duration-us-government-securities-fund-ustb,
-     janus-henderson-anemoy-aaa-clo-fund, spiko-eu-t-bills-money-market-fund]
+     janus-henderson-anemoy-aaa-clo-fund, spiko-eu-t-bills-money-market-fund,
+     figure-heloc]           # Figure HELOC: tokenized home-equity loans ($29bn), found in the trial, 27 Nov
   pegged_max_vol_30d: 0.003  # daily moves averaging under 0.3% over 30 days = pegged, left out. (1% would also catch real
                              # coins in quiet months: Bitcoin averaged under 1% a day in mid-2023. Pegged tokens move 0.01-0.1%.)
   meme_category: meme-token  # labelled and hideable, never excluded
@@ -54,15 +55,15 @@ defillama_map:               # coins DefiLlama does not link to CoinGecko by its
 alerts:
   priority: 3                # at most one push a day: coins newly Dual Bull that pass quality, only while the regime is ON
 
-sectors:                     # plain sector names from CoinGecko categories, first match wins
-  Meme: [meme-token]
-  Exchange: [exchange-based-tokens, centralized-exchange-token-cex]
-  AI: [artificial-intelligence, ai-agents, ai-framework]
+sectors:                     # plain sector names from CoinGecko categories; the first match wins, most specific first
+  Meme: [meme-token]         # (the trial put LINK under DeFi and NEAR / WAL under AI with a looser order, 27 Nov)
   Privacy: [privacy-coins]
-  DeFi: [decentralized-finance-defi, decentralized-exchange, lending-borrowing, derivatives, perpetuals]
+  L1: [layer-1, smart-contract-platform]
+  L2: [layer-2, optimistic-rollups, zero-knowledge-zk]
+  Infrastructure: [oracle, storage, data-availability, interoperability, infrastructure]
   Payments: [payment-solutions]
+  DeFi: [decentralized-finance-defi, decentralized-exchange, lending-borrowing, derivatives, perpetuals]
+  AI: [artificial-intelligence, ai-agents, ai-framework]
   RWA: [real-world-assets-rwa]
   Gaming: [gaming]
-  L2: [layer-2, zero-knowledge-zk, optimistic-rollups]
-  L1: [layer-1, smart-contract-platform]
-  Infrastructure: [oracle, infrastructure, storage, data-availability, interoperability]
+  Exchange: [exchange-based-tokens, centralized-exchange-token-cex]

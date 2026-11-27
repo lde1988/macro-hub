@@ -26,7 +26,7 @@ START = pd.Timestamp("2020-01-01")
 
 def regime_series(btc, sth):
     """Daily ON/OFF from weekly closes (Sunday) against the moving stand-ins."""
-    wk = pd.concat([btc.resample("W-SUN").last(), sth.resample("W-SUN").last()], axis=1, keys=["p", "s"]).dropna()
+    wk = pd.concat([btc.resample("W-SUN").last(), sth.resample("W-SUN").last()], axis=1, keys=["p", "s"], sort=True).dropna()
     on, out = True, {}
     for d, r in wk.iterrows():
         if on and r.p < 0.96 * r.s:
@@ -55,7 +55,11 @@ def main():
     cfg = yaml.safe_load(open(ROOT / "config" / "scanner.yaml"))
     tc = cfg["trend"]
     folder = Path(a.data) / "scanner"
-    prices = {p.stem: D.read_csv(p, "close") for p in (folder / "prices").glob("*.csv")}
+    raw = {p.stem: D.read_csv(p, "close") for p in (folder / "prices").glob("*.csv")}
+    prices, cleaned = {}, []
+    for k, v in raw.items():
+        prices[k], notes = D.clean_prices(v, skip_days=14)     # listing days and impossible jumps left out
+        cleaned += [f"{k}: {n}" for n in notes]
     latest = D.load_json(folder / "latest.json", {})
     meta = {c["id"]: c for c in latest.get("coins", [])}
     st = Store(a.data)
@@ -66,8 +70,9 @@ def main():
     rets = pd.DataFrame({k: v.reindex(days).pct_change(fill_method=None) for k, v in prices.items()})
     dual = {}
     tested = []
+    keep = {c for c in meta if c not in cfg["universe"]["exclude_ids"]}     # only coins the scanner keeps today
     for cid, p in prices.items():
-        if cid == "bitcoin" or p.index.min() > btc.index.max() - pd.Timedelta(days=tc["min_history_days"] + 30):
+        if cid not in keep or cid == "bitcoin" or p.index.min() > btc.index.max() - pd.Timedelta(days=tc["min_history_days"] + 30):
             continue
         own = T.rating(p, tc)
         vs = T.rating((p / btc).dropna(), tc)
@@ -81,11 +86,24 @@ def main():
     # weekly rebalance: holdings chosen on Sunday's close, held Monday to Sunday
     pick = dual[days.dayofweek == 6].reindex(days).ffill().shift(1).fillna(False).astype(bool)
     hold = pick.where(on, False)
-    w = hold.div(hold.sum(axis=1).replace(0, np.nan), axis=0).fillna(0)
-    strat = (w * rets[w.columns].fillna(0)).sum(axis=1)
+    def run(cols, start=START):
+        h = hold[cols][hold.index >= start]
+        w = h.div(h.sum(axis=1).replace(0, np.nan), axis=0).fillna(0)
+        contrib = w * rets[cols].reindex(w.index).fillna(0)
+        return contrib.sum(axis=1), contrib.sum()
+    cols = list(hold.columns)
+    strat, contrib = run(cols)
+    top = list(contrib.sort_values(ascending=False).index[:5])
+    memes = {c for c, m in meta.items() if m.get("meme")}
     btc_r = rets["bitcoin"].fillna(0)
+    since22 = pd.Timestamp("2022-01-01")
     rows = [stats(strat, "Dual Bull coins, equal weight, only while the regime is ON (cash otherwise)"),
-            stats(btc_r, "Hold Bitcoin"), stats(btc_r.where(on, 0), "Bitcoin only while the regime is ON")]
+            stats(run([c for c in cols if c not in memes])[0], "the same, memecoins left out"),
+            stats(run([c for c in cols if c not in top])[0], "the same, without its 5 biggest winners (" +
+                  ", ".join(meta.get(c, {}).get("symbol", c) for c in top) + ")"),
+            stats(btc_r, "Hold Bitcoin"), stats(btc_r.where(on, 0), "Bitcoin only while the regime is ON"),
+            stats(run(cols, since22)[0], "Dual Bull rule, from 2022 only"),
+            stats(btc_r[btc_r.index >= since22], "Hold Bitcoin, from 2022 only")]
     # each new Dual Bull entry while the regime is ON: 30 and 90-day result against Bitcoin
     sig = []
     for cid in dual.columns:
@@ -121,6 +139,9 @@ def main():
         s = sig[(sig.days == 90) & ~sig.coin.isin(memes)]
         if len(s):
             out.append(f"| 90 days, memecoins left out | {len(s)} | {s.beat.mean():.0%} | {s.coin_ret.median():+.1%} | {s.btc_ret.median():+.1%} |")
+    if cleaned:
+        out += ["", "## Price data cleaned before testing", ""] + [f"- {c}" for c in cleaned]
+        out += ["- every coin's first 14 days after listing are left out"]
     out += ["", f"Regime ON on {on.mean():.0%} of days since {START:%Y}. Coins tested: {', '.join(sorted(meta.get(c, {}).get('symbol', c) for c in tested))}."]
     Path(a.out).mkdir(parents=True, exist_ok=True)
     (Path(a.out) / "scanner_backtest.md").write_text("\n".join(out) + "\n")

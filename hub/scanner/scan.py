@@ -106,6 +106,7 @@ def update_prices(api, folder, rows, today, log):
 def rate(rows, prices, supplies, revs, cfg, reg, today):
     """Every coin's ratings, quality and the table row. Pure: no network."""
     tc, qc = cfg["trend"], cfg["quality"]
+    prices = {k: D.clean_prices(v)[0] for k, v in prices.items()}      # impossible jumps never reach a rating
     btc = prices.get("bitcoin", pd.Series(dtype=float))
     growths, out = {}, []
     for r in rows:
