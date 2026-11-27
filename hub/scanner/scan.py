@@ -20,7 +20,7 @@ from hub.store import Store
 from hub.util import ROOT, Web, utcnow
 
 SNAP_COLS = ["date", "id", "symbol", "rank", "price", "market_cap", "sector", "meme", "exchange", "owner",
-             "own_state", "own_since", "vs_btc_state", "vs_btc_since", "dual_bull", "revenue_kind", "revenue_90d",
+             "eligible", "avg_volume_30d", "history_days", "own_state", "own_since", "vs_btc_state", "vs_btc_since", "dual_bull", "revenue_kind", "revenue_90d",
              "revenue_growth", "revenue_fixed", "revenue_rank", "revenue_of", "revenue_relative", "supply_growth",
              "float_share", "dilution", "holders_share", "accrual", "quality_pass", "parts_scored", "regime"]
 
@@ -46,20 +46,21 @@ def regime(data):
 
 def update_prices(api, folder, rows, today, log):
     """Keep scanner/prices/<id>.csv and scanner/supply/<id>.csv up to date. Returns {id: Series}."""
-    prices, supplies = {}, {}
-    pdir, sdir = Path(folder) / "prices", Path(folder) / "supply"
+    prices, supplies, volumes = {}, {}, {}
+    pdir, sdir, vdir = Path(folder) / "prices", Path(folder) / "supply", Path(folder) / "volume"
     cm_ids = D.load_json(Path(folder) / "coinmetrics_ids.json", {})
     for r in rows:
         cid = r["id"]
         p, s = D.read_csv(pdir / f"{cid}.csv", "close"), D.read_csv(sdir / f"{cid}.csv", "circulating")
+        v = D.read_csv(vdir / f"{cid}.csv", "volume_usd")
         if len(p) == 0:                                    # first time: CoinGecko's free year, then Coin Metrics if same coin
             try:
-                pr, sup = D.cg_year(api, cid)
+                pr, sup, vol = D.cg_year(api, cid)
             except Exception as e:  # noqa: BLE001
                 log.append(f"{r['symbol']}: CoinGecko history failed: {D.safe(e)}")
-                prices[cid], supplies[cid] = p, s
+                prices[cid], supplies[cid], volumes[cid] = p, s, v
                 continue
-            p, s = pr, sup
+            p, s, v = pr, sup, vol
             sym = r["symbol"].lower()
             try:
                 cm = D.cm_prices(api, [sym], "2015-01-01").get(sym)
@@ -71,7 +72,7 @@ def update_prices(api, folder, rows, today, log):
                 log.append(f"{r['symbol']}: history from Coin Metrics since {cm.index.min():%Y-%m-%d}")
             else:
                 log.append(f"{r['symbol']}: history from CoinGecko's free year ({len(pr)} days)")
-        prices[cid], supplies[cid] = p, s
+        prices[cid], supplies[cid], volumes[cid] = p, s, v
     # new closes: Coin Metrics in one call for the coins it has, CoinGecko for the rest
     last = today - pd.Timedelta(days=1)
     cm_need = {cid: sym for cid, sym in cm_ids.items() if cid in prices and (not len(prices[cid]) or prices[cid].index.max() < last)}
@@ -88,22 +89,44 @@ def update_prices(api, folder, rows, today, log):
             continue
         gap = (today - p.index.max()).days if len(p) else 365
         try:
-            pr, sup = D.cg_year(api, cid, days=min(max(gap + 1, 2), 365))
+            pr, sup, vol = D.cg_year(api, cid, days=min(max(gap + 1, 2), 365))
         except Exception as e:  # noqa: BLE001
             log.append(f"{r['symbol']}: CoinGecko update failed: {D.safe(e)}")
             continue
         prices[cid] = D.merge(p, pr[pr.index < today])
         supplies[cid] = D.merge(supplies[cid], sup[sup.index < today])
-    for r in rows:                                          # today's circulating supply from the markets call
+        volumes[cid] = D.merge(volumes[cid], vol[vol.index < today])
+    for r in rows:                                          # the last day's supply and volume from the markets call
         if r.get("circulating"):
             supplies[r["id"]] = D.merge(pd.Series({last: float(r["circulating"])}), supplies[r["id"]])
+        if r.get("total_volume") is not None:
+            volumes[r["id"]] = D.merge(volumes[r["id"]], pd.Series({last: float(r["total_volume"])}))
         D.write_series(pdir / f"{r['id']}.csv", prices[r["id"]], "close")
         D.write_series(sdir / f"{r['id']}.csv", supplies[r["id"]], "circulating")
+        D.write_series(vdir / f"{r['id']}.csv", volumes[r["id"]], "volume_usd")
     D.save_json(Path(folder) / "coinmetrics_ids.json", cm_ids)
-    return prices, supplies
+    return prices, supplies, volumes
 
 
-def rate(rows, prices, supplies, revs, cfg, reg, today):
+def eligibility(p, vol, cfg):
+    """Owner's rule (27 Nov): to be a watchlist entry or buy candidate a coin needs at least $20M average daily volume
+    over 30 days and at least 180 days of price history. Coins that fail are shown greyed, not hidden.
+    Returns (eligible, average volume, days of history, reason or None)."""
+    lc = cfg["liquidity"]
+    days = int(len(p.dropna())) if p is not None else 0
+    v = vol.dropna().sort_index().tail(30) if vol is not None and len(vol) else None
+    avg = float(v.mean()) if v is not None and len(v) >= 20 else None
+    why = []
+    if days < lc["min_history_days"]:
+        why.append(f"too new: {days} days of prices (needs {lc['min_history_days']})")
+    if avg is None:
+        why.append("too thin: no volume figures yet")
+    elif avg < lc["min_avg_volume_usd_30d"]:
+        why.append(f"too thin: ${avg / 1e6:,.1f}M a day on average over 30 days (needs ${lc['min_avg_volume_usd_30d'] / 1e6:,.0f}M)")
+    return not why, avg, days, ("; ".join(why) or None)
+
+
+def rate(rows, prices, supplies, revs, cfg, reg, today, volumes=None):
     """Every coin's ratings, quality and the table row. Pure: no network."""
     tc, qc = cfg["trend"], cfg["quality"]
     prices = {k: D.clean_prices(v)[0] for k, v in prices.items()}      # impossible jumps never reach a rating
@@ -137,6 +160,7 @@ def rate(rows, prices, supplies, revs, cfg, reg, today):
         if since_own is not None and len(p):
             base = p[p.index <= pd.Timestamp(since_own)]
             pct_since = (float(p.iloc[-1]) / float(base.iloc[-1]) - 1) * 100 if len(base) else None
+        ok_liq, avg_vol, hist_days, why_not = eligibility(p, (volumes or {}).get(r["id"]), cfg)
         days = [d for d in (own.get("since"), vs.get("since")) if d is not None]
         last_change = max(days) if days else None
         out.append({**{k: r[k] for k in ("id", "symbol", "name", "rank", "sector", "meme", "exchange", "owner", "market_cap")},
@@ -146,6 +170,7 @@ def rate(rows, prices, supplies, revs, cfg, reg, today):
                     "vs_btc": {k: vs.get(k) for k in ("state", "since", "why", "tests", "detail")},
                     "days_since": (pd.Timestamp(today) - pd.Timestamp(last_change)).days if last_change is not None else None,
                     "dual_bull": T.dual_bull(own.get("state"), vs.get("state")),
+                    "eligible": ok_liq, "avg_volume_30d": avg_vol, "history_days": hist_days, "not_eligible_why": why_not,
                     "quality": {"revenue_kind": rv["kind"] if rv else None, "revenue_90d": total,
                                 "revenue_growth": g, "revenue_fixed": Q.fixed_mark(g, qc), "revenue_rank": rank, "revenue_of": of,
                                 "revenue_relative": rmark, "supply_growth": sgrowth, "float_share": fshare, "dilution": dil,
@@ -184,7 +209,8 @@ def snapshot_rows(table, reg, day):
         q = x["quality"]
         out.append({"date": day, "id": x["id"], "symbol": x["symbol"], "rank": x["rank"], "price": x["price"],
                     "market_cap": x["market_cap"], "sector": x["sector"], "meme": x["meme"], "exchange": x["exchange"],
-                    "owner": x["owner"], "own_state": x["own"]["state"], "own_since": x["own"]["since"],
+                    "owner": x["owner"], "eligible": x.get("eligible"), "avg_volume_30d": x.get("avg_volume_30d"),
+                    "history_days": x.get("history_days"), "own_state": x["own"]["state"], "own_since": x["own"]["since"],
                     "vs_btc_state": x["vs_btc"]["state"], "vs_btc_since": x["vs_btc"]["since"], "dual_bull": x["dual_bull"],
                     "revenue_kind": q["revenue_kind"], "revenue_90d": q["revenue_90d"], "revenue_growth": q["revenue_growth"],
                     "revenue_fixed": q["revenue_fixed"], "revenue_rank": q["revenue_rank"], "revenue_of": q["revenue_of"],
@@ -196,7 +222,7 @@ def snapshot_rows(table, reg, day):
 
 def alert(table, reg, state, day, cfg):
     """At most one push a day: coins that NEWLY became Dual Bull and pass quality, on a day the regime is ON."""
-    now_ok = sorted(x["id"] for x in table if x["dual_bull"] and x["quality"]["pass"])
+    now_ok = sorted(x["id"] for x in table if x["dual_bull"] and x["quality"]["pass"] and x.get("eligible", True))
     new = [x for x in table if x["id"] in set(now_ok) - set(state.get("dual_ok", []))]
     push = None
     if reg["on"] and new and state.get("last_alert") != day:
@@ -240,7 +266,7 @@ def main(argv=None, now=None, web=None, sender=None, sleep=None):
     rows, excluded, missing = U.build(mk, members, cfg, prices=old, coin_cats=coin_cats)
     if missing:
         log.append(f"owner's coins not found on CoinGecko: {missing}")
-    prices, supplies = update_prices(api, folder, rows, today, log)
+    prices, supplies, volumes = update_prices(api, folder, rows, today, log)
     rows2, excluded2, _ = U.build(mk, members, cfg, prices=prices, coin_cats=coin_cats)   # pegged test on fresh prices
     if len(excluded2) > len(excluded):
         rows, excluded = rows2, excluded2
@@ -256,11 +282,17 @@ def main(argv=None, now=None, web=None, sender=None, sleep=None):
             except Exception as e:  # noqa: BLE001
                 log.append(f"{r['symbol']}: DefiLlama failed: {D.safe(e)}")
     reg = regime(a.data)
-    table, med = rate(rows, prices, supplies, revs, cfg, reg, today)
-    wl = watchlist(table, prices, reg, cfg["regime"]["watchlist_size"]) if not reg["on"] else []
-    candidates = [x["id"] for x in table if reg["on"] and x["dual_bull"] and x["quality"]["pass"]]
+    table, med = rate(rows, prices, supplies, revs, cfg, reg, today, volumes)
+    wl_all = watchlist(table, prices, reg, len(table)) if not reg["on"] else []
+    elig = {x["id"]: x["eligible"] for x in table}
+    wl = [w for w in wl_all if elig.get(w["id"])][:cfg["regime"]["watchlist_size"]]
+    cut = wl[-1]["vs_btc_since_off_pct"] if len(wl) == cfg["regime"]["watchlist_size"] else -1e9
+    wl_thin = [w for w in wl_all if not elig.get(w["id"]) and w["vs_btc_since_off_pct"] >= cut]   # would have made the list
+    candidates = [x["id"] for x in table if reg["on"] and x["dual_bull"] and x["quality"]["pass"] and x["eligible"]]
+    cand_thin = [x["id"] for x in table if reg["on"] and x["dual_bull"] and x["quality"]["pass"] and not x["eligible"]]
     latest = {"version": 1, "generated_at": pd.Timestamp(now).strftime("%Y-%m-%dT%H:%M:%SZ"), "day": day, "regime": reg,
               "revenue_median_growth": med, "coins": table, "watchlist": wl, "candidates": candidates,
+              "watchlist_too_new_or_thin": wl_thin, "candidates_too_new_or_thin": cand_thin,
               "excluded": excluded, "calls": api.calls, "log": log[-60:],
               "note": "Context only: never part of the buy / hold reading. Not advice."}
     D.save_json(folder / "latest.json", latest)

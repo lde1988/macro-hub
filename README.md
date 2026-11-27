@@ -197,6 +197,8 @@ changes the buy / hold reading or any dial. **Free data only**: CoinGecko, Coin 
   the regime line.
   - While it is OFF there are no buy candidates; instead a watchlist shows the coins holding up best against Bitcoin.
   - When it turns ON, coins that are Dual Bull and pass quality are listed.
+  - Both lists (and the push) need at least $20M average daily volume over 30 days and 180 days of prices. Coins that
+    fail are shown greyed in a "too new / too thin" line, not hidden.
 - **Trend ratings**, own (in dollars) and against Bitcoin. Three daily tests, each +1, 0 or −1:
   - price against its 50-day average (±3%);
   - that average's 10-day change (±1%);

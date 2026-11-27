@@ -23,6 +23,10 @@ regime:                      # decision A: the hub's own weekly trend exit, the 
   source: hub_trend_exit     # ON = RISK-ON. The short-term holder cost (Bitview) is shown as "the regime line"
   watchlist_size: 15         # while OFF: the coins holding up best against Bitcoin since the regime turned OFF
 
+liquidity:                   # owner's rule (27 Nov): watchlist entries and buy candidates need both; coins that fail
+  min_avg_volume_usd_30d: 20000000   # are shown greyed in a "too new / too thin" line, never hidden. Pushes need both too
+  min_history_days: 180
+
 trend:                       # decision C (reports/18, section 3)
   ma_days: 50                # the average the position and direction tests use
   position_band: 0.03        # price more than 3% above / below the average

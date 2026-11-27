@@ -160,14 +160,15 @@ def test_coingecko_daily_points_are_dated_to_the_close_and_today_is_dropped():
 
         def json(self):
             return {"prices": [[day("2026-11-25"), 100.0], [day("2026-11-26"), 110.0], [day("2026-11-26", 9), 111.0]],
-                    "market_caps": [[day("2026-11-25"), 1000.0], [day("2026-11-26"), 1210.0], [day("2026-11-26", 9), 1.0]]}
+                    "market_caps": [[day("2026-11-25"), 1000.0], [day("2026-11-26"), 1210.0], [day("2026-11-26", 9), 1.0]],
+                    "total_volumes": [[day("2026-11-25"), 5e7], [day("2026-11-26"), 6e7], [day("2026-11-26", 9), 1.0]]}
 
     class Api:
         def get(self, *a, **k):
             return R()
-    p, s = D.cg_year(Api(), "x")
+    p, s, v = D.cg_year(Api(), "x")
     assert list(p.index.strftime("%Y-%m-%d")) == ["2026-11-24", "2026-11-25"] and list(p) == [100.0, 110.0]
-    assert list(s) == [10.0, 11.0]
+    assert list(s) == [10.0, 11.0] and list(v) == [5e7, 6e7]
 
 
 def test_coin_metrics_is_used_only_when_it_is_the_same_coin():
@@ -269,13 +270,15 @@ class FakeWeb:
                 ids = params["ids"].split(",")
             return FakeResp([{"id": i, "symbol": i[:4], "name": i, "market_cap_rank": n + 1, "current_price": 10.0,
                               "market_cap": 1e9, "circulating_supply": 1e8, "total_supply": 1e8, "max_supply": None,
-                              "price_change_percentage_7d_in_currency": 2.0} for n, i in enumerate(ids)])
+                              "price_change_percentage_7d_in_currency": 2.0,
+                              "total_volume": 5e6 if i == "dogecoin" else 5e7} for n, i in enumerate(ids)])
         if "/market_chart" in url:
             cid = url.split("/coins/")[1].split("/")[0]
             k = 0.01 if cid != "tether" else 0.0          # real coins move about 1% a day; tether not at all
             days = pd.date_range(end=self.today, periods=min(int(params.get("days", 365)), 365) + 1)
             p = [[int(d.timestamp() * 1000), 10 * np.exp(k * i) * (1 if cid != "bitcoin" else 1000)] for i, d in enumerate(days)]
-            return FakeResp({"prices": p, "market_caps": [[t, v * 1e8] for t, v in p]})
+            vol = 5e6 if cid == "dogecoin" else 5e7                     # dogecoin is "too thin" in this made-up world
+            return FakeResp({"prices": p, "market_caps": [[t, v * 1e8] for t, v in p], "total_volumes": [[t, vol] for t, v in p]})
         if "coinmetrics" in url:
             return FakeResp({"data": []})
         if url.endswith("/overview/fees"):
@@ -305,6 +308,10 @@ def test_whole_job_writes_only_inside_scanner_and_pushes_nothing_while_off(tmp_p
     assert "tether" not in ids and {"bitcoin", "solana"} <= ids
     assert {e["id"] for e in latest["excluded"]} == {"tether"}
     assert latest["watchlist"]                                   # regime OFF: the relative-strength list instead
+    assert "dogecoin" not in {w["id"] for w in latest["watchlist"]}            # $5M a day: too thin
+    doge = next(c for c in latest["coins"] if c["id"] == "dogecoin")
+    assert doge["eligible"] is False and "too thin" in doge["not_eligible_why"]
+    assert (tmp_path / "scanner" / "volume" / "solana.csv").exists()
     # second day: only new closes are fetched (a few days), not the whole year again
     web2 = FakeWeb(pd.Timestamp("2026-11-28"))
     scan.main(["--data", str(tmp_path)], now=now + dt.timedelta(days=1), web=web2, sender=lambda *a, **k: (True, "x"),
@@ -401,3 +408,42 @@ def test_impossible_price_jumps_are_cleaned():
 
 def test_figure_heloc_is_excluded():
     assert "figure-heloc" in CFG["universe"]["exclude_ids"]
+
+
+
+# ------------------------------------------------------------------ owner's liquidity and age rule (27 Nov)
+def test_eligibility_needs_20m_volume_and_180_days():
+    p = series(range(1, 200))
+    ok, avg, days, why = scan.eligibility(p, series([25e6] * 30), CFG)
+    assert ok and avg == 25e6 and days == 199 and why is None
+    ok, _, _, why = scan.eligibility(p, series([19e6] * 30), CFG)
+    assert not ok and why.startswith("too thin: $19.0M a day")
+    ok, _, _, why = scan.eligibility(series(range(1, 100)), series([50e6] * 30), CFG)
+    assert not ok and why.startswith("too new: 99 days")
+    ok, _, _, why = scan.eligibility(p, None, CFG)
+    assert not ok and "no volume figures yet" in why
+
+
+def test_thin_coins_never_alert():
+    c = {**coin("thin"), "eligible": False}
+    push, _ = scan.alert([c], {"on": True}, {"dual_ok": []}, "2026-12-01", CFG)
+    assert push is None
+
+
+def test_tab_shows_too_new_or_thin_greyed_not_hidden():
+    from hub.outputs import scanner as pane
+    table, _ = scan.rate(rows_for(["bitcoin", "sol", "new"]), {"bitcoin": trend_up(), "sol": trend_up(daily=0.02),
+                         "new": trend_up(daily=0.03)}, {}, {}, CFG, {}, pd.Timestamp("2025-10-28"),
+                         volumes={"sol": series([5e7] * 300), "new": series([1e6] * 300)})
+    by = {c["id"]: c for c in table}
+    assert by["sol"]["eligible"] and not by["new"]["eligible"]
+    wl = [{"id": "sol", "symbol": "SOL", "vs_btc_since_off_pct": 5.0, "vs_btc_state": "Bull", "meme": False, "exchange": False, "owner": True}]
+    thin = [{"id": "new", "symbol": "NEW", "vs_btc_since_off_pct": 50.0, "vs_btc_state": "Bull", "meme": False, "exchange": False, "owner": False}]
+    page = pane.pane(json.loads(json.dumps({"day": "2026-11-26", "regime": {"on": False, "state": "RISK-OFF", "since": "2026-11-16", "line": 1.0},
+                                            "coins": table, "watchlist": wl, "watchlist_too_new_or_thin": thin, "candidates": [],
+                                            "excluded": []}, default=str)))
+    assert "Too new / too thin" in page and 'class="thin"' in page and "<b>NEW</b>" in page
+    page = pane.pane(json.loads(json.dumps({"day": "d", "regime": {"on": True, "state": "RISK-ON", "line": None}, "coins": table,
+                                            "watchlist": [], "candidates": ["sol"], "candidates_too_new_or_thin": ["new"],
+                                            "excluded": []}, default=str)))
+    assert "Too new / too thin" in page and "NEW" in page

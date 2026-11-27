@@ -87,18 +87,20 @@ def categories(api, ids):
 
 
 def cg_year(api, coin, days=365):
-    """Daily closes and circulating supply from CoinGecko's free history. A point stamped 00:00 UTC on day D is
-    the close of D-1; the last point (now) is dropped, because that day has not closed."""
+    """Daily closes, circulating supply and trading volume from CoinGecko's free history. A point stamped 00:00 UTC
+    on day D is the close of D-1 (and that day's volume); the last point (now) is dropped, because that day has not
+    closed. Returns (prices, supply, volume)."""
     r = api.get(f"{CG}/coins/{coin}/market_chart", {"vs_currency": "usd", "days": days, "interval": "daily"})
     j = r.json() if getattr(r, "status_code", 200) == 200 else {}
     pr = pd.Series({pd.Timestamp(t, unit="ms"): v for t, v in j.get("prices", [])}, dtype=float)
     mc = pd.Series({pd.Timestamp(t, unit="ms"): v for t, v in j.get("market_caps", [])}, dtype=float)
+    vol = pd.Series({pd.Timestamp(t, unit="ms"): v for t, v in j.get("total_volumes", [])}, dtype=float)
     keep = lambda s: s[(s.index.hour == 0) & (s.index.minute == 0)]  # noqa: E731
-    pr, mc = keep(pr), keep(mc)
-    pr.index = (pr.index - pd.Timedelta(days=1)).normalize()
-    mc.index = (mc.index - pd.Timedelta(days=1)).normalize()
+    pr, mc, vol = keep(pr), keep(mc), keep(vol)
+    for x in (pr, mc, vol):
+        x.index = (x.index - pd.Timedelta(days=1)).normalize()
     supply = (mc / pr).replace([float("inf")], float("nan")).dropna()
-    return pr[pr > 0], supply[supply > 0]
+    return pr[pr > 0], supply[supply > 0], vol[vol >= 0]
 
 
 # ------------------------------------------------------------------ Coin Metrics

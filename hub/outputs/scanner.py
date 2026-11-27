@@ -87,8 +87,12 @@ def pane(scan):
         body = ("".join(f'<li><b>{esc(c["symbol"])}</b> {esc(c["sector"])}: own {chip(c["own"]["state"])}, vs BTC '
                         f'{chip(c["vs_btc"]["state"])}, quality {marks(c["quality"])}</li>' for c in cands)
                 or "<li>No coin is Dual Bull with quality today.</li>")
+        thin = [by[i] for i in scan.get("candidates_too_new_or_thin", []) if i in by]
+        thin_line = (f'<p class="thin"><b>Too new / too thin</b> (under $20M a day or under 180 days of prices): '
+                     + ", ".join(f'<b>{esc(c["symbol"])}</b> ({esc(c.get("not_eligible_why") or "")})' for c in thin) + "</p>") if thin else ""
         banner = (f'<section class="card sban on"><h4>Bitcoin regime ON: buy candidates</h4><p class="disc">Dual Bull '
-                  f'(own trend and vs BTC both Bull or better) and passing quality.{esc(line)}</p><ul class="wl">{body}</ul></section>')
+                  f'(own trend and vs BTC both Bull or better), passing quality, at least $20M traded a day and 180 days of '
+                  f'prices.{esc(line)}</p><ul class="wl">{body}</ul>{thin_line}</section>')
     else:
         since = f' since {esc((reg.get("since") or "")[:10])}' if reg.get("since") else ""
         body = "".join(f'<li data-meme="{int(w["meme"])}" data-exch="{int(w["exchange"])}"><b>{esc(w["symbol"])}</b> '
@@ -99,10 +103,16 @@ def pane(scan):
         except (ValueError, TypeError):
             span = None
         short = (f' Only {span} days so far, so this list is still noisy.' if span is not None and span < 30 else "")
+        why = {c["id"]: c.get("not_eligible_why") or "" for c in coins}
+        thin = scan.get("watchlist_too_new_or_thin", [])
+        thin_line = (f'<p class="thin"><b>Too new / too thin</b>, would otherwise be on the list: '
+                     + ", ".join(f'<span data-meme="{int(w["meme"])}" data-exch="{int(w["exchange"])}"><b>{esc(w["symbol"])}</b> '
+                                 f'{pct(w["vs_btc_since_off_pct"])} ({esc(why.get(w["id"], ""))})</span>' for w in thin) + "</p>") if thin else ""
         banner = (f'<section class="card sban off"><h4>No buy candidates: Bitcoin regime OFF{since}</h4>'
                   f'<p class="disc">The hub\'s weekly trend line is {esc(reg["state"])}.{esc(line)} Meanwhile, the coins '
                   f'holding up best against Bitcoin since the regime turned OFF (change against Bitcoin · trend against '
-                  f'Bitcoin).{esc(short)}</p><ol class="wl swl">{body}</ol></section>')
+                  f'Bitcoin). Only coins trading at least $20M a day with 180 days of prices.{esc(short)}</p>'
+                  f'<ol class="wl swl">{body}</ol>{thin_line}</section>')
     rows = []
     for c in coins:
         q = c["quality"]
@@ -158,6 +168,7 @@ text-transform:uppercase;letter-spacing:.04em;color:var(--mute);padding:6px 6px 
 .stab tr.sr{cursor:pointer} .stab .sm{font-size:11px;color:var(--mute)} .sst{font-weight:600}
 .stab tr.sd td{white-space:normal;color:#c9ced4;background:#15181b;padding:8px} .stab tr.sd p{margin:3px 0}
 .sdi{position:sticky;left:8px;max-width:calc(100vw - 72px)} @media(min-width:700px){.sdi{max-width:none;position:static}}
+.thin{font-size:13px;color:#7d838a;margin-top:8px} .thin b{color:#9aa0a6}
 .swl{columns:2;column-gap:18px} .swl li{break-inside:avoid} @media(min-width:700px){.swl{columns:3}}
 .qv{font-size:11px;border:1px solid currentColor;border-radius:8px;padding:0 5px;margin-left:3px} .qv.pass{color:#13c43a} .qv.fail{color:#ff5a5a} .qv.nodata{color:#8a8f96}
 """
@@ -168,7 +179,7 @@ function pairs(){var r=[],rs=tb.rows;for(var i=0;i<rs.length;i+=2)r.push([rs[i],
 function apply(){var hm=document.getElementById('hidememe').checked,he=document.getElementById('hideexch').checked;
 pairs().forEach(function(p){var d=p[0].dataset,show=(f==='all'||(f==='dual'&&d.dual==='1')||(f==='mine'&&d.mine==='1')||d.own===f)
 &&!(hm&&d.meme==='1')&&!(he&&d.exch==='1');p[0].hidden=!show;if(!show)p[1].hidden=true;});
-document.querySelectorAll('.sban li[data-meme]').forEach(function(li){li.hidden=(hm&&li.dataset.meme==='1')||(he&&li.dataset.exch==='1');});
+document.querySelectorAll('.sban [data-meme]').forEach(function(li){li.hidden=(hm&&li.dataset.meme==='1')||(he&&li.dataset.exch==='1');});
 try{localStorage.setItem('scan',JSON.stringify({hm:hm,he:he}))}catch(e){}}
 try{var s=JSON.parse(localStorage.getItem('scan')||'{}');document.getElementById('hidememe').checked=!!s.hm;document.getElementById('hideexch').checked=!!s.he;}catch(e){}
 document.querySelectorAll('.sf').forEach(function(b){b.addEventListener('click',function(){f=b.dataset.f;
