@@ -1,6 +1,6 @@
 {
  "version": 1,
- "generated_at": "2026-11-28T02:31:21Z",
+ "generated_at": "2026-11-28T08:30:15Z",
  "day": "2026-11-27",
  "regime": {
   "on": false,
@@ -9,7 +9,7 @@
   "line": 71993.22,
   "line_name": "short-term holder cost (Bitview)"
  },
- "revenue_median_growth": 0.2280550140737544,
+ "revenue_median_growth": 0.22589756754107604,
  "coins": [
   {
    "id": "bitcoin",
@@ -20,10 +20,10 @@
    "meme": false,
    "exchange": false,
    "owner": true,
-   "market_cap": 1208904654524,
+   "market_cap": 1199715749020,
    "price": 59804.1151065809,
    "price_date": "2026-11-27",
-   "change_7d": 2.0707,
+   "change_7d": 3.1758,
    "pct_since_signal": -7.8,
    "own": {
     "state": "Strong Bear",
@@ -79,10 +79,10 @@
    "meme": false,
    "exchange": false,
    "owner": true,
-   "market_cap": 203888631156,
+   "market_cap": 202311523681,
    "price": 1659.09215281122,
    "price_date": "2026-11-27",
-   "change_7d": 2.9669,
+   "change_7d": 1.2365,
    "pct_since_signal": -17.8,
    "own": {
     "state": "Strong Bear",
@@ -122,16 +122,16 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "revenue",
-    "revenue_90d": 15510116.0,
-    "revenue_growth": 1.1038096846411514,
+    "revenue_90d": 15574624.0,
+    "revenue_growth": 1.1432065317980404,
     "revenue_fixed": "good",
     "revenue_rank": 6,
     "revenue_of": 24,
     "revenue_relative": "good",
-    "supply_growth": 0.00814720278485015,
+    "supply_growth": 0.008171424830315521,
     "float_share": 1.0,
     "dilution": "good",
-    "holders_share": 1.0,
+    "holders_share": 0.9999933224712199,
     "accrual": "good",
     "pass": true,
     "parts_scored": 3
@@ -146,10 +146,10 @@
    "meme": false,
    "exchange": true,
    "owner": false,
-   "market_cap": 73071403918,
+   "market_cap": 72465452212,
    "price": 553.628312405245,
    "price_date": "2026-11-27",
-   "change_7d": 3.1179,
+   "change_7d": 4.9774,
    "pct_since_signal": -4.8,
    "own": {
     "state": "Strong Bear",
@@ -189,14 +189,14 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "revenue",
-    "revenue_90d": 4590337.0,
-    "revenue_growth": 0.2331553672437805,
+    "revenue_90d": 4583457.0,
+    "revenue_growth": 0.2288404741784238,
     "revenue_fixed": "good",
     "revenue_rank": 12,
     "revenue_of": 24,
     "revenue_relative": "neutral",
-    "supply_growth": -0.045050622638893145,
-    "float_share": 0.6575492022,
+    "supply_growth": -0.045050704910884365,
+    "float_share": 0.65754914555,
     "dilution": "good",
     "holders_share": 1.0,
     "accrual": "good",
@@ -213,10 +213,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 60448046262,
+   "market_cap": 59799919783,
    "price": 0.946860312453606,
    "price_date": "2026-11-27",
-   "change_7d": 4.957,
+   "change_7d": 5.0841,
    "pct_since_signal": -9.0,
    "own": {
     "state": "Strong Bear",
@@ -256,8 +256,8 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "revenue",
-    "revenue_90d": 105691.0,
-    "revenue_growth": 2.253732721731367,
+    "revenue_90d": 105661.0,
+    "revenue_growth": 2.252809161715359,
     "revenue_fixed": "good",
     "revenue_rank": 2,
     "revenue_of": 24,
@@ -265,7 +265,7 @@
     "supply_growth": 0.051720921940585196,
     "float_share": 0.63516606953,
     "dilution": "neutral",
-    "holders_share": 0.2516581355082268,
+    "holders_share": 0.25144566112378264,
     "accrual": "neutral",
     "pass": true,
     "parts_scored": 3
@@ -280,10 +280,10 @@
    "meme": false,
    "exchange": false,
    "owner": true,
-   "market_cap": 42625917579,
+   "market_cap": 42171310081,
    "price": 71.4667257911973,
    "price_date": "2026-11-27",
-   "change_7d": 4.7417,
+   "change_7d": 4.4919,
    "pct_since_signal": -14.2,
    "own": {
     "state": "Strong Bear",
@@ -323,14 +323,14 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "revenue",
-    "revenue_90d": 6740878.0,
-    "revenue_growth": 0.3331146044448241,
+    "revenue_90d": 6679259.0,
+    "revenue_growth": 0.31156966159908683,
     "revenue_fixed": "good",
     "revenue_rank": 11,
     "revenue_of": 24,
     "revenue_relative": "neutral",
-    "supply_growth": 0.05820048646866094,
-    "float_share": 0.9281597546286087,
+    "supply_growth": 0.05820006184949533,
+    "float_share": 0.9280704887678639,
     "dilution": "neutral",
     "holders_share": 1.0,
     "accrual": "good",
@@ -347,10 +347,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 28573074405,
+   "market_cap": 28574587110,
    "price": 0.300525508088999,
    "price_date": "2026-11-27",
-   "change_7d": -0.142,
+   "change_7d": -0.5012,
    "pct_since_signal": -2.4,
    "own": {
     "state": "Bear",
@@ -397,7 +397,7 @@
     "revenue_of": 24,
     "revenue_relative": "bad",
     "supply_growth": 0.003821608802137,
-    "float_share": 0.9999924882212744,
+    "float_share": 0.9999851449255841,
     "dilution": "good",
     "holders_share": 1.0,
     "accrual": "good",
@@ -414,10 +414,10 @@
    "meme": false,
    "exchange": false,
    "owner": true,
-   "market_cap": 15314668726,
+   "market_cap": 15169210612,
    "price": 63.3164248396678,
    "price_date": "2026-11-27",
-   "change_7d": 6.631,
+   "change_7d": 9.4057,
    "pct_since_signal": -5.4,
    "own": {
     "state": "Strong Bear",
@@ -457,14 +457,14 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "revenue",
-    "revenue_90d": 2309245.0,
-    "revenue_growth": -0.25057507149449787,
+    "revenue_90d": 2315009.0,
+    "revenue_growth": -0.24242104929021835,
     "revenue_fixed": "bad",
     "revenue_rank": 22,
     "revenue_of": 24,
     "revenue_relative": "bad",
-    "supply_growth": -0.12210587151361707,
-    "float_share": 0.23765083413233792,
+    "supply_growth": -0.12212488225390139,
+    "float_share": 0.2376456878189734,
     "dilution": "bad",
     "holders_share": 1.0,
     "accrual": "good",
@@ -481,10 +481,10 @@
    "meme": false,
    "exchange": false,
    "owner": true,
-   "market_cap": 12935829636,
+   "market_cap": 12524232467,
    "price": 730.70143788184,
    "price_date": "2026-11-27",
-   "change_7d": 0.6546,
+   "change_7d": 0.3166,
    "pct_since_signal": -24.5,
    "own": {
     "state": "Strong Bear",
@@ -548,10 +548,10 @@
    "meme": true,
    "exchange": false,
    "owner": false,
-   "market_cap": 9085773786,
+   "market_cap": 8910708507,
    "price": 0.0575707576094523,
    "price_date": "2026-11-27",
-   "change_7d": 6.673,
+   "change_7d": 6.2134,
    "pct_since_signal": -27.1,
    "own": {
     "state": "Strong Bear",
@@ -598,7 +598,7 @@
     "revenue_of": 24,
     "revenue_relative": null,
     "supply_growth": 0.03236469200462522,
-    "float_share": 0.9999696678320341,
+    "float_share": 0.9999488951789421,
     "dilution": "neutral",
     "holders_share": null,
     "accrual": null,
@@ -615,10 +615,10 @@
    "meme": false,
    "exchange": true,
    "owner": false,
-   "market_cap": 8357236275,
+   "market_cap": 8332494828,
    "price": 9.0945,
    "price_date": "2026-11-27",
-   "change_7d": -0.5635,
+   "change_7d": -0.7903,
    "pct_since_signal": -2.6,
    "own": {
     "state": "Neutral",
@@ -682,10 +682,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 7770506046,
+   "market_cap": 7991474514,
    "price": 408.783076046045,
    "price_date": "2026-11-27",
-   "change_7d": -10.079,
+   "change_7d": -3.747,
    "pct_since_signal": -17.2,
    "own": {
     "state": "Strong Bear",
@@ -731,7 +731,7 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.02264236741236081,
+    "supply_growth": 0.02264744893413284,
     "float_share": 1.0,
     "dilution": "neutral",
     "holders_share": null,
@@ -749,10 +749,10 @@
    "meme": false,
    "exchange": true,
    "owner": false,
-   "market_cap": 7165959429,
+   "market_cap": 7113734710,
    "price": 60.176700824611544,
    "price_date": "2026-11-27",
-   "change_7d": 7.2012,
+   "change_7d": 7.1814,
    "pct_since_signal": -15.6,
    "own": {
     "state": "Strong Bear",
@@ -816,10 +816,10 @@
    "meme": false,
    "exchange": false,
    "owner": true,
-   "market_cap": 7156234134,
+   "market_cap": 7032988180,
    "price": 9.34958603369119,
    "price_date": "2026-11-27",
-   "change_7d": 9.7444,
+   "change_7d": 9.3012,
    "pct_since_signal": 5.3,
    "own": {
     "state": "Strong Bear",
@@ -883,10 +883,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 5583044779,
+   "market_cap": 5500996528,
    "price": 0.148011528099604,
    "price_date": "2026-11-27",
-   "change_7d": 4.094,
+   "change_7d": 4.3289,
    "pct_since_signal": -18.1,
    "own": {
     "state": "Strong Bear",
@@ -926,7 +926,7 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "revenue",
-    "revenue_90d": 46658.0,
+    "revenue_90d": 46654.0,
     "revenue_growth": null,
     "revenue_fixed": null,
     "revenue_rank": null,
@@ -950,10 +950,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 4496946547,
+   "market_cap": 4406638639,
    "price": 0.126488040128904,
    "price_date": "2026-11-27",
-   "change_7d": -0.4535,
+   "change_7d": -0.6259,
    "pct_since_signal": -22.3,
    "own": {
     "state": "Strong Bear",
@@ -999,8 +999,8 @@
     "revenue_rank": 15,
     "revenue_of": 24,
     "revenue_relative": "neutral",
-    "supply_growth": 0.09775543801452025,
-    "float_share": 0.7097542391128441,
+    "supply_growth": 0.09775540316657416,
+    "float_share": 0.7097542165818899,
     "dilution": "neutral",
     "holders_share": null,
     "accrual": null,
@@ -1017,10 +1017,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 4216594388,
+   "market_cap": 4146042512,
    "price": 206.665071386009,
    "price_date": "2026-11-27",
-   "change_7d": 7.8399,
+   "change_7d": 9.1816,
    "pct_since_signal": -2.6,
    "own": {
     "state": "Strong Bear",
@@ -1066,8 +1066,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.007669343582457966,
-    "float_share": 0.9582254415071791,
+    "supply_growth": 0.007676072567009307,
+    "float_share": 0.9582318403167029,
     "dilution": "good",
     "holders_share": null,
     "accrual": null,
@@ -1084,10 +1084,10 @@
    "meme": false,
    "exchange": false,
    "owner": true,
-   "market_cap": 4010840757,
+   "market_cap": 3972704019,
    "price": 3.0165196553263,
    "price_date": "2026-11-27",
-   "change_7d": 8.6201,
+   "change_7d": 11.639,
    "pct_since_signal": 1.0,
    "own": {
     "state": "Strong Bear",
@@ -1133,8 +1133,8 @@
     "revenue_rank": 4,
     "revenue_of": 24,
     "revenue_relative": "good",
-    "supply_growth": 0.025016746124560285,
-    "float_share": 0.9999999710560664,
+    "supply_growth": 0.02503664867984834,
+    "float_share": 0.9999999687716254,
     "dilution": "neutral",
     "holders_share": 1.0,
     "accrual": "good",
@@ -1151,10 +1151,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 3502383088,
+   "market_cap": 3431231042,
    "price": 44.8616226894464,
    "price_date": "2026-11-27",
-   "change_7d": 10.294,
+   "change_7d": 12.9804,
    "pct_since_signal": -1.5,
    "own": {
     "state": "Strong Bear",
@@ -1194,14 +1194,14 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "fees",
-    "revenue_90d": 38027.0,
+    "revenue_90d": 38023.0,
     "revenue_growth": null,
     "revenue_fixed": null,
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.017615970917395085,
-    "float_share": 0.9270717938147454,
+    "supply_growth": 0.01762593498715659,
+    "float_share": 0.9270808713138133,
     "dilution": "good",
     "holders_share": null,
     "accrual": null,
@@ -1218,10 +1218,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 3008835756,
+   "market_cap": 3003679839,
    "price": 0.0742773056360788,
    "price_date": "2026-11-27",
-   "change_7d": 0.2275,
+   "change_7d": 2.6818,
    "pct_since_signal": -25.2,
    "own": {
     "state": "Strong Bear",
@@ -1267,7 +1267,7 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.12518892926199188,
+    "supply_growth": 0.12521908751316868,
     "float_share": 1.0,
     "dilution": "bad",
     "holders_share": null,
@@ -1280,15 +1280,15 @@
    "id": "avalanche-2",
    "symbol": "AVAX",
    "name": "Avalanche",
-   "rank": 26,
+   "rank": 27,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 2961126550,
+   "market_cap": 2914869862,
    "price": 6.59418384652868,
    "price_date": "2026-11-27",
-   "change_7d": 1.9993,
+   "change_7d": 3.0776,
    "pct_since_signal": -6.2,
    "own": {
     "state": "Strong Bear",
@@ -1328,14 +1328,14 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "revenue",
-    "revenue_90d": 1030475.0,
-    "revenue_growth": 2.7793405706740995,
+    "revenue_90d": 1029669.0,
+    "revenue_growth": 2.776384508178684,
     "revenue_fixed": "good",
     "revenue_rank": 1,
     "revenue_of": 24,
     "revenue_relative": "good",
-    "supply_growth": 0.04085271024589776,
-    "float_share": 0.6204904169961301,
+    "supply_growth": 0.040853908263821515,
+    "float_share": 0.6204911311784863,
     "dilution": "neutral",
     "holders_share": 1.0,
     "accrual": "good",
@@ -1352,10 +1352,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 2920948857,
+   "market_cap": 2848732663,
    "price": 4.81205117059607,
    "price_date": "2026-11-27",
-   "change_7d": 8.4156,
+   "change_7d": 5.8777,
    "pct_since_signal": -7.1,
    "own": {
     "state": "Strong Bear",
@@ -1401,8 +1401,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.011964933099360975,
-    "float_share": 0.6070498958759789,
+    "supply_growth": 0.01195826501530406,
+    "float_share": 0.6070458958759789,
     "dilution": "good",
     "holders_share": null,
     "accrual": null,
@@ -1419,10 +1419,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 2832601044,
+   "market_cap": 2827975721,
    "price": 0.977414545428149,
    "price_date": "2026-11-27",
-   "change_7d": 0.9913,
+   "change_7d": 5.8289,
    "pct_since_signal": -19.1,
    "own": {
     "state": "Strong Bear",
@@ -1468,8 +1468,8 @@
     "revenue_rank": 21,
     "revenue_of": 24,
     "revenue_relative": "bad",
-    "supply_growth": 0.16192766447186369,
-    "float_share": 0.5469812112867073,
+    "supply_growth": 0.16198504224391663,
+    "float_share": 0.5469935083273806,
     "dilution": "bad",
     "holders_share": 1.0,
     "accrual": "good",
@@ -1486,10 +1486,10 @@
    "meme": false,
    "exchange": false,
    "owner": true,
-   "market_cap": 2794158849,
+   "market_cap": 2770774209,
    "price": 0.671125835854829,
    "price_date": "2026-11-27",
-   "change_7d": 4.27,
+   "change_7d": 7.0816,
    "pct_since_signal": -6.7,
    "own": {
     "state": "Strong Bear",
@@ -1548,15 +1548,15 @@
    "id": "hedera-hashgraph",
    "symbol": "HBAR",
    "name": "Hedera",
-   "rank": 34,
+   "rank": 35,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 2374668507,
+   "market_cap": 2358043068,
    "price": 0.0537928619806148,
    "price_date": "2026-11-27",
-   "change_7d": 4.652,
+   "change_7d": 5.7868,
    "pct_since_signal": -19.8,
    "own": {
     "state": "Strong Bear",
@@ -1596,14 +1596,14 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "fees",
-    "revenue_90d": 49610.0,
+    "revenue_90d": 49597.0,
     "revenue_growth": null,
     "revenue_fixed": null,
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.044090303638664174,
-    "float_share": 0.8865517632656035,
+    "supply_growth": 0.04409030364867905,
+    "float_share": 0.8865517632741072,
     "dilution": "neutral",
     "holders_share": null,
     "accrual": null,
@@ -1620,10 +1620,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 2212885302,
+   "market_cap": 2178490886,
    "price": 186.88350671466813,
    "price_date": "2026-11-27",
-   "change_7d": 4.5516,
+   "change_7d": 5.2489,
    "pct_since_signal": 1.7,
    "own": {
     "state": "Strong Bear",
@@ -1682,15 +1682,15 @@
    "id": "shiba-inu",
    "symbol": "SHIB",
    "name": "Shiba Inu",
-   "rank": 38,
+   "rank": 39,
    "sector": "Meme",
    "meme": true,
    "exchange": false,
    "owner": false,
-   "market_cap": 2174909270,
+   "market_cap": 2138705727,
    "price": 3.68503320207453e-06,
    "price_date": "2026-11-27",
-   "change_7d": 3.1911,
+   "change_7d": 2.8938,
    "pct_since_signal": -15.5,
    "own": {
     "state": "Strong Bear",
@@ -1736,8 +1736,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 2.137597103057942e-05,
-    "float_share": 0.9995630193404333,
+    "supply_growth": 2.1373723538831157e-05,
+    "float_share": 0.9995630176438273,
     "dilution": "good",
     "holders_share": null,
     "accrual": null,
@@ -1749,15 +1749,15 @@
    "id": "quant-network",
    "symbol": "QNT",
    "name": "Quant",
-   "rank": 40,
+   "rank": 41,
    "sector": "Infrastructure",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 2128462889,
+   "market_cap": 2105852081,
    "price": 146.29020757867,
    "price_date": "2026-11-27",
-   "change_7d": 6.06,
+   "change_7d": 9.4285,
    "pct_since_signal": -1.0,
    "own": {
     "state": "Bear",
@@ -1813,152 +1813,18 @@
    }
   },
   {
-   "id": "crypto-com-chain",
-   "symbol": "CRO",
-   "name": "Cronos",
-   "rank": 42,
-   "sector": "Exchange",
-   "meme": false,
-   "exchange": true,
-   "owner": false,
-   "market_cap": 2082205139,
-   "price": 0.0398602514458639,
-   "price_date": "2026-11-27",
-   "change_7d": 0.7343,
-   "pct_since_signal": -17.0,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-11-09",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -20.8,
-     "average_change_pct": -9.3,
-     "momentum": -1.43
-    }
-   },
-   "vs_btc": {
-    "state": "Bear",
-    "since": "2026-11-15",
-    "why": null,
-    "tests": {
-     "position": 0,
-     "direction": -1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": -1.5,
-     "average_change_pct": -3.4,
-     "momentum": 0.34
-    }
-   },
-   "days_since": 13,
-   "dual_bull": false,
-   "eligible": false,
-   "avg_volume_30d": 5640861.782464679,
-   "history_days": 2810,
-   "not_eligible_why": "too thin: $5.6M a day on average over 30 days (needs $20M)",
-   "quality": {
-    "revenue_kind": "fees",
-    "revenue_90d": 40387.0,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": 0.394083356817291,
-    "float_share": 0.5196633365653287,
-    "dilution": "bad",
-    "holders_share": null,
-    "accrual": null,
-    "pass": false,
-    "parts_scored": 1
-   }
-  },
-  {
-   "id": "memecore",
-   "symbol": "M",
-   "name": "MemeCore",
-   "rank": 43,
-   "sector": "Meme",
-   "meme": true,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 1855773471,
-   "price": 0.8307229656632353,
-   "price_date": "2026-11-27",
-   "change_7d": -5.5459,
-   "pct_since_signal": -3.4,
-   "own": {
-    "state": "Bear",
-    "since": "2026-11-03",
-    "why": null,
-    "tests": {
-     "position": 0,
-     "direction": -1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": -2.5,
-     "average_change_pct": -5.1,
-     "momentum": -0.0
-    }
-   },
-   "vs_btc": {
-    "state": "Neutral",
-    "since": "2026-11-16",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": 1,
-     "momentum": 1
-    },
-    "detail": {
-     "vs_average_pct": 19.8,
-     "average_change_pct": 1.9,
-     "momentum": 1.0
-    }
-   },
-   "days_since": 12,
-   "dual_bull": false,
-   "eligible": false,
-   "avg_volume_30d": 1414006.7386075212,
-   "history_days": 366,
-   "not_eligible_why": "too thin: $1.4M a day on average over 30 days (needs $20M)",
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": 0.3477826778345803,
-    "float_share": 0.23026927355435847,
-    "dilution": "bad",
-    "holders_share": null,
-    "accrual": null,
-    "pass": false,
-    "parts_scored": 1
-   }
-  },
-  {
    "id": "bitway",
    "symbol": "BTW",
    "name": "Bitway",
-   "rank": 44,
+   "rank": 42,
    "sector": "DeFi",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1780652090,
+   "market_cap": 2102336737,
    "price": 1.184783404722242,
    "price_date": "2026-11-27",
-   "change_7d": 78.9778,
+   "change_7d": 98.0285,
    "pct_since_signal": 31.7,
    "own": {
     "state": "Bear",
@@ -2014,6 +1880,140 @@
    }
   },
   {
+   "id": "crypto-com-chain",
+   "symbol": "CRO",
+   "name": "Cronos",
+   "rank": 43,
+   "sector": "Exchange",
+   "meme": false,
+   "exchange": true,
+   "owner": false,
+   "market_cap": 2032995072,
+   "price": 0.0398602514458639,
+   "price_date": "2026-11-27",
+   "change_7d": -1.6726,
+   "pct_since_signal": -17.0,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-11-09",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -20.8,
+     "average_change_pct": -9.3,
+     "momentum": -1.43
+    }
+   },
+   "vs_btc": {
+    "state": "Bear",
+    "since": "2026-11-15",
+    "why": null,
+    "tests": {
+     "position": 0,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": -1.5,
+     "average_change_pct": -3.4,
+     "momentum": 0.34
+    }
+   },
+   "days_since": 13,
+   "dual_bull": false,
+   "eligible": false,
+   "avg_volume_30d": 5640861.782464679,
+   "history_days": 2810,
+   "not_eligible_why": "too thin: $5.6M a day on average over 30 days (needs $20M)",
+   "quality": {
+    "revenue_kind": "fees",
+    "revenue_90d": 40387.0,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 0.39409466770318335,
+    "float_share": 0.5196675528502972,
+    "dilution": "bad",
+    "holders_share": null,
+    "accrual": null,
+    "pass": false,
+    "parts_scored": 1
+   }
+  },
+  {
+   "id": "memecore",
+   "symbol": "M",
+   "name": "MemeCore",
+   "rank": 44,
+   "sector": "Meme",
+   "meme": true,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 1782266794,
+   "price": 0.8307229656632353,
+   "price_date": "2026-11-27",
+   "change_7d": -0.883,
+   "pct_since_signal": -3.4,
+   "own": {
+    "state": "Bear",
+    "since": "2026-11-03",
+    "why": null,
+    "tests": {
+     "position": 0,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": -2.5,
+     "average_change_pct": -5.1,
+     "momentum": -0.0
+    }
+   },
+   "vs_btc": {
+    "state": "Neutral",
+    "since": "2026-11-16",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": 1,
+     "momentum": 1
+    },
+    "detail": {
+     "vs_average_pct": 19.8,
+     "average_change_pct": 1.9,
+     "momentum": 1.0
+    }
+   },
+   "days_since": 12,
+   "dual_bull": false,
+   "eligible": false,
+   "avg_volume_30d": 1414006.7386075212,
+   "history_days": 366,
+   "not_eligible_why": "too thin: $1.4M a day on average over 30 days (needs $20M)",
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 0.34783686460272367,
+    "float_share": 0.23027853138794088,
+    "dilution": "bad",
+    "holders_share": null,
+    "accrual": null,
+    "pass": false,
+    "parts_scored": 1
+   }
+  },
+  {
    "id": "okb",
    "symbol": "OKB",
    "name": "OKB",
@@ -2022,10 +2022,10 @@
    "meme": false,
    "exchange": true,
    "owner": false,
-   "market_cap": 1760550110,
+   "market_cap": 1732451847,
    "price": 83.1722167904346,
    "price_date": "2026-11-27",
-   "change_7d": 6.6462,
+   "change_7d": 7.1743,
    "pct_since_signal": -11.4,
    "own": {
     "state": "Strong Bear",
@@ -2084,15 +2084,15 @@
    "id": "rain",
    "symbol": "RAIN",
    "name": "Rain",
-   "rank": 47,
+   "rank": 48,
    "sector": "DeFi",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1644357884,
+   "market_cap": 1619385601,
    "price": 0.00230298011223501,
    "price_date": "2026-11-27",
-   "change_7d": -38.8359,
+   "change_7d": -39.6913,
    "pct_since_signal": -76.6,
    "own": {
     "state": "Strong Bear",
@@ -2151,15 +2151,15 @@
    "id": "pepe",
    "symbol": "PEPE",
    "name": "Pepe",
-   "rank": 51,
+   "rank": 52,
    "sector": "Meme",
    "meme": true,
    "exchange": false,
    "owner": false,
-   "market_cap": 1495060160,
+   "market_cap": 1464774955,
    "price": 3.52935474660454e-06,
    "price_date": "2026-11-27",
-   "change_7d": 3.7233,
+   "change_7d": 4.3555,
    "pct_since_signal": 2.9,
    "own": {
     "state": "Strong Bear",
@@ -2223,10 +2223,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1464446223,
+   "market_cap": 1444783476,
    "price": 95.5777512417512,
    "price_date": "2026-11-27",
-   "change_7d": -2.1795,
+   "change_7d": -2.0905,
    "pct_since_signal": -11.9,
    "own": {
     "state": "Strong Bear",
@@ -2272,8 +2272,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.018497621209410786,
-    "float_share": 0.9651081390435879,
+    "supply_growth": 0.01849772798580518,
+    "float_share": 0.9651082402227809,
     "dilution": "good",
     "holders_share": null,
     "accrual": null,
@@ -2282,85 +2282,18 @@
    }
   },
   {
-   "id": "ondo-finance",
-   "symbol": "ONDO",
-   "name": "Ondo",
+   "id": "ethena",
+   "symbol": "ENA",
+   "name": "Ethena",
    "rank": 54,
    "sector": "DeFi",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1407779573,
-   "price": 0.286715976870396,
-   "price_date": "2026-11-27",
-   "change_7d": 3.2965,
-   "pct_since_signal": -8.1,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-11-17",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -24.9,
-     "average_change_pct": -9.7,
-     "momentum": -1.04
-    }
-   },
-   "vs_btc": {
-    "state": "Bear",
-    "since": "2026-11-18",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": -6.1,
-     "average_change_pct": -4.2,
-     "momentum": -0.01
-    }
-   },
-   "days_since": 10,
-   "dual_bull": false,
-   "eligible": true,
-   "avg_volume_30d": 101326311.77377395,
-   "history_days": 1045,
-   "not_eligible_why": null,
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": 0.5410105516187367,
-    "float_share": 0.4869330647,
-    "dilution": "bad",
-    "holders_share": null,
-    "accrual": null,
-    "pass": false,
-    "parts_scored": 1
-   }
-  },
-  {
-   "id": "ethena",
-   "symbol": "ENA",
-   "name": "Ethena",
-   "rank": 55,
-   "sector": "DeFi",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 1398776467,
+   "market_cap": 1382037098,
    "price": 0.103654869275154,
    "price_date": "2026-11-27",
-   "change_7d": 5.1853,
+   "change_7d": 7.6441,
    "pct_since_signal": -14.6,
    "own": {
     "state": "Strong Bear",
@@ -2416,18 +2349,152 @@
    }
   },
   {
-   "id": "aster-2",
-   "symbol": "ASTER",
-   "name": "Aster",
-   "rank": 57,
+   "id": "ondo-finance",
+   "symbol": "ONDO",
+   "name": "Ondo",
+   "rank": 55,
    "sector": "DeFi",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1300618721,
+   "market_cap": 1380557180,
+   "price": 0.286715976870396,
+   "price_date": "2026-11-27",
+   "change_7d": 5.1811,
+   "pct_since_signal": -8.1,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-11-17",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -24.9,
+     "average_change_pct": -9.7,
+     "momentum": -1.04
+    }
+   },
+   "vs_btc": {
+    "state": "Bear",
+    "since": "2026-11-18",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": -6.1,
+     "average_change_pct": -4.2,
+     "momentum": -0.01
+    }
+   },
+   "days_since": 10,
+   "dual_bull": false,
+   "eligible": true,
+   "avg_volume_30d": 101326311.77377395,
+   "history_days": 1045,
+   "not_eligible_why": null,
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 0.5410105516187367,
+    "float_share": 0.4869330647,
+    "dilution": "bad",
+    "holders_share": null,
+    "accrual": null,
+    "pass": false,
+    "parts_scored": 1
+   }
+  },
+  {
+   "id": "venice-token",
+   "symbol": "VVV",
+   "name": "Venice Token",
+   "rank": 57,
+   "sector": "AI",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 1311265305,
+   "price": 25.6501849048361,
+   "price_date": "2026-11-27",
+   "change_7d": 20.2003,
+   "pct_since_signal": -12.3,
+   "own": {
+    "state": "Neutral",
+    "since": "2026-11-25",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": 11.9,
+     "average_change_pct": -2.1,
+     "momentum": 0.64
+    }
+   },
+   "vs_btc": {
+    "state": "Strong Bull",
+    "since": "2026-11-27",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": 1,
+     "momentum": 1
+    },
+    "detail": {
+     "vs_average_pct": 37.1,
+     "average_change_pct": 5.7,
+     "momentum": 1.45
+    }
+   },
+   "days_since": 1,
+   "dual_bull": false,
+   "eligible": true,
+   "avg_volume_30d": 43338953.27824928,
+   "history_days": 610,
+   "not_eligible_why": null,
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 0.18568182071897588,
+    "float_share": 0.606523022801825,
+    "dilution": "bad",
+    "holders_share": null,
+    "accrual": null,
+    "pass": false,
+    "parts_scored": 1
+   }
+  },
+  {
+   "id": "aster-2",
+   "symbol": "ASTER",
+   "name": "Aster",
+   "rank": 58,
+   "sector": "DeFi",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 1285028464,
    "price": 0.504122333437098,
    "price_date": "2026-11-27",
-   "change_7d": 0.9076,
+   "change_7d": 3.51,
    "pct_since_signal": -4.7,
    "own": {
     "state": "Strong Bear",
@@ -2483,73 +2550,6 @@
    }
   },
   {
-   "id": "venice-token",
-   "symbol": "VVV",
-   "name": "Venice Token",
-   "rank": 58,
-   "sector": "AI",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 1286088921,
-   "price": 25.6501849048361,
-   "price_date": "2026-11-27",
-   "change_7d": 24.0035,
-   "pct_since_signal": -12.3,
-   "own": {
-    "state": "Neutral",
-    "since": "2026-11-25",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": -1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": 11.9,
-     "average_change_pct": -2.1,
-     "momentum": 0.64
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bull",
-    "since": "2026-11-27",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": 1,
-     "momentum": 1
-    },
-    "detail": {
-     "vs_average_pct": 37.1,
-     "average_change_pct": 5.7,
-     "momentum": 1.45
-    }
-   },
-   "days_since": 1,
-   "dual_bull": false,
-   "eligible": true,
-   "avg_volume_30d": 43338953.27824928,
-   "history_days": 610,
-   "not_eligible_why": null,
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": 0.18546801003438307,
-    "float_share": 0.6064218980449556,
-    "dilution": "bad",
-    "holders_share": null,
-    "accrual": null,
-    "pass": false,
-    "parts_scored": 1
-   }
-  },
-  {
    "id": "htx-dao",
    "symbol": "HTX",
    "name": "HTX DAO",
@@ -2558,10 +2558,10 @@
    "meme": false,
    "exchange": true,
    "owner": false,
-   "market_cap": 1280615165,
+   "market_cap": 1277089249,
    "price": 1.43963512231423e-06,
    "price_date": "2026-11-27",
-   "change_7d": -1.2566,
+   "change_7d": -0.7123,
    "pct_since_signal": -6.3,
    "own": {
     "state": "Strong Bear",
@@ -2625,10 +2625,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1218577428,
+   "market_cap": 1221214744,
    "price": 0.367035424774927,
    "price_date": "2026-11-27",
-   "change_7d": -1.7341,
+   "change_7d": 0.2216,
    "pct_since_signal": -22.3,
    "own": {
     "state": "Strong Bear",
@@ -2684,85 +2684,18 @@
    }
   },
   {
-   "id": "sky",
-   "symbol": "SKY",
-   "name": "Sky",
+   "id": "just",
+   "symbol": "JST",
+   "name": "JUST",
    "rank": 61,
    "sector": "DeFi",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1209240790,
-   "price": 0.051936991493741626,
-   "price_date": "2026-11-27",
-   "change_7d": 19.0317,
-   "pct_since_signal": -2.8,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-11-17",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -16.8,
-     "average_change_pct": -11.5,
-     "momentum": -1.03
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bear",
-    "since": "2026-11-23",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": -1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": 4.0,
-     "average_change_pct": -6.1,
-     "momentum": 0.11
-    }
-   },
-   "days_since": 5,
-   "dual_bull": false,
-   "eligible": false,
-   "avg_volume_30d": 19660262.903096795,
-   "history_days": 366,
-   "not_eligible_why": "too thin: $19.7M a day on average over 30 days (needs $20M)",
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": 0.01408544194017236,
-    "float_share": 0.9920881247933376,
-    "dilution": "good",
-    "holders_share": null,
-    "accrual": null,
-    "pass": true,
-    "parts_scored": 1
-   }
-  },
-  {
-   "id": "just",
-   "symbol": "JST",
-   "name": "JUST",
-   "rank": 62,
-   "sector": "DeFi",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 1181535692,
+   "market_cap": 1173678982,
    "price": 0.147029829535572,
    "price_date": "2026-11-27",
-   "change_7d": 2.8266,
+   "change_7d": 4.0621,
    "pct_since_signal": 4.4,
    "own": {
     "state": "Bull",
@@ -2818,6 +2751,73 @@
    }
   },
   {
+   "id": "sky",
+   "symbol": "SKY",
+   "name": "Sky",
+   "rank": 62,
+   "sector": "DeFi",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 1167480914,
+   "price": 0.051936991493741626,
+   "price_date": "2026-11-27",
+   "change_7d": 10.5858,
+   "pct_since_signal": -2.8,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-11-17",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -16.8,
+     "average_change_pct": -11.5,
+     "momentum": -1.03
+    }
+   },
+   "vs_btc": {
+    "state": "Strong Bear",
+    "since": "2026-11-23",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": 4.0,
+     "average_change_pct": -6.1,
+     "momentum": 0.11
+    }
+   },
+   "days_since": 5,
+   "dual_bull": false,
+   "eligible": false,
+   "avg_volume_30d": 19660262.903096795,
+   "history_days": 366,
+   "not_eligible_why": "too thin: $19.7M a day on average over 30 days (needs $20M)",
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 0.01404636655490199,
+    "float_share": 0.9920498970226833,
+    "dilution": "good",
+    "holders_share": null,
+    "accrual": null,
+    "pass": true,
+    "parts_scored": 1
+   }
+  },
+  {
    "id": "morpho",
    "symbol": "MORPHO",
    "name": "Morpho",
@@ -2826,10 +2826,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1160687870,
+   "market_cap": 1136847793,
    "price": 1.63402660002364,
    "price_date": "2026-11-27",
-   "change_7d": 7.4076,
+   "change_7d": 4.3109,
    "pct_since_signal": -0.2,
    "own": {
     "state": "Strong Bear",
@@ -2875,8 +2875,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.33319630143497814,
-    "float_share": 0.706028090312335,
+    "supply_growth": 0.3332177403956973,
+    "float_share": 0.7060394438605548,
     "dilution": "bad",
     "holders_share": null,
     "accrual": null,
@@ -2893,10 +2893,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1139488045,
+   "market_cap": 1123007094,
    "price": 0.667479993008207,
    "price_date": "2026-11-27",
-   "change_7d": 0.8691,
+   "change_7d": 1.1729,
    "pct_since_signal": -26.9,
    "own": {
     "state": "Strong Bear",
@@ -2942,8 +2942,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.04535371471063998,
-    "float_share": 0.8162543708934611,
+    "supply_growth": 0.045376750060705406,
+    "float_share": 0.8162723578244983,
     "dilution": "neutral",
     "holders_share": null,
     "accrual": null,
@@ -2960,10 +2960,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1124704594,
+   "market_cap": 1088973586,
    "price": 1.99240850595563,
    "price_date": "2026-11-27",
-   "change_7d": 1.2512,
+   "change_7d": 1.7076,
    "pct_since_signal": -18.0,
    "own": {
     "state": "Strong Bear",
@@ -3009,8 +3009,8 @@
     "revenue_rank": 5,
     "revenue_of": 24,
     "revenue_relative": "good",
-    "supply_growth": 0.031986503084254325,
-    "float_share": 1.0000000032600234,
+    "supply_growth": 0.031987338015382116,
+    "float_share": 0.9999999375471453,
     "dilution": "neutral",
     "holders_share": 1.0,
     "accrual": "good",
@@ -3019,22 +3019,22 @@
    }
   },
   {
-   "id": "world-liberty-financial",
-   "symbol": "WLFI",
-   "name": "World Liberty Financial",
+   "id": "bitget-token",
+   "symbol": "BGB",
+   "name": "Bitget Token",
    "rank": 66,
-   "sector": "Other",
+   "sector": "Exchange",
    "meme": false,
-   "exchange": false,
+   "exchange": true,
    "owner": false,
-   "market_cap": 1090772779,
-   "price": 0.0360734276335858,
+   "market_cap": 1059956180,
+   "price": 1.5178668459965576,
    "price_date": "2026-11-27",
-   "change_7d": -20.7858,
-   "pct_since_signal": -27.8,
+   "change_7d": -1.839,
+   "pct_since_signal": -12.9,
    "own": {
     "state": "Strong Bear",
-    "since": "2026-11-02",
+    "since": "2026-11-03",
     "why": null,
     "tests": {
      "position": -1,
@@ -3042,42 +3042,42 @@
      "momentum": -1
     },
     "detail": {
-     "vs_average_pct": -27.5,
-     "average_change_pct": -4.9,
-     "momentum": -1.95
+     "vs_average_pct": -13.7,
+     "average_change_pct": -4.7,
+     "momentum": -1.82
     }
    },
    "vs_btc": {
-    "state": "Bear",
-    "since": "2026-10-23",
+    "state": "Strong Bull",
+    "since": "2026-11-25",
     "why": null,
     "tests": {
-     "position": -1,
+     "position": 1,
      "direction": 1,
-     "momentum": 0
+     "momentum": 1
     },
     "detail": {
-     "vs_average_pct": -10.2,
-     "average_change_pct": 1.4,
-     "momentum": -0.08
+     "vs_average_pct": 6.6,
+     "average_change_pct": 1.7,
+     "momentum": 1.6
     }
    },
-   "days_since": 26,
+   "days_since": 3,
    "dual_bull": false,
-   "eligible": true,
-   "avg_volume_30d": 33881042.39165134,
-   "history_days": 453,
-   "not_eligible_why": null,
+   "eligible": false,
+   "avg_volume_30d": 10057820.858975101,
+   "history_days": 366,
+   "not_eligible_why": "too thin: $10.1M a day on average over 30 days (needs $20M)",
    "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
+    "revenue_kind": "revenue",
+    "revenue_90d": 10342.67,
     "revenue_growth": null,
     "revenue_fixed": null,
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.16484666416407112,
-    "float_share": 0.31662728871,
+    "supply_growth": -0.00027884428721847154,
+    "float_share": 0.34999601482405196,
     "dilution": "bad",
     "holders_share": null,
     "accrual": null,
@@ -3089,15 +3089,15 @@
    "id": "pieverse",
    "symbol": "PIEVERSE",
    "name": "Pieverse",
-   "rank": 67,
+   "rank": 68,
    "sector": "AI",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 1065589831,
+   "market_cap": 1004745157,
    "price": 3.86313109378527,
    "price_date": "2026-11-27",
-   "change_7d": 27.4912,
+   "change_7d": 23.9715,
    "pct_since_signal": 28.5,
    "own": {
     "state": "Strong Bull",
@@ -3153,73 +3153,6 @@
    }
   },
   {
-   "id": "bitget-token",
-   "symbol": "BGB",
-   "name": "Bitget Token",
-   "rank": 68,
-   "sector": "Exchange",
-   "meme": false,
-   "exchange": true,
-   "owner": false,
-   "market_cap": 1062790740,
-   "price": 1.5178668459965576,
-   "price_date": "2026-11-27",
-   "change_7d": -2.6608,
-   "pct_since_signal": -12.9,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-11-03",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -13.7,
-     "average_change_pct": -4.7,
-     "momentum": -1.82
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bull",
-    "since": "2026-11-25",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": 1,
-     "momentum": 1
-    },
-    "detail": {
-     "vs_average_pct": 6.6,
-     "average_change_pct": 1.7,
-     "momentum": 1.6
-    }
-   },
-   "days_since": 3,
-   "dual_bull": false,
-   "eligible": false,
-   "avg_volume_30d": 10057820.858975101,
-   "history_days": 366,
-   "not_eligible_why": "too thin: $10.1M a day on average over 30 days (needs $20M)",
-   "quality": {
-    "revenue_kind": "revenue",
-    "revenue_90d": 10367.039999999999,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": -0.00027884428721847154,
-    "float_share": 0.34999601482405196,
-    "dilution": "bad",
-    "holders_share": null,
-    "accrual": null,
-    "pass": false,
-    "parts_scored": 1
-   }
-  },
-  {
    "id": "ethereum-classic",
    "symbol": "ETC",
    "name": "Ethereum Classic",
@@ -3228,10 +3161,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 942039540,
+   "market_cap": 924804365,
    "price": 5.90284000599791,
    "price_date": "2026-11-27",
-   "change_7d": 7.9938,
+   "change_7d": 9.3231,
    "pct_since_signal": -11.3,
    "own": {
     "state": "Strong Bear",
@@ -3277,8 +3210,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.0297359314065595,
-    "float_share": 0.7553951348320841,
+    "supply_growth": 0.02975221024511332,
+    "float_share": 0.7554070766853972,
     "dilution": "neutral",
     "holders_share": null,
     "accrual": null,
@@ -3295,10 +3228,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 935429473,
+   "market_cap": 914055500,
    "price": 0.246316678346362,
    "price_date": "2026-11-27",
-   "change_7d": 8.4438,
+   "change_7d": 8.7923,
    "pct_since_signal": -18.1,
    "own": {
     "state": "Strong Bear",
@@ -3338,14 +3271,14 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "fees",
-    "revenue_90d": 55251.0,
+    "revenue_90d": 54907.0,
     "revenue_growth": null,
     "revenue_fixed": null,
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.6112489817678952,
-    "float_share": 0.3805317931471131,
+    "supply_growth": 0.6112508519129873,
+    "float_share": 0.3805322348229021,
     "dilution": "bad",
     "holders_share": null,
     "accrual": null,
@@ -3357,15 +3290,15 @@
    "id": "pump-fun",
    "symbol": "PUMP",
    "name": "Pump.fun",
-   "rank": 73,
+   "rank": 72,
    "sector": "DeFi",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 920132393,
+   "market_cap": 909577839,
    "price": 0.00258661490222763,
    "price_date": "2026-11-27",
-   "change_7d": 7.9564,
+   "change_7d": 12.2092,
    "pct_since_signal": -0.4,
    "own": {
     "state": "Strong Bear",
@@ -3411,12 +3344,79 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.15318433265034948,
-    "float_share": 0.35215039394494907,
+    "supply_growth": 0.1530128119595855,
+    "float_share": 0.35209801630061927,
     "dilution": "bad",
     "holders_share": null,
     "accrual": null,
     "pass": false,
+    "parts_scored": 1
+   }
+  },
+  {
+   "id": "midnight-3",
+   "symbol": "NIGHT",
+   "name": "Midnight",
+   "rank": 73,
+   "sector": "L1",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 840043494,
+   "price": 0.050271850242772934,
+   "price_date": "2026-11-27",
+   "change_7d": 25.6123,
+   "pct_since_signal": 16.0,
+   "own": {
+    "state": "Bull",
+    "since": "2026-11-04",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": 1,
+     "momentum": 1
+    },
+    "detail": {
+     "vs_average_pct": 16.3,
+     "average_change_pct": 1.3,
+     "momentum": 0.8
+    }
+   },
+   "vs_btc": {
+    "state": "Strong Bull",
+    "since": "2026-11-15",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": 1,
+     "momentum": 1
+    },
+    "detail": {
+     "vs_average_pct": 41.5,
+     "average_change_pct": 9.2,
+     "momentum": 1.8
+    }
+   },
+   "days_since": 13,
+   "dual_bull": true,
+   "eligible": true,
+   "avg_volume_30d": 27428878.033485435,
+   "history_days": 355,
+   "not_eligible_why": null,
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": null,
+    "float_share": 0.6919749750264564,
+    "dilution": "neutral",
+    "holders_share": null,
+    "accrual": null,
+    "pass": true,
     "parts_scored": 1
    }
   },
@@ -3429,10 +3429,10 @@
    "meme": false,
    "exchange": true,
    "owner": false,
-   "market_cap": 843551979,
+   "market_cap": 826328541,
    "price": 6.007660870061802,
    "price_date": "2026-11-27",
-   "change_7d": 3.513,
+   "change_7d": 3.0681,
    "pct_since_signal": -2.7,
    "own": {
     "state": "Strong Bear",
@@ -3496,10 +3496,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 828245261,
+   "market_cap": 814579004,
    "price": 0.0778115216088888,
    "price_date": "2026-11-27",
-   "change_7d": 2.584,
+   "change_7d": 2.2165,
    "pct_since_signal": 0.8,
    "own": {
     "state": "Strong Bear",
@@ -3555,85 +3555,18 @@
    }
   },
   {
-   "id": "midnight-3",
-   "symbol": "NIGHT",
-   "name": "Midnight",
-   "rank": 76,
-   "sector": "L1",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 828004969,
-   "price": 0.050271850242772934,
-   "price_date": "2026-11-27",
-   "change_7d": 18.1396,
-   "pct_since_signal": 16.0,
-   "own": {
-    "state": "Bull",
-    "since": "2026-11-04",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": 1,
-     "momentum": 1
-    },
-    "detail": {
-     "vs_average_pct": 16.3,
-     "average_change_pct": 1.3,
-     "momentum": 0.8
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bull",
-    "since": "2026-11-15",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": 1,
-     "momentum": 1
-    },
-    "detail": {
-     "vs_average_pct": 41.5,
-     "average_change_pct": 9.2,
-     "momentum": 1.8
-    }
-   },
-   "days_since": 13,
-   "dual_bull": true,
-   "eligible": true,
-   "avg_volume_30d": 27428878.033485435,
-   "history_days": 355,
-   "not_eligible_why": null,
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": null,
-    "float_share": 0.6919749750264564,
-    "dilution": "neutral",
-    "holders_share": null,
-    "accrual": null,
-    "pass": true,
-    "parts_scored": 1
-   }
-  },
-  {
    "id": "jupiter-exchange-solana",
    "symbol": "JUP",
    "name": "Jupiter",
-   "rank": 77,
+   "rank": 76,
    "sector": "DeFi",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 822774065,
+   "market_cap": 811565665,
    "price": 0.247573717241671,
    "price_date": "2026-11-27",
-   "change_7d": 8.541,
+   "change_7d": 13.0237,
    "pct_since_signal": -6.7,
    "own": {
     "state": "Bear",
@@ -3692,15 +3625,15 @@
    "id": "arbitrum",
    "symbol": "ARB",
    "name": "Arbitrum",
-   "rank": 78,
+   "rank": 77,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 798994281,
+   "market_cap": 790744659,
    "price": 0.114868831395235,
    "price_date": "2026-11-27",
-   "change_7d": 1.8604,
+   "change_7d": 3.4189,
    "pct_since_signal": 1.8,
    "own": {
     "state": "Strong Bear",
@@ -3759,15 +3692,15 @@
    "id": "render-token",
    "symbol": "RENDER",
    "name": "Render",
-   "rank": 79,
+   "rank": 78,
    "sector": "AI",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 775355433,
+   "market_cap": 747052976,
    "price": 1.38541255990707,
    "price_date": "2026-11-27",
-   "change_7d": 9.2572,
+   "change_7d": 8.0529,
    "pct_since_signal": -19.1,
    "own": {
     "state": "Neutral",
@@ -3826,15 +3759,15 @@
    "id": "kaspa",
    "symbol": "KAS",
    "name": "Kaspa",
-   "rank": 80,
+   "rank": 79,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 743411091,
+   "market_cap": 732505930,
    "price": 0.0267281237309226,
    "price_date": "2026-11-27",
-   "change_7d": 2.6745,
+   "change_7d": 5.5779,
    "pct_since_signal": -9.6,
    "own": {
     "state": "Strong Bear",
@@ -3893,15 +3826,15 @@
    "id": "algorand",
    "symbol": "ALGO",
    "name": "Algorand",
-   "rank": 81,
+   "rank": 80,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 730752812,
+   "market_cap": 718866243,
    "price": 0.0811054235570762,
    "price_date": "2026-11-27",
-   "change_7d": 10.1576,
+   "change_7d": 9.3094,
    "pct_since_signal": 1.4,
    "own": {
     "state": "Strong Bear",
@@ -3941,7 +3874,7 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "revenue",
-    "revenue_90d": 2332.2799999999997,
+    "revenue_90d": 2361.7699999999995,
     "revenue_growth": null,
     "revenue_fixed": null,
     "revenue_rank": null,
@@ -3950,7 +3883,7 @@
     "supply_growth": 0.0310572448684574,
     "float_share": 0.9083206289437172,
     "dilution": "neutral",
-    "holders_share": 0.6778903047661516,
+    "holders_share": 0.6643449616177698,
     "accrual": "good",
     "pass": true,
     "parts_scored": 2
@@ -3960,15 +3893,15 @@
    "id": "gatechain-token",
    "symbol": "GT",
    "name": "Gate",
-   "rank": 82,
+   "rank": 81,
    "sector": "Exchange",
    "meme": false,
    "exchange": true,
    "owner": false,
-   "market_cap": 725630223,
+   "market_cap": 709573813,
    "price": 6.87526097368432,
    "price_date": "2026-11-27",
-   "change_7d": 10.7567,
+   "change_7d": 9.8357,
    "pct_since_signal": -7.5,
    "own": {
     "state": "Strong Bear",
@@ -4024,18 +3957,85 @@
    }
   },
   {
-   "id": "cosmos",
-   "symbol": "ATOM",
-   "name": "Cosmos Hub",
-   "rank": 84,
+   "id": "pearl-2",
+   "symbol": "PEARL",
+   "name": "Pearl",
+   "rank": 83,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 673911860,
+   "market_cap": 674606527,
+   "price": 1.7008582477595837,
+   "price_date": "2026-11-27",
+   "change_7d": -7.9699,
+   "pct_since_signal": 12.7,
+   "own": {
+    "state": "Neutral",
+    "since": "2026-11-14",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": 1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": -4.0,
+     "average_change_pct": 10.4,
+     "momentum": -0.07
+    }
+   },
+   "vs_btc": {
+    "state": "Strong Bull",
+    "since": "2026-11-22",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": 1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": 17.0,
+     "average_change_pct": 18.8,
+     "momentum": 0.42
+    }
+   },
+   "days_since": 6,
+   "dual_bull": false,
+   "eligible": false,
+   "avg_volume_30d": 20292002.077179845,
+   "history_days": 160,
+   "not_eligible_why": "too new: 160 days of prices (needs 180)",
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": null,
+    "float_share": 0.1870203524354656,
+    "dilution": "bad",
+    "holders_share": null,
+    "accrual": null,
+    "pass": false,
+    "parts_scored": 1
+   }
+  },
+  {
+   "id": "cosmos",
+   "symbol": "ATOM",
+   "name": "Cosmos Hub",
+   "rank": 85,
+   "sector": "L1",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 655251341,
    "price": 1.22459019070467,
    "price_date": "2026-11-27",
-   "change_7d": 1.6741,
+   "change_7d": 2.7864,
    "pct_since_signal": -11.7,
    "own": {
     "state": "Strong Bear",
@@ -4075,13 +4075,13 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "revenue",
-    "revenue_90d": 550.55,
+    "revenue_90d": 550.57,
     "revenue_growth": null,
     "revenue_fixed": null,
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.1321579508425843,
+    "supply_growth": 0.1322561360400174,
     "float_share": 1.0,
     "dilution": "bad",
     "holders_share": 1.0,
@@ -4094,15 +4094,15 @@
    "id": "lighter",
    "symbol": "LIT",
    "name": "Lighter",
-   "rank": 85,
+   "rank": 86,
    "sector": "DeFi",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 670063216,
+   "market_cap": 654776227,
    "price": 2.6753511627214297,
    "price_date": "2026-11-27",
-   "change_7d": 16.5913,
+   "change_7d": 12.2168,
    "pct_since_signal": 12.2,
    "own": {
     "state": "Strong Bear",
@@ -4158,85 +4158,18 @@
    }
   },
   {
-   "id": "pearl-2",
-   "symbol": "PEARL",
-   "name": "Pearl",
+   "id": "injective-protocol",
+   "symbol": "INJ",
+   "name": "Injective",
    "rank": 87,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 646723117,
-   "price": 1.7008582477595837,
-   "price_date": "2026-11-27",
-   "change_7d": -11.7779,
-   "pct_since_signal": 12.7,
-   "own": {
-    "state": "Neutral",
-    "since": "2026-11-14",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": 1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": -4.0,
-     "average_change_pct": 10.4,
-     "momentum": -0.07
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bull",
-    "since": "2026-11-22",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": 1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": 17.0,
-     "average_change_pct": 18.8,
-     "momentum": 0.42
-    }
-   },
-   "days_since": 6,
-   "dual_bull": false,
-   "eligible": false,
-   "avg_volume_30d": 20292002.077179845,
-   "history_days": 160,
-   "not_eligible_why": "too new: 160 days of prices (needs 180)",
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": null,
-    "float_share": 0.1869136089613493,
-    "dilution": "bad",
-    "holders_share": null,
-    "accrual": null,
-    "pass": false,
-    "parts_scored": 1
-   }
-  },
-  {
-   "id": "injective-protocol",
-   "symbol": "INJ",
-   "name": "Injective",
-   "rank": 88,
-   "sector": "L1",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 629263508,
+   "market_cap": 628837385,
    "price": 6.30963405046992,
    "price_date": "2026-11-27",
-   "change_7d": -0.439,
+   "change_7d": 1.6999,
    "pct_since_signal": 0.3,
    "own": {
     "state": "Bear",
@@ -4295,15 +4228,15 @@
    "id": "nexo",
    "symbol": "NEXO",
    "name": "NEXO",
-   "rank": 89,
+   "rank": 88,
    "sector": "Exchange",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 620580328,
+   "market_cap": 616676887,
    "price": 0.619992268217501,
    "price_date": "2026-11-27",
-   "change_7d": 0.7074,
+   "change_7d": 2.1614,
    "pct_since_signal": -17.4,
    "own": {
     "state": "Strong Bear",
@@ -4359,6 +4292,73 @@
    }
   },
   {
+   "id": "world-liberty-financial",
+   "symbol": "WLFI",
+   "name": "World Liberty Financial",
+   "rank": 89,
+   "sector": "Other",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 611668999,
+   "price": 0.0360734276335858,
+   "price_date": "2026-11-27",
+   "change_7d": -56.1752,
+   "pct_since_signal": -27.8,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-11-02",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -27.5,
+     "average_change_pct": -4.9,
+     "momentum": -1.95
+    }
+   },
+   "vs_btc": {
+    "state": "Bear",
+    "since": "2026-10-23",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": 1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": -10.2,
+     "average_change_pct": 1.4,
+     "momentum": -0.08
+    }
+   },
+   "days_since": 26,
+   "dual_bull": false,
+   "eligible": true,
+   "avg_volume_30d": 33881042.39165134,
+   "history_days": 453,
+   "not_eligible_why": null,
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 0.16484666416407112,
+    "float_share": 0.31662728871,
+    "dilution": "bad",
+    "holders_share": null,
+    "accrual": null,
+    "pass": false,
+    "parts_scored": 1
+   }
+  },
+  {
    "id": "pi-network",
    "symbol": "PI",
    "name": "Pi Network",
@@ -4367,10 +4367,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 594804605,
+   "market_cap": 573778542,
    "price": 0.05147785636161922,
    "price_date": "2026-11-27",
-   "change_7d": 3.1982,
+   "change_7d": 0.0968,
    "pct_since_signal": -25.8,
    "own": {
     "state": "Strong Bear",
@@ -4416,8 +4416,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.36616128694962247,
-    "float_share": 0.1140358677014675,
+    "supply_growth": 0.36616131782713657,
+    "float_share": 0.1140358702788675,
     "dilution": "bad",
     "holders_share": null,
     "accrual": null,
@@ -4434,10 +4434,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 548671064,
+   "market_cap": 543020075,
    "price": 1.55774476782162,
    "price_date": "2026-11-27",
-   "change_7d": 5.7069,
+   "change_7d": 7.5893,
    "pct_since_signal": -16.4,
    "own": {
     "state": "Strong Bear",
@@ -4483,8 +4483,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.04052143166921196,
-    "float_share": 0.8767035582822216,
+    "supply_growth": 0.04052192440485425,
+    "float_share": 0.8767039734424265,
     "dilution": "neutral",
     "holders_share": null,
     "accrual": null,
@@ -4501,10 +4501,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 510437129,
+   "market_cap": 501940616,
    "price": 0.0254580893892184,
    "price_date": "2026-11-27",
-   "change_7d": -6.1899,
+   "change_7d": -5.0706,
    "pct_since_signal": -1.2,
    "own": {
     "state": "Strong Bear",
@@ -4544,7 +4544,7 @@
    "not_eligible_why": "too thin: $13.0M a day on average over 30 days (needs $20M)",
    "quality": {
     "revenue_kind": "fees",
-    "revenue_90d": 1479.7999999999997,
+    "revenue_90d": 1482.3500000000001,
     "revenue_growth": null,
     "revenue_fixed": null,
     "revenue_rank": null,
@@ -4563,15 +4563,15 @@
    "id": "blockstack",
    "symbol": "STX",
    "name": "Stacks",
-   "rank": 95,
+   "rank": 96,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 501836348,
+   "market_cap": 496696291,
    "price": 0.265429306868563,
    "price_date": "2026-11-27",
-   "change_7d": 10.5884,
+   "change_7d": 11.6222,
    "pct_since_signal": 2.0,
    "own": {
     "state": "Strong Bear",
@@ -4611,13 +4611,13 @@
    "not_eligible_why": "too thin: $18.4M a day on average over 30 days (needs $20M)",
    "quality": {
     "revenue_kind": "fees",
-    "revenue_90d": 108775.0,
-    "revenue_growth": 1.0208428740092015,
+    "revenue_90d": 108070.0,
+    "revenue_growth": 0.9646751159634623,
     "revenue_fixed": "good",
     "revenue_rank": 7,
     "revenue_of": 24,
     "revenue_relative": "good",
-    "supply_growth": 0.03905756563383278,
+    "supply_growth": 0.039088458869687814,
     "float_share": 1.0,
     "dilution": "neutral",
     "holders_share": null,
@@ -4630,15 +4630,15 @@
    "id": "beldex",
    "symbol": "BDX",
    "name": "Beldex",
-   "rank": 97,
+   "rank": 99,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 497504757,
+   "market_cap": 480385814,
    "price": 0.06255393553560876,
    "price_date": "2026-11-27",
-   "change_7d": -12.6416,
+   "change_7d": -12.1517,
    "pct_since_signal": -12.8,
    "own": {
     "state": "Bear",
@@ -4684,8 +4684,75 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.052564426252221796,
-    "float_share": 0.7919908578048144,
+    "supply_growth": 0.052564104003664625,
+    "float_share": 0.7919906153323302,
+    "dilution": "neutral",
+    "holders_share": null,
+    "accrual": null,
+    "pass": true,
+    "parts_scored": 1
+   }
+  },
+  {
+   "id": "dash",
+   "symbol": "DASH",
+   "name": "Dash",
+   "rank": 100,
+   "sector": "L1",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 455757512,
+   "price": 35.7193695711388,
+   "price_date": "2026-11-27",
+   "change_7d": 9.7081,
+   "pct_since_signal": -5.7,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-11-15",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -20.9,
+     "average_change_pct": -8.9,
+     "momentum": -1.0
+    }
+   },
+   "vs_btc": {
+    "state": "Bear",
+    "since": "2026-11-01",
+    "why": null,
+    "tests": {
+     "position": 0,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": -1.5,
+     "average_change_pct": -3.1,
+     "momentum": -0.15
+    }
+   },
+   "days_since": 13,
+   "dual_bull": false,
+   "eligible": true,
+   "avg_volume_30d": 43000792.94138265,
+   "history_days": 4349,
+   "not_eligible_why": null,
+   "quality": {
+    "revenue_kind": "fees",
+    "revenue_90d": 1788.71,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 0.028059579954837544,
+    "float_share": 0.6799308179445227,
     "dilution": "neutral",
     "holders_share": null,
     "accrual": null,
@@ -4697,15 +4764,15 @@
    "id": "bianrensheng",
    "symbol": "\u5e01\u5b89\u4eba\u751f",
    "name": "\u5e01\u5b89\u4eba\u751f (BinanceLife)",
-   "rank": 100,
+   "rank": 102,
    "sector": "Meme",
    "meme": true,
    "exchange": false,
    "owner": false,
-   "market_cap": 466234020,
+   "market_cap": 452346723,
    "price": 0.45989708487794173,
    "price_date": "2026-11-27",
-   "change_7d": 5.6274,
+   "change_7d": 4.7058,
    "pct_since_signal": 2.7,
    "own": {
     "state": "Strong Bear",
@@ -4761,152 +4828,18 @@
    }
   },
   {
-   "id": "dash",
-   "symbol": "DASH",
-   "name": "Dash",
-   "rank": 101,
-   "sector": "L1",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 462301300,
-   "price": 35.7193695711388,
-   "price_date": "2026-11-27",
-   "change_7d": 9.9781,
-   "pct_since_signal": -5.7,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-11-15",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -20.9,
-     "average_change_pct": -8.9,
-     "momentum": -1.0
-    }
-   },
-   "vs_btc": {
-    "state": "Bear",
-    "since": "2026-11-01",
-    "why": null,
-    "tests": {
-     "position": 0,
-     "direction": -1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": -1.5,
-     "average_change_pct": -3.1,
-     "momentum": -0.15
-    }
-   },
-   "days_since": 13,
-   "dual_bull": false,
-   "eligible": true,
-   "avg_volume_30d": 43000792.94138265,
-   "history_days": 4349,
-   "not_eligible_why": null,
-   "quality": {
-    "revenue_kind": "fees",
-    "revenue_90d": 1788.71,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": 0.028043012379519228,
-    "float_share": 0.6799198605980253,
-    "dilution": "neutral",
-    "holders_share": null,
-    "accrual": null,
-    "pass": true,
-    "parts_scored": 1
-   }
-  },
-  {
-   "id": "filecoin",
-   "symbol": "FIL",
-   "name": "Filecoin",
+   "id": "flare-networks",
+   "symbol": "FLR",
+   "name": "Flare",
    "rank": 103,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 452607680,
-   "price": 0.532268608842667,
-   "price_date": "2026-11-27",
-   "change_7d": 0.0865,
-   "pct_since_signal": -25.0,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-11-13",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -36.1,
-     "average_change_pct": -11.3,
-     "momentum": -1.6
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bear",
-    "since": "2026-11-18",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": -19.4,
-     "average_change_pct": -6.4,
-     "momentum": -0.74
-    }
-   },
-   "days_since": 10,
-   "dual_bull": false,
-   "eligible": true,
-   "avg_volume_30d": 70114363.33049399,
-   "history_days": 2234,
-   "not_eligible_why": null,
-   "quality": {
-    "revenue_kind": "revenue",
-    "revenue_90d": 251941.0,
-    "revenue_growth": -0.45186127972499623,
-    "revenue_fixed": "bad",
-    "revenue_rank": 24,
-    "revenue_of": 24,
-    "revenue_relative": "bad",
-    "supply_growth": 0.18364809435438256,
-    "float_share": 0.4365875055740291,
-    "dilution": "bad",
-    "holders_share": 1.0,
-    "accrual": "good",
-    "pass": false,
-    "parts_scored": 3
-   }
-  },
-  {
-   "id": "flare-networks",
-   "symbol": "FLR",
-   "name": "Flare",
-   "rank": 104,
-   "sector": "L1",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 446240857,
+   "market_cap": 442087908,
    "price": 0.00507175939946381,
    "price_date": "2026-11-27",
-   "change_7d": 5.6383,
+   "change_7d": 6.2635,
    "pct_since_signal": -15.4,
    "own": {
     "state": "Strong Bear",
@@ -4953,12 +4886,79 @@
     "revenue_of": 24,
     "revenue_relative": null,
     "supply_growth": 0.11636635793154082,
-    "float_share": 0.8217132858616684,
+    "float_share": 0.8217193758378498,
     "dilution": "bad",
     "holders_share": null,
     "accrual": null,
     "pass": false,
     "parts_scored": 1
+   }
+  },
+  {
+   "id": "filecoin",
+   "symbol": "FIL",
+   "name": "Filecoin",
+   "rank": 104,
+   "sector": "L1",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 440397701,
+   "price": 0.532268608842667,
+   "price_date": "2026-11-27",
+   "change_7d": 1.1775,
+   "pct_since_signal": -25.0,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-11-13",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -36.1,
+     "average_change_pct": -11.3,
+     "momentum": -1.6
+    }
+   },
+   "vs_btc": {
+    "state": "Strong Bear",
+    "since": "2026-11-18",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": -19.4,
+     "average_change_pct": -6.4,
+     "momentum": -0.74
+    }
+   },
+   "days_since": 10,
+   "dual_bull": false,
+   "eligible": true,
+   "avg_volume_30d": 70114363.33049399,
+   "history_days": 2234,
+   "not_eligible_why": null,
+   "quality": {
+    "revenue_kind": "revenue",
+    "revenue_90d": 251823.0,
+    "revenue_growth": -0.45211800796292667,
+    "revenue_fixed": "bad",
+    "revenue_rank": 24,
+    "revenue_of": 24,
+    "revenue_relative": "bad",
+    "supply_growth": 0.18364809435438256,
+    "float_share": 0.4365875787541643,
+    "dilution": "bad",
+    "holders_share": 1.0,
+    "accrual": "good",
+    "pass": false,
+    "parts_scored": 3
    }
   },
   {
@@ -4970,10 +4970,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 445063985,
+   "market_cap": 437356904,
    "price": 0.4355960747367,
    "price_date": "2026-11-27",
-   "change_7d": -1.0323,
+   "change_7d": -0.4077,
    "pct_since_signal": -10.2,
    "own": {
     "state": "Strong Bear",
@@ -5029,85 +5029,18 @@
    }
   },
   {
-   "id": "stable-2",
-   "symbol": "STABLE",
-   "name": "\u200b\u200bStable",
+   "id": "layerzero",
+   "symbol": "ZRO",
+   "name": "LayerZero",
    "rank": 106,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 443391648,
-   "price": 0.0245114486769308,
-   "price_date": "2026-11-27",
-   "change_7d": 9.1894,
-   "pct_since_signal": 5.9,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-11-23",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": -4.7,
-     "average_change_pct": -2.9,
-     "momentum": -0.29
-    }
-   },
-   "vs_btc": {
-    "state": "Bull",
-    "since": "2026-11-22",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": 1,
-     "momentum": 1
-    },
-    "detail": {
-     "vs_average_pct": 17.4,
-     "average_change_pct": 3.8,
-     "momentum": 1.04
-    }
-   },
-   "days_since": 5,
-   "dual_bull": false,
-   "eligible": false,
-   "avg_volume_30d": 7354677.262533078,
-   "history_days": 356,
-   "not_eligible_why": "too thin: $7.4M a day on average over 30 days (needs $20M)",
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": null,
-    "float_share": 0.17998900009699006,
-    "dilution": "bad",
-    "holders_share": null,
-    "accrual": null,
-    "pass": false,
-    "parts_scored": 1
-   }
-  },
-  {
-   "id": "layerzero",
-   "symbol": "ZRO",
-   "name": "LayerZero",
-   "rank": 107,
-   "sector": "L1",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 438257516,
+   "market_cap": 432997946,
    "price": 1.08382944084887,
    "price_date": "2026-11-27",
-   "change_7d": -3.9972,
+   "change_7d": -2.6523,
    "pct_since_signal": 3.6,
    "own": {
     "state": "Strong Bear",
@@ -5163,6 +5096,73 @@
    }
   },
   {
+   "id": "stable-2",
+   "symbol": "STABLE",
+   "name": "\u200b\u200bStable",
+   "rank": 107,
+   "sector": "L1",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 429602516,
+   "price": 0.0245114486769308,
+   "price_date": "2026-11-27",
+   "change_7d": 5.5182,
+   "pct_since_signal": 5.9,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-11-23",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": -4.7,
+     "average_change_pct": -2.9,
+     "momentum": -0.29
+    }
+   },
+   "vs_btc": {
+    "state": "Bull",
+    "since": "2026-11-22",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": 1,
+     "momentum": 1
+    },
+    "detail": {
+     "vs_average_pct": 17.4,
+     "average_change_pct": 3.8,
+     "momentum": 1.04
+    }
+   },
+   "days_since": 5,
+   "dual_bull": false,
+   "eligible": false,
+   "avg_volume_30d": 7354677.262533078,
+   "history_days": 356,
+   "not_eligible_why": "too thin: $7.4M a day on average over 30 days (needs $20M)",
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": null,
+    "float_share": 0.17998900009699006,
+    "dilution": "bad",
+    "holders_share": null,
+    "accrual": null,
+    "pass": false,
+    "parts_scored": 1
+   }
+  },
+  {
    "id": "vechain",
    "symbol": "VET",
    "name": "VeChain",
@@ -5171,10 +5171,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 430348381,
+   "market_cap": 418422695,
    "price": 0.00498405828340122,
    "price_date": "2026-11-27",
-   "change_7d": 11.6764,
+   "change_7d": 9.2275,
    "pct_since_signal": -12.0,
    "own": {
     "state": "Strong Bear",
@@ -5233,15 +5233,15 @@
    "id": "derive",
    "symbol": "DRV",
    "name": "Derive",
-   "rank": 109,
+   "rank": 110,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 386410471,
+   "market_cap": 378821868,
    "price": 0.3623817030253688,
    "price_date": "2026-11-27",
-   "change_7d": 46.7559,
+   "change_7d": 34.8983,
    "pct_since_signal": 38.9,
    "own": {
     "state": "Bear",
@@ -5297,85 +5297,18 @@
    }
   },
   {
-   "id": "pyth-network",
-   "symbol": "PYTH",
-   "name": "Pyth Network",
-   "rank": 111,
-   "sector": "Infrastructure",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 379996387,
-   "price": 0.0483519946249594,
-   "price_date": "2026-11-27",
-   "change_7d": 0.1511,
-   "pct_since_signal": -5.3,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-11-23",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -26.9,
-     "average_change_pct": -7.7,
-     "momentum": -1.2
-    }
-   },
-   "vs_btc": {
-    "state": "Bear",
-    "since": "2026-11-25",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": 0
-    },
-    "detail": {
-     "vs_average_pct": -8.7,
-     "average_change_pct": -2.1,
-     "momentum": -0.22
-    }
-   },
-   "days_since": 3,
-   "dual_bull": false,
-   "eligible": true,
-   "avg_volume_30d": 25412140.395076,
-   "history_days": 1104,
-   "not_eligible_why": null,
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": 0.36986850547754657,
-    "float_share": 0.7874958541732542,
-    "dilution": "bad",
-    "holders_share": null,
-    "accrual": null,
-    "pass": false,
-    "parts_scored": 1
-   }
-  },
-  {
    "id": "hash-2",
    "symbol": "HASH",
    "name": "Provenance Blockchain",
-   "rank": 112,
+   "rank": 111,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 372910874,
+   "market_cap": 377294330,
    "price": 0.006140300017742527,
    "price_date": "2026-11-27",
-   "change_7d": -5.109,
+   "change_7d": -4.7184,
    "pct_since_signal": -5.5,
    "own": {
     "state": "Neutral",
@@ -5421,8 +5354,8 @@
     "revenue_rank": 13,
     "revenue_of": 24,
     "revenue_relative": "neutral",
-    "supply_growth": 0.17218550588165815,
-    "float_share": 0.60702827475,
+    "supply_growth": 0.1723782555486173,
+    "float_share": 0.60712809214,
     "dilution": "bad",
     "holders_share": 0.0,
     "accrual": "bad",
@@ -5431,55 +5364,55 @@
    }
   },
   {
-   "id": "falcon-finance-ff",
-   "symbol": "FF",
-   "name": "Falcon Finance",
-   "rank": 113,
-   "sector": "DeFi",
+   "id": "pyth-network",
+   "symbol": "PYTH",
+   "name": "Pyth Network",
+   "rank": 112,
+   "sector": "Infrastructure",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 358838125,
-   "price": 0.097171239141077,
+   "market_cap": 371704590,
+   "price": 0.0483519946249594,
    "price_date": "2026-11-27",
-   "change_7d": -2.4909,
-   "pct_since_signal": -4.9,
+   "change_7d": 1.4186,
+   "pct_since_signal": -5.3,
    "own": {
-    "state": "Neutral",
-    "since": "2026-11-19",
+    "state": "Strong Bear",
+    "since": "2026-11-23",
     "why": null,
     "tests": {
-     "position": 0,
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -26.9,
+     "average_change_pct": -7.7,
+     "momentum": -1.2
+    }
+   },
+   "vs_btc": {
+    "state": "Bear",
+    "since": "2026-11-25",
+    "why": null,
+    "tests": {
+     "position": -1,
      "direction": -1,
      "momentum": 0
     },
     "detail": {
-     "vs_average_pct": -1.2,
-     "average_change_pct": -3.0,
-     "momentum": 0.6
+     "vs_average_pct": -8.7,
+     "average_change_pct": -2.1,
+     "momentum": -0.22
     }
    },
-   "vs_btc": {
-    "state": "Strong Bull",
-    "since": "2026-11-26",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": 1,
-     "momentum": 1
-    },
-    "detail": {
-     "vs_average_pct": 21.0,
-     "average_change_pct": 4.6,
-     "momentum": 1.49
-    }
-   },
-   "days_since": 2,
+   "days_since": 3,
    "dual_bull": false,
-   "eligible": false,
-   "avg_volume_30d": 5644838.296766131,
-   "history_days": 401,
-   "not_eligible_why": "too thin: $5.6M a day on average over 30 days (needs $20M)",
+   "eligible": true,
+   "avg_volume_30d": 25412140.395076,
+   "history_days": 1104,
+   "not_eligible_why": null,
    "quality": {
     "revenue_kind": null,
     "revenue_90d": null,
@@ -5488,8 +5421,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.516130330763062,
-    "float_share": 0.354611111,
+    "supply_growth": 0.3698685052905022,
+    "float_share": 0.7874958540657281,
     "dilution": "bad",
     "holders_share": null,
     "accrual": null,
@@ -5501,15 +5434,15 @@
    "id": "raydium",
    "symbol": "RAY",
    "name": "Raydium",
-   "rank": 115,
+   "rank": 114,
    "sector": "DeFi",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 353531210,
+   "market_cap": 352255374,
    "price": 1.29991406276182,
    "price_date": "2026-11-27",
-   "change_7d": 1.6879,
+   "change_7d": 2.2488,
    "pct_since_signal": -29.0,
    "own": {
     "state": "Neutral",
@@ -5565,18 +5498,85 @@
    }
   },
   {
+   "id": "falcon-finance-ff",
+   "symbol": "FF",
+   "name": "Falcon Finance",
+   "rank": 115,
+   "sector": "DeFi",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 338980288,
+   "price": 0.097171239141077,
+   "price_date": "2026-11-27",
+   "change_7d": -5.8575,
+   "pct_since_signal": -4.9,
+   "own": {
+    "state": "Neutral",
+    "since": "2026-11-19",
+    "why": null,
+    "tests": {
+     "position": 0,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": -1.2,
+     "average_change_pct": -3.0,
+     "momentum": 0.6
+    }
+   },
+   "vs_btc": {
+    "state": "Strong Bull",
+    "since": "2026-11-26",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": 1,
+     "momentum": 1
+    },
+    "detail": {
+     "vs_average_pct": 21.0,
+     "average_change_pct": 4.6,
+     "momentum": 1.49
+    }
+   },
+   "days_since": 2,
+   "dual_bull": false,
+   "eligible": false,
+   "avg_volume_30d": 5644838.296766131,
+   "history_days": 401,
+   "not_eligible_why": "too thin: $5.6M a day on average over 30 days (needs $20M)",
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 0.516130330763062,
+    "float_share": 0.354611111,
+    "dilution": "bad",
+    "holders_share": null,
+    "accrual": null,
+    "pass": false,
+    "parts_scored": 1
+   }
+  },
+  {
    "id": "aptos",
    "symbol": "APT",
    "name": "Aptos",
-   "rank": 116,
+   "rank": 117,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 346304751,
+   "market_cap": 336394002,
    "price": 0.391302678450871,
    "price_date": "2026-11-27",
-   "change_7d": 7.1197,
+   "change_7d": 6.9171,
    "pct_since_signal": -12.9,
    "own": {
     "state": "Strong Bear",
@@ -5616,14 +5616,14 @@
    "not_eligible_why": null,
    "quality": {
     "revenue_kind": "revenue",
-    "revenue_90d": 346535.0,
-    "revenue_growth": -0.01123342235613689,
+    "revenue_90d": 346444.0,
+    "revenue_growth": -0.011493072199776355,
     "revenue_fixed": "neutral",
     "revenue_rank": 16,
     "revenue_of": 24,
     "revenue_relative": "neutral",
-    "supply_growth": 0.20715497410530204,
-    "float_share": 0.4236366876200633,
+    "supply_growth": 0.2071715158919567,
+    "float_share": 0.4236424927634425,
     "dilution": "bad",
     "holders_share": 1.0,
     "accrual": "good",
@@ -5635,15 +5635,15 @@
    "id": "celestia",
    "symbol": "TIA",
    "name": "Celestia",
-   "rank": 117,
+   "rank": 118,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 339098929,
+   "market_cap": 335665507,
    "price": 0.342448573757418,
    "price_date": "2026-11-27",
-   "change_7d": 4.296,
+   "change_7d": 6.9338,
    "pct_since_signal": -0.6,
    "own": {
     "state": "Strong Bear",
@@ -5707,10 +5707,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 335278596,
+   "market_cap": 325843824,
    "price": 0.139602334821756,
    "price_date": "2026-11-27",
-   "change_7d": 0.1811,
+   "change_7d": 1.9686,
    "pct_since_signal": 24.9,
    "own": {
     "state": "Neutral",
@@ -5774,10 +5774,10 @@
    "meme": true,
    "exchange": false,
    "owner": false,
-   "market_cap": 308622925,
+   "market_cap": 305973778,
    "price": 1.46336085726712e-06,
    "price_date": "2026-11-27",
-   "change_7d": -1.2769,
+   "change_7d": -1.8562,
    "pct_since_signal": 25.2,
    "own": {
     "state": "Neutral",
@@ -5841,10 +5841,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 299888207,
+   "market_cap": 295741250,
    "price": 0.389167362245273,
    "price_date": "2026-11-27",
-   "change_7d": -1.3008,
+   "change_7d": -1.2412,
    "pct_since_signal": -10.7,
    "own": {
     "state": "Strong Bear",
@@ -5891,7 +5891,7 @@
     "revenue_of": 24,
     "revenue_relative": null,
     "supply_growth": null,
-    "float_share": 0.36467176814837043,
+    "float_share": 0.36489989713691073,
     "dilution": "bad",
     "holders_share": null,
     "accrual": null,
@@ -5908,10 +5908,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 291163648,
+   "market_cap": 290924844,
    "price": 3.0063718340058366e-07,
    "price_date": "2026-11-27",
-   "change_7d": 0.287,
+   "change_7d": 2.5665,
    "pct_since_signal": 0.2,
    "own": {
     "state": "Strong Bear",
@@ -5975,10 +5975,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 290453473,
+   "market_cap": 286633751,
    "price": 14.4345455280709,
    "price_date": "2026-11-27",
-   "change_7d": 2.8062,
+   "change_7d": 4.309,
    "pct_since_signal": 1.8,
    "own": {
     "state": "Strong Bear",
@@ -6024,8 +6024,8 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.0071531979106254084,
-    "float_share": 0.9579412202380952,
+    "supply_growth": 0.007162741620679425,
+    "float_share": 0.9579502976190476,
     "dilution": "good",
     "holders_share": null,
     "accrual": null,
@@ -6042,10 +6042,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 290093307,
+   "market_cap": 285156209,
    "price": 0.126308928686827,
    "price_date": "2026-11-27",
-   "change_7d": 11.1788,
+   "change_7d": 13.1673,
    "pct_since_signal": -15.0,
    "own": {
     "state": "Strong Bear",
@@ -6101,152 +6101,18 @@
    }
   },
   {
-   "id": "curve-dao-token",
-   "symbol": "CRV",
-   "name": "Curve DAO",
-   "rank": 127,
-   "sector": "DeFi",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 280406384,
-   "price": 0.177737660450157,
-   "price_date": "2026-11-27",
-   "change_7d": -1.2508,
-   "pct_since_signal": -32.0,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-11-03",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -36.3,
-     "average_change_pct": -12.1,
-     "momentum": -1.94
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bear",
-    "since": "2026-11-04",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -19.7,
-     "average_change_pct": -7.2,
-     "momentum": -0.98
-    }
-   },
-   "days_since": 24,
-   "dual_bull": false,
-   "eligible": true,
-   "avg_volume_30d": 42327662.5583186,
-   "history_days": 2296,
-   "not_eligible_why": null,
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": 0.11234643774407194,
-    "float_share": 0.5248093767292938,
-    "dilution": "bad",
-    "holders_share": null,
-    "accrual": null,
-    "pass": false,
-    "parts_scored": 1
-   }
-  },
-  {
-   "id": "pudgy-penguins",
-   "symbol": "PENGU",
-   "name": "Pudgy Penguins",
-   "rank": 128,
-   "sector": "Meme",
-   "meme": true,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 280038725,
-   "price": 0.00445639171325939,
-   "price_date": "2026-11-27",
-   "change_7d": 3.1074,
-   "pct_since_signal": -26.8,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-11-13",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -31.7,
-     "average_change_pct": -12.9,
-     "momentum": -1.68
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bear",
-    "since": "2026-11-18",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -14.2,
-     "average_change_pct": -7.8,
-     "momentum": -0.77
-    }
-   },
-   "days_since": 10,
-   "dual_bull": false,
-   "eligible": true,
-   "avg_volume_30d": 72031764.0882493,
-   "history_days": 673,
-   "not_eligible_why": null,
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": 4.65492302814674e-06,
-    "float_share": 0.7071794560195718,
-    "dilution": "good",
-    "holders_share": null,
-    "accrual": null,
-    "pass": true,
-    "parts_scored": 1
-   }
-  },
-  {
    "id": "sun-token",
    "symbol": "SUN",
    "name": "Sun Token",
-   "rank": 130,
+   "rank": 128,
    "sector": "DeFi",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 276973740,
+   "market_cap": 275565275,
    "price": 0.0143777799736431,
    "price_date": "2026-11-27",
-   "change_7d": -1.5057,
+   "change_7d": -1.3144,
    "pct_since_signal": -6.2,
    "own": {
     "state": "Strong Bear",
@@ -6302,6 +6168,140 @@
    }
   },
   {
+   "id": "curve-dao-token",
+   "symbol": "CRV",
+   "name": "Curve DAO",
+   "rank": 129,
+   "sector": "DeFi",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 274520527,
+   "price": 0.177737660450157,
+   "price_date": "2026-11-27",
+   "change_7d": 0.1942,
+   "pct_since_signal": -32.0,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-11-03",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -36.3,
+     "average_change_pct": -12.1,
+     "momentum": -1.94
+    }
+   },
+   "vs_btc": {
+    "state": "Strong Bear",
+    "since": "2026-11-04",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -19.7,
+     "average_change_pct": -7.2,
+     "momentum": -0.98
+    }
+   },
+   "days_since": 24,
+   "dual_bull": false,
+   "eligible": true,
+   "avg_volume_30d": 42327662.5583186,
+   "history_days": 2296,
+   "not_eligible_why": null,
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 0.11237817637595549,
+    "float_share": 0.5248243511392904,
+    "dilution": "bad",
+    "holders_share": null,
+    "accrual": null,
+    "pass": false,
+    "parts_scored": 1
+   }
+  },
+  {
+   "id": "pudgy-penguins",
+   "symbol": "PENGU",
+   "name": "Pudgy Penguins",
+   "rank": 130,
+   "sector": "Meme",
+   "meme": true,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 273804269,
+   "price": 0.00445639171325939,
+   "price_date": "2026-11-27",
+   "change_7d": 3.7643,
+   "pct_since_signal": -26.8,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-11-13",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -31.7,
+     "average_change_pct": -12.9,
+     "momentum": -1.68
+    }
+   },
+   "vs_btc": {
+    "state": "Strong Bear",
+    "since": "2026-11-18",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -14.2,
+     "average_change_pct": -7.8,
+     "momentum": -0.77
+    }
+   },
+   "days_since": 10,
+   "dual_bull": false,
+   "eligible": true,
+   "avg_volume_30d": 72031764.0882493,
+   "history_days": 673,
+   "not_eligible_why": null,
+   "quality": {
+    "revenue_kind": null,
+    "revenue_90d": null,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 4.65492302814674e-06,
+    "float_share": 0.7071794560195718,
+    "dilution": "good",
+    "holders_share": null,
+    "accrual": null,
+    "pass": true,
+    "parts_scored": 1
+   }
+  },
+  {
    "id": "unibase",
    "symbol": "UB",
    "name": "Unibase",
@@ -6310,10 +6310,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 270927788,
+   "market_cap": 265699171,
    "price": 0.107593740865206,
    "price_date": "2026-11-27",
-   "change_7d": 12.1596,
+   "change_7d": 11.0444,
    "pct_since_signal": -2.2,
    "own": {
     "state": "Bear",
@@ -6377,10 +6377,10 @@
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 265580132,
+   "market_cap": 262001013,
    "price": 0.369272431913231,
    "price_date": "2026-11-27",
-   "change_7d": 0.7931,
+   "change_7d": -0.1684,
    "pct_since_signal": -2.5,
    "own": {
     "state": "Strong Bear",
@@ -6436,152 +6436,18 @@
    }
   },
   {
-   "id": "safo",
-   "symbol": "SAFO",
-   "name": "Spiko Amundi Overnight Swap Fund",
-   "rank": 135,
-   "sector": "DeFi",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 260435727,
-   "price": 1.029817,
-   "price_date": "2026-11-27",
-   "change_7d": 0.0827,
-   "pct_since_signal": 1.6,
-   "own": {
-    "state": "Neutral",
-    "since": "2026-07-13",
-    "why": null,
-    "tests": {
-     "position": 0,
-     "direction": 0,
-     "momentum": 1
-    },
-    "detail": {
-     "vs_average_pct": 0.3,
-     "average_change_pct": 0.1,
-     "momentum": 4.68
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bull",
-    "since": "2026-11-15",
-    "why": null,
-    "tests": {
-     "position": 1,
-     "direction": 1,
-     "momentum": 1
-    },
-    "detail": {
-     "vs_average_pct": 22.8,
-     "average_change_pct": 7.4,
-     "momentum": 2.55
-    }
-   },
-   "days_since": 13,
-   "dual_bull": false,
-   "eligible": false,
-   "avg_volume_30d": 0.0,
-   "history_days": 228,
-   "not_eligible_why": "too thin: $0.0M a day on average over 30 days (needs $20M)",
-   "quality": {
-    "revenue_kind": null,
-    "revenue_90d": null,
-    "revenue_growth": null,
-    "revenue_fixed": null,
-    "revenue_rank": null,
-    "revenue_of": 24,
-    "revenue_relative": null,
-    "supply_growth": null,
-    "float_share": 1.0,
-    "dilution": "neutral",
-    "holders_share": null,
-    "accrual": null,
-    "pass": true,
-    "parts_scored": 1
-   }
-  },
-  {
-   "id": "monad",
-   "symbol": "MON",
-   "name": "Monad",
-   "rank": 134,
-   "sector": "L1",
-   "meme": false,
-   "exchange": false,
-   "owner": false,
-   "market_cap": 260343169,
-   "price": 0.010172177501063546,
-   "price_date": "2026-11-27",
-   "change_7d": -21.8534,
-   "pct_since_signal": -53.9,
-   "own": {
-    "state": "Strong Bear",
-    "since": "2026-10-21",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -44.4,
-     "average_change_pct": -16.6,
-     "momentum": -1.87
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bear",
-    "since": "2026-11-27",
-    "why": null,
-    "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -30.1,
-     "average_change_pct": -11.6,
-     "momentum": -1.12
-    }
-   },
-   "days_since": 1,
-   "dual_bull": false,
-   "eligible": true,
-   "avg_volume_30d": 20811484.087082908,
-   "history_days": 366,
-   "not_eligible_why": null,
-   "quality": {
-    "revenue_kind": "revenue",
-    "revenue_90d": 955559.0,
-    "revenue_growth": 0.745845764826897,
-    "revenue_fixed": "good",
-    "revenue_rank": 8,
-    "revenue_of": 24,
-    "revenue_relative": "good",
-    "supply_growth": 1.380467048157481,
-    "float_share": 0.25345755530894637,
-    "dilution": "bad",
-    "holders_share": 1.0,
-    "accrual": "good",
-    "pass": false,
-    "parts_scored": 3
-   }
-  },
-  {
    "id": "sei-network",
    "symbol": "SEI",
    "name": "Sei",
-   "rank": 136,
+   "rank": 135,
    "sector": "L1",
    "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 257811790,
+   "market_cap": 258818574,
    "price": 0.038439227737420055,
    "price_date": "2026-11-27",
-   "change_7d": 9.3797,
+   "change_7d": 13.6394,
    "pct_since_signal": -3.2,
    "own": {
     "state": "Strong Bear",
@@ -6637,55 +6503,55 @@
    }
   },
   {
-   "id": "official-trump",
-   "symbol": "TRUMP",
-   "name": "Official Trump",
-   "rank": 137,
-   "sector": "Meme",
-   "meme": true,
+   "id": "terra-luna",
+   "symbol": "LUNC",
+   "name": "Terra Luna Classic",
+   "rank": 136,
+   "sector": "L1",
+   "meme": false,
    "exchange": false,
    "owner": false,
-   "market_cap": 256683853,
-   "price": 0.8768228200659269,
+   "market_cap": 253910064,
+   "price": 4.4802494596142676e-05,
    "price_date": "2026-11-27",
-   "change_7d": 3.0012,
-   "pct_since_signal": -22.6,
+   "change_7d": 13.503,
+   "pct_since_signal": -4.5,
    "own": {
     "state": "Strong Bear",
-    "since": "2026-11-08",
+    "since": "2026-10-20",
     "why": null,
     "tests": {
-     "position": -1,
-     "direction": -1,
-     "momentum": -1
-    },
-    "detail": {
-     "vs_average_pct": -37.1,
-     "average_change_pct": -13.9,
-     "momentum": -1.37
-    }
-   },
-   "vs_btc": {
-    "state": "Strong Bear",
-    "since": "2026-11-08",
-    "why": null,
-    "tests": {
-     "position": -1,
+     "position": 1,
      "direction": -1,
      "momentum": 0
     },
     "detail": {
-     "vs_average_pct": -20.4,
-     "average_change_pct": -9.1,
-     "momentum": -0.35
+     "vs_average_pct": 3.1,
+     "average_change_pct": -4.0,
+     "momentum": 0.69
     }
    },
-   "days_since": 20,
+   "vs_btc": {
+    "state": "Neutral",
+    "since": "2026-11-20",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": 1,
+     "momentum": 1
+    },
+    "detail": {
+     "vs_average_pct": 26.9,
+     "average_change_pct": 3.3,
+     "momentum": 2.42
+    }
+   },
+   "days_since": 8,
    "dual_bull": false,
-   "eligible": true,
-   "avg_volume_30d": 114336342.58789404,
-   "history_days": 680,
-   "not_eligible_why": null,
+   "eligible": false,
+   "avg_volume_30d": 10848126.57672801,
+   "history_days": 365,
+   "not_eligible_why": "too thin: $10.8M a day on average over 30 days (needs $20M)",
    "quality": {
     "revenue_kind": null,
     "revenue_90d": null,
@@ -6694,28 +6560,162 @@
     "revenue_rank": null,
     "revenue_of": 24,
     "revenue_relative": null,
-    "supply_growth": 0.4696521496535062,
-    "float_share": 0.293868035671502,
-    "dilution": "bad",
+    "supply_growth": 0.005235115728352113,
+    "float_share": 0.8560578734579215,
+    "dilution": "good",
     "holders_share": null,
     "accrual": null,
-    "pass": false,
+    "pass": true,
     "parts_scored": 1
+   }
+  },
+  {
+   "id": "monad",
+   "symbol": "MON",
+   "name": "Monad",
+   "rank": 138,
+   "sector": "L1",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 252032642,
+   "price": 0.010172177501063546,
+   "price_date": "2026-11-27",
+   "change_7d": -23.426,
+   "pct_since_signal": -53.9,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-10-21",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -44.4,
+     "average_change_pct": -16.6,
+     "momentum": -1.87
+    }
+   },
+   "vs_btc": {
+    "state": "Strong Bear",
+    "since": "2026-11-27",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": -1
+    },
+    "detail": {
+     "vs_average_pct": -30.1,
+     "average_change_pct": -11.6,
+     "momentum": -1.12
+    }
+   },
+   "days_since": 1,
+   "dual_bull": false,
+   "eligible": true,
+   "avg_volume_30d": 20811484.087082908,
+   "history_days": 366,
+   "not_eligible_why": null,
+   "quality": {
+    "revenue_kind": "revenue",
+    "revenue_90d": 955559.0,
+    "revenue_growth": 0.745845764826897,
+    "revenue_fixed": "good",
+    "revenue_rank": 8,
+    "revenue_of": 24,
+    "revenue_relative": "good",
+    "supply_growth": 1.380467048157481,
+    "float_share": 0.2534459368050306,
+    "dilution": "bad",
+    "holders_share": 1.0,
+    "accrual": "good",
+    "pass": false,
+    "parts_scored": 3
+   }
+  },
+  {
+   "id": "tezos",
+   "symbol": "XTZ",
+   "name": "Tezos",
+   "rank": 139,
+   "sector": "L1",
+   "meme": false,
+   "exchange": false,
+   "owner": false,
+   "market_cap": 250865200,
+   "price": 0.2273528230688828,
+   "price_date": "2026-11-27",
+   "change_7d": 15.4323,
+   "pct_since_signal": -5.1,
+   "own": {
+    "state": "Strong Bear",
+    "since": "2026-11-12",
+    "why": null,
+    "tests": {
+     "position": -1,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": -12.7,
+     "average_change_pct": -7.7,
+     "momentum": -0.64
+    }
+   },
+   "vs_btc": {
+    "state": "Neutral",
+    "since": "2026-11-26",
+    "why": null,
+    "tests": {
+     "position": 1,
+     "direction": -1,
+     "momentum": 0
+    },
+    "detail": {
+     "vs_average_pct": 8.7,
+     "average_change_pct": -1.8,
+     "momentum": 0.57
+    }
+   },
+   "days_since": 2,
+   "dual_bull": false,
+   "eligible": false,
+   "avg_volume_30d": 6569558.583188605,
+   "history_days": 3073,
+   "not_eligible_why": "too thin: $6.6M a day on average over 30 days (needs $20M)",
+   "quality": {
+    "revenue_kind": "revenue",
+    "revenue_90d": 8278.0,
+    "revenue_growth": null,
+    "revenue_fixed": null,
+    "revenue_rank": null,
+    "revenue_of": 24,
+    "revenue_relative": null,
+    "supply_growth": 0.033470180714762376,
+    "float_share": 0.9822368093803223,
+    "dilution": "neutral",
+    "holders_share": 1.0,
+    "accrual": "good",
+    "pass": true,
+    "parts_scored": 2
    }
   },
   {
    "id": "walrus-2",
    "symbol": "WAL",
    "name": "Walrus",
-   "rank": 343,
+   "rank": 344,
    "sector": "Infrastructure",
    "meme": false,
    "exchange": false,
    "owner": true,
-   "market_cap": 61672635,
+   "market_cap": 60285943,
    "price": 0.023234750077895,
    "price_date": "2026-11-27",
-   "change_7d": 4.7056,
+   "change_7d": 5.3606,
    "pct_since_signal": -5.4,
    "own": {
     "state": "Strong Bear",
@@ -6774,15 +6774,15 @@
    "id": "deep",
    "symbol": "DEEP",
    "name": "DeepBook",
-   "rank": 565,
+   "rank": 571,
    "sector": "Infrastructure",
    "meme": false,
    "exchange": false,
    "owner": true,
-   "market_cap": 30028432,
+   "market_cap": 29030477,
    "price": 0.0119252171760148,
    "price_date": "2026-11-27",
-   "change_7d": 3.0388,
+   "change_7d": 4.1872,
    "pct_since_signal": -3.5,
    "own": {
     "state": "Strong Bear",
@@ -6996,6 +6996,15 @@
    "owner": false
   },
   {
+   "id": "terra-luna",
+   "symbol": "LUNC",
+   "vs_btc_since_off_pct": 32.3,
+   "vs_btc_state": "Neutral",
+   "meme": false,
+   "exchange": false,
+   "owner": false
+  },
+  {
    "id": "ape-and-pepe",
    "symbol": "APEPE",
    "vs_btc_since_off_pct": 27.8,
@@ -7018,6 +7027,15 @@
    "symbol": "PEARL",
    "vs_btc_since_off_pct": 14.9,
    "vs_btc_state": "Strong Bull",
+   "meme": false,
+   "exchange": false,
+   "owner": false
+  },
+  {
+   "id": "tezos",
+   "symbol": "XTZ",
+   "vs_btc_since_off_pct": 14.9,
+   "vs_btc_state": "Neutral",
    "meme": false,
    "exchange": false,
    "owner": false
@@ -7063,15 +7081,6 @@
    "symbol": "KAS",
    "vs_btc_since_off_pct": 8.6,
    "vs_btc_state": "Neutral",
-   "meme": false,
-   "exchange": false,
-   "owner": false
-  },
-  {
-   "id": "safo",
-   "symbol": "SAFO",
-   "vs_btc_since_off_pct": 8.6,
-   "vs_btc_state": "Strong Bull",
    "meme": false,
    "exchange": false,
    "owner": false
@@ -7169,7 +7178,7 @@
    "id": "tether-gold",
    "symbol": "XAUT",
    "name": "Tether Gold",
-   "rank": 27,
+   "rank": 26,
    "reasons": [
     "category: tokenized-gold",
     "category: tokenized-commodities"
@@ -7209,7 +7218,7 @@
    "id": "ondo-us-dollar-yield",
    "symbol": "USDY",
    "name": "Ondo US Dollar Yield",
-   "rank": 35,
+   "rank": 34,
    "reasons": [
     "category: yield-bearing-stablecoins"
    ]
@@ -7228,7 +7237,7 @@
    "id": "hashnote-usyc",
    "symbol": "USYC",
    "name": "Circle USYC",
-   "rank": 39,
+   "rank": 38,
    "reasons": [
     "price hardly moves (average daily move 0.01%): pegged"
    ]
@@ -7237,7 +7246,7 @@
    "id": "spiko-amundi-overnight-swap-fund-eur",
    "symbol": "EURSAFO",
    "name": "Spiko Amundi Overnight Swap Fund (EUR)",
-   "rank": 41,
+   "rank": 40,
    "reasons": [
     "price hardly moves (average daily move 0.23%): pegged"
    ]
@@ -7256,7 +7265,7 @@
    "id": "pax-gold",
    "symbol": "PAXG",
    "name": "PAX Gold",
-   "rank": 48,
+   "rank": 47,
    "reasons": [
     "category: tokenized-gold",
     "category: tokenized-commodities"
@@ -7285,7 +7294,7 @@
    "id": "usdd",
    "symbol": "USDD",
    "name": "USDD",
-   "rank": 52,
+   "rank": 51,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7305,7 +7314,7 @@
    "id": "open-usd",
    "symbol": "OUSD",
    "name": "Open USD",
-   "rank": 69,
+   "rank": 67,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7315,7 +7324,7 @@
    "id": "usdgo",
    "symbol": "USDGO",
    "name": "USDGO",
-   "rank": 72,
+   "rank": 69,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7325,7 +7334,7 @@
    "id": "gho",
    "symbol": "GHO",
    "name": "GHO",
-   "rank": 83,
+   "rank": 82,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7335,7 +7344,7 @@
    "id": "superstate-short-duration-us-government-securities-fund-ustb",
    "symbol": "USTB",
    "name": "Invesco Short Duration US Government Securities Fund",
-   "rank": 86,
+   "rank": 84,
    "reasons": [
     "tokenized fund or security"
    ]
@@ -7363,7 +7372,7 @@
    "id": "euro-coin",
    "symbol": "EURC",
    "name": "EURC",
-   "rank": 96,
+   "rank": 95,
    "reasons": [
     "category: stablecoins"
    ]
@@ -7372,7 +7381,7 @@
    "id": "true-usd",
    "symbol": "TUSD",
    "name": "TrueUSD",
-   "rank": 98,
+   "rank": 97,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7382,7 +7391,7 @@
    "id": "eutbl",
    "symbol": "EUTBL",
    "name": "Spiko EU T-Bills Money Market Fund",
-   "rank": 99,
+   "rank": 98,
    "reasons": [
     "price hardly moves (average daily move 0.23%): pegged"
    ]
@@ -7391,7 +7400,7 @@
    "id": "a7a5",
    "symbol": "A7A5",
    "name": "A7A5",
-   "rank": 102,
+   "rank": 101,
    "reasons": [
     "category: stablecoins"
    ]
@@ -7400,7 +7409,7 @@
    "id": "sofiusd",
    "symbol": "SOFID",
    "name": "SoFiUSD",
-   "rank": 110,
+   "rank": 109,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7410,7 +7419,7 @@
    "id": "ylds",
    "symbol": "YLDS",
    "name": "YLDS",
-   "rank": 114,
+   "rank": 113,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7420,7 +7429,7 @@
    "id": "re-protocol-reusd",
    "symbol": "REUSD",
    "name": "Re Protocol reUSD",
-   "rank": 118,
+   "rank": 116,
    "reasons": [
     "category: stablecoins",
     "category: yield-bearing-stablecoins"
@@ -7449,7 +7458,7 @@
    "id": "first-digital-usd",
    "symbol": "FDUSD",
    "name": "First Digital USD",
-   "rank": 129,
+   "rank": 127,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7466,10 +7475,19 @@
    ]
   },
   {
+   "id": "safo",
+   "symbol": "SAFO",
+   "name": "Spiko Amundi Overnight Swap Fund",
+   "rank": 134,
+   "reasons": [
+    "price hardly moves (average daily move 0.01%): pegged"
+   ]
+  },
+  {
    "id": "spx6900",
    "symbol": "SPX",
    "name": "SPX6900",
-   "rank": 138,
+   "rank": 137,
    "reasons": [
     "category: bridged-tokens"
    ]
@@ -7488,7 +7506,7 @@
    "id": "pendle",
    "symbol": "PENDLE",
    "name": "Pendle",
-   "rank": 150,
+   "rank": 151,
    "reasons": [
     "category: liquid-staking"
    ]
@@ -7507,7 +7525,7 @@
    "id": "lido-dao",
    "symbol": "LDO",
    "name": "Lido DAO",
-   "rank": 154,
+   "rank": 153,
    "reasons": [
     "category: liquid-staking"
    ]
@@ -7516,7 +7534,7 @@
    "id": "usa",
    "symbol": "USAT",
    "name": "USAT",
-   "rank": 156,
+   "rank": 155,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7526,7 +7544,7 @@
    "id": "societe-generale-forge-eurcv",
    "symbol": "EURCV",
    "name": "EUR CoinVertible",
-   "rank": 161,
+   "rank": 159,
    "reasons": [
     "category: stablecoins"
    ]
@@ -7535,7 +7553,7 @@
    "id": "usdai",
    "symbol": "USDAI",
    "name": "USDai",
-   "rank": 174,
+   "rank": 173,
    "reasons": [
     "category: yield-bearing-stablecoins"
    ]
@@ -7553,7 +7571,7 @@
    "id": "agora-dollar",
    "symbol": "AUSD",
    "name": "AUSD",
-   "rank": 179,
+   "rank": 177,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7563,7 +7581,7 @@
    "id": "gusd",
    "symbol": "GUSD",
    "name": "GUSD",
-   "rank": 180,
+   "rank": 181,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7573,7 +7591,7 @@
    "id": "crvusd",
    "symbol": "CRVUSD",
    "name": "crvUSD",
-   "rank": 191,
+   "rank": 190,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7583,7 +7601,7 @@
    "id": "cash-4",
    "symbol": "CASH",
    "name": "CASH",
-   "rank": 194,
+   "rank": 193,
    "reasons": [
     "category: stablecoins",
     "category: usd-stablecoin"
@@ -7599,21 +7617,21 @@
    ]
   },
   {
-   "id": "jito-governance-token",
-   "symbol": "JTO",
-   "name": "Jito",
-   "rank": 198,
-   "reasons": [
-    "category: liquid-staking"
-   ]
-  },
-  {
    "id": "jpysc",
    "symbol": "JPYSC",
    "name": "JPYSC",
-   "rank": 202,
+   "rank": 200,
    "reasons": [
     "category: stablecoins"
+   ]
+  },
+  {
+   "id": "jito-governance-token",
+   "symbol": "JTO",
+   "name": "Jito",
+   "rank": 201,
+   "reasons": [
+    "category: liquid-staking"
    ]
   },
   {
@@ -7629,7 +7647,7 @@
    "id": "hastra-auto",
    "symbol": "AUTO",
    "name": "Hastra AUTO",
-   "rank": 215,
+   "rank": 214,
    "reasons": [
     "category: liquid-staking"
    ]
@@ -7638,21 +7656,20 @@
    "id": "unity-usd",
    "symbol": "UUSD",
    "name": "Unity USD",
-   "rank": 245,
+   "rank": 241,
    "reasons": [
     "category: stablecoins"
    ]
   }
  ],
  "calls": {
-  "coingecko": 28,
-  "coinmetrics": 4,
-  "defillama": 116
+  "coingecko": 4,
+  "coinmetrics": 2,
+  "defillama": 120
  },
  "log": [
-  "SAFO: history from CoinGecko's free year (228 days)",
-  "SEI: history from Coin Metrics since 2023-08-17",
-  "TRUMP: history from Coin Metrics since 2025-01-17"
+  "LUNC: history from CoinGecko's free year (365 days)",
+  "XTZ: history from Coin Metrics since 2018-06-30"
  ],
  "note": "Context only: never part of the buy / hold reading. Not advice."
 }
