@@ -37,7 +37,7 @@
  "dxycheck": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-27"
+  "last_ok": "2026-11-28"
  },
  "ecb": {
   "fails": 0,
@@ -62,6 +62,6 @@
  "treasury": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-27"
+  "last_ok": "2026-11-28"
  }
 }
