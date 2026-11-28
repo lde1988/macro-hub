@@ -22,7 +22,7 @@
  "coinmetrics": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-27"
+  "last_ok": "2026-11-28"
  },
  "defillama": {
   "fails": 0,
@@ -32,7 +32,7 @@
  "defillama_fees": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-27"
+  "last_ok": "2026-11-28"
  },
  "dxycheck": {
   "fails": 0,
