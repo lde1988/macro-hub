@@ -85,7 +85,7 @@
    "colour": "amber",
    "count": 0,
    "extra": {
-    "ratio_to_realised": 1.1272109874989815
+    "ratio_to_realised": 1.1418373681529321
    },
    "pending": null,
    "since": "2026-02-27 23:59:00"
@@ -340,8 +340,8 @@
   }
  },
  "down": [],
- "last_digest": "2026-11-27",
- "last_run": "2026-11-27T23:45:35Z",
+ "last_digest": "2026-11-28",
+ "last_run": "2026-11-28T00:00:52Z",
  "outbox": [],
  "since": {
   "reading": "2026-11-16",

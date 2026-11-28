@@ -2,17 +2,17 @@
  "bitview": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-27"
+  "last_ok": "2026-11-28"
  },
  "coinalyze": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-27"
+  "last_ok": "2026-11-28"
  },
  "coinbase": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-27"
+  "last_ok": "2026-11-28"
  },
  "coingecko": {
   "fails": 0,
@@ -27,7 +27,7 @@
  "defillama": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-27"
+  "last_ok": "2026-11-28"
  },
  "defillama_fees": {
   "fails": 0,
@@ -52,12 +52,12 @@
  "fred": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-27"
+  "last_ok": "2026-11-28"
  },
  "nasdaq": {
   "fails": 0,
   "last_error": "",
-  "last_ok": "2026-11-27"
+  "last_ok": "2026-11-28"
  },
  "treasury": {
   "fails": 0,
